@@ -1021,8 +1021,8 @@ module XmlSerializer =
     let createGraphModelElement (page: Page) =
         let graphModel = XElement(XName.Get("mxGraphModel"))
         
-        graphModel.SetAttributeValue(XName.Get("dx"), "0")
-        graphModel.SetAttributeValue(XName.Get("dy"), "0")
+        graphModel.SetAttributeValue(XName.Get("dx"), "800")
+        graphModel.SetAttributeValue(XName.Get("dy"), "600")
         graphModel.SetAttributeValue(XName.Get("grid"), "1")
         graphModel.SetAttributeValue(XName.Get("gridSize"), "10")
         graphModel.SetAttributeValue(XName.Get("guides"), "1")
@@ -1032,8 +1032,8 @@ module XmlSerializer =
         graphModel.SetAttributeValue(XName.Get("fold"), "1")
         graphModel.SetAttributeValue(XName.Get("page"), "1")
         graphModel.SetAttributeValue(XName.Get("pageScale"), "1")
-        graphModel.SetAttributeValue(XName.Get("pageWidth"), "800")
-        graphModel.SetAttributeValue(XName.Get("pageHeight"), "600")
+        graphModel.SetAttributeValue(XName.Get("pageWidth"), "850")
+        graphModel.SetAttributeValue(XName.Get("pageHeight"), "1100")
         graphModel.SetAttributeValue(XName.Get("math"), "0")
         graphModel.SetAttributeValue(XName.Get("shadow"), "0")
         

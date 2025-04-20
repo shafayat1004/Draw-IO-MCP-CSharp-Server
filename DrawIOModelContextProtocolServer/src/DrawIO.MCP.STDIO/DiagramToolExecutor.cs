@@ -821,22 +821,17 @@ namespace DrawIO.MCP.STDIO
                 bool drawIoAvailable = CheckDrawIoCliAvailable(logWriter, verbose);
                 if (!drawIoAvailable)
                 {
-                    LogMessage(logWriter, true, "draw.io CLI is not available. Returning diagram XML content instead.");
-                    
-                    // If draw.io is not available, return the diagram XML content instead
-                    string diagramXml = await File.ReadAllTextAsync(filePath);
-                    
                     return new
                     {
+                        isError = true,
                         content = new[]
                         {
                             new
                             {
                                 type = "text",
-                                text = $"Error: draw.io CLI not available. XML content: {diagramXml}"
+                                text = "Error: draw.io CLI is not available. Please install draw.io CLI to enable image export."
                             }
-                        },
-                        isError = true
+                        }
                     };
                 }
                 
@@ -861,7 +856,18 @@ namespace DrawIO.MCP.STDIO
                 using var process = System.Diagnostics.Process.Start(processStartInfo);
                 if (process == null)
                 {
-                    throw new Exception("Failed to start draw.io CLI process");
+                    return new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = "Error: Failed to start draw.io CLI process"
+                            }
+                        }
+                    };
                 }
                 
                 string stdout = await process.StandardOutput.ReadToEndAsync();
@@ -873,20 +879,17 @@ namespace DrawIO.MCP.STDIO
                     LogMessage(logWriter, true, $"draw.io CLI failed with exit code {process.ExitCode}");
                     LogMessage(logWriter, true, $"Stderr: {stderr}");
                     
-                    // Return the diagram XML content as a fallback
-                    string diagramXml = await File.ReadAllTextAsync(filePath);
-                    
                     return new
                     {
+                        isError = true,
                         content = new[]
                         {
                             new
                             {
                                 type = "text",
-                                text = $"Error: {stderr}. XML content: {diagramXml}"
+                                text = $"Error: draw.io CLI failed: {stderr}"
                             }
-                        },
-                        isError = true
+                        }
                     };
                 }
                 
@@ -895,20 +898,17 @@ namespace DrawIO.MCP.STDIO
                 {
                     LogMessage(logWriter, true, $"Output file not created: {outputImagePath}");
                     
-                    // Return the diagram XML content as a fallback
-                    string diagramXml = await File.ReadAllTextAsync(filePath);
-                    
                     return new
                     {
+                        isError = true,
                         content = new[]
                         {
                             new
                             {
                                 type = "text",
-                                text = $"Error: Image file not created. XML content: {diagramXml}"
+                                text = "Error: Image file was not created by draw.io CLI"
                             }
-                        },
-                        isError = true
+                        }
                     };
                 }
                 
@@ -943,20 +943,17 @@ namespace DrawIO.MCP.STDIO
             {
                 LogMessage(logWriter, true, $"Error generating diagram image: {ex.Message}");
                 
-                // Return the diagram XML content as a fallback
-                string diagramXml = await File.ReadAllTextAsync(filePath);
-                
                 return new
                 {
+                    isError = true,
                     content = new[]
                     {
                         new
                         {
                             type = "text",
-                            text = $"Error: {ex.Message}. XML content: {diagramXml}"
+                            text = $"Error: Failed to generate diagram image: {ex.Message}"
                         }
-                    },
-                    isError = true
+                    }
                 };
             }
         }
