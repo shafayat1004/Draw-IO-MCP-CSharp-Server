@@ -65,10 +65,11 @@ namespace DrawIO.MCP.STDIO
             {
                 LogMessage(logWriter, true, $"Error executing tool {toolName}: {ex.Message}");
                 // Return an error object
-                return new Dictionary<string, object>
+                return new 
                 {
-                    ["error"] = ex.Message,
-                    ["detail"] = ex.ToString()
+                    error = ex.Message,
+                    detail = ex.ToString(),
+                    content = new object[] { } // Add empty content array to satisfy MCP protocol
                 };
             }
         }
@@ -104,11 +105,12 @@ namespace DrawIO.MCP.STDIO
             // Create a new diagram using the Core library
             var diagram = CreateNewDiagram(filePath);
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new 
             {
-                ["Status"] = "success",
-                ["DiagramId"] = $"diagram://{name}",
-                ["FileName"] = name
+                Status = "success",
+                DiagramId = $"diagram://{name}",
+                FileName = name,
+                content = new object[] { } // Add empty content array to satisfy MCP protocol
             });
         }
 
