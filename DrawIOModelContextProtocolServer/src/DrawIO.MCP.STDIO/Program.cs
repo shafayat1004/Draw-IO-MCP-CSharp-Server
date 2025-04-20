@@ -24,6 +24,15 @@ namespace DrawIO.MCP.STDIO
         {
             try
             {
+                // Configure console streams for UTF-8 encoding and disable buffering
+                Console.InputEncoding = Encoding.UTF8;
+                Console.OutputEncoding = Encoding.UTF8;
+                
+                // Ensure stdout is not buffered
+                var stdout = Console.OpenStandardOutput();
+                var writer = new StreamWriter(stdout) { AutoFlush = true };
+                Console.SetOut(writer);
+
                 AppDomain.CurrentDomain.ProcessExit += (sender, e) => 
                 {
                     var writer = _logWriter ?? Console.Error;
@@ -353,7 +362,8 @@ namespace DrawIO.MCP.STDIO
                         try
                         {
                             using var doc = JsonDocument.Parse(line);
-                            LogMessage($"Read input line: line received");
+                            var method = doc.RootElement.GetProperty("method").GetString();
+                            LogMessage($"Read input line: {method} request received");
                         }
                         catch (JsonException)
                         {
@@ -371,13 +381,13 @@ namespace DrawIO.MCP.STDIO
                             var responseJson = JsonSerializer.Serialize(response, new JsonSerializerOptions
                             {
                                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                                WriteIndented = false // Ensure compact JSON
                             });
                             
                             try
                             {
-                                await Console.Out.WriteLineAsync(responseJson);
-                                await Console.Out.FlushAsync();
+                                await WriteResponseAsync(responseJson);
                                 LogMessage($"Response sent for request {response.Id}.");
                             }
                             catch (Exception ex)
@@ -434,6 +444,23 @@ namespace DrawIO.MCP.STDIO
                 LogMessage($"FATAL ERROR in STDIO server: {ex.Message}");
                 LogMessage($"FATAL ERROR: Stack trace: {ex.StackTrace}");
                 LogMessage($"FATAL ERROR: Inner exception: {ex.InnerException?.Message ?? "none"}");
+            }
+        }
+
+        private static async Task WriteResponseAsync(string responseJson)
+        {
+            try
+            {
+                // Write just the JSON response with a newline
+                await Console.Out.WriteLineAsync(responseJson);
+                await Console.Out.FlushAsync();
+                
+                LogMessage($"Response sent: {responseJson}");
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"ERROR writing response: {ex.Message}");
+                throw;
             }
         }
     }

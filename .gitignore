@@ -1507,3 +1507,9 @@ DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/D
 DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.Tests 2.pdb
 
 .fake
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.sourcelink.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.sourcelink.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.sourcelink.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.sourcelink.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.sourcelink.json
+mcp-debug.log

@@ -129,21 +129,22 @@ namespace DrawIO.MCP.STDIO
                 }
             }
 
-            return Task.FromResult<object>(new
+            // Return the exact format expected by VS Code
+            return Task.FromResult<object>(new Dictionary<string, object>
             {
-                protocolVersion = protocolVersion,
-                capabilities = new
+                ["protocolVersion"] = protocolVersion,
+                ["capabilities"] = new Dictionary<string, object>
                 {
-                    experimental = new { },
-                    tools = new
+                    ["experimental"] = new Dictionary<string, object>(),
+                    ["tools"] = new Dictionary<string, object>
                     {
-                        listChanged = true
+                        ["listChanged"] = true
                     }
                 },
-                serverInfo = new
+                ["serverInfo"] = new Dictionary<string, object>
                 {
-                    name = "DrawIO MCP Server",
-                    version = "1.0.0"
+                    ["name"] = "DrawIO MCP Server",
+                    ["version"] = "1.0.0"
                 }
             });
         }

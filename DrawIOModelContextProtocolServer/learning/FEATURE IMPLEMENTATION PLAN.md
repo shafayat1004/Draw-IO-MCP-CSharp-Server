@@ -205,6 +205,126 @@ The DrawIO MCP Server currently implements the following tools:
     - Complexity: Medium
     - Requires draw.io CLI capability tests
 
+### Tier 4: Network Diagram Specific Tools
+
+#### Canvas Management
+59. **Set Canvas Size** 🔴 - *New tool needed*
+    - Approach: Implement `set_canvas_size` to modify diagram dimensions
+    - Complexity: Low
+    - Essential for large network diagrams
+    
+60. **Set Canvas Background** 🔴 - *New tool needed*
+    - Approach: Implement `set_background` for zone coloring
+    - Complexity: Low
+    - Support for zone differentiation
+
+#### Network-Specific Shapes
+61. **Add Network Component** 🔴 - *New tool needed*
+    - Approach: Implement `add_network_component` with predefined network shapes
+    - Complexity: Medium
+    - Include server, firewall, switch, router icons
+    
+62. **Add Connection Line** 🔴 - *New tool needed*
+    - Approach: Implement `add_connection` with network-specific line styles
+    - Complexity: Medium
+    - Support for different connection types (VPN, HTTPS, etc.)
+
+#### Zone Management
+63. **Create Zone** 🔴 - *New tool needed*
+    - Approach: Implement `create_zone` for network segmentation
+    - Complexity: Medium
+    - Support for zone coloring and labeling
+    
+64. **Group Components in Zone** 🔴 - *New tool needed*
+    - Approach: Implement `group_in_zone` for logical grouping
+    - Complexity: Medium
+    - Maintain zone relationships
+
+#### Network-Specific Styling
+65. **Set Connection Type** 🔴 - *New tool needed*
+    - Approach: Implement `set_connection_type` for line patterns
+    - Complexity: Low
+    - Support for dotted, dashed, colored lines
+    
+66. **Add Network Icon** 🔴 - *New tool needed*
+    - Approach: Implement `add_network_icon` for standard network symbols
+    - Complexity: Medium
+    - Include common network icon library
+
+#### Layout Assistance
+67. **Auto-arrange Network Layout** 🔴 - *New tool needed*
+    - Approach: Enhance `arrange_diagram` with network-specific layouts
+    - Complexity: High
+    - Support for hierarchical network layouts
+    
+68. **Align to Network Grid** 🔴 - *New tool needed*
+    - Approach: Implement `align_to_grid` for clean positioning
+    - Complexity: Medium
+    - Maintain professional spacing
+
+#### Documentation
+69. **Add Network Legend** 🔴 - *New tool needed*
+    - Approach: Implement `add_legend` for connection types
+    - Complexity: Low
+    - Auto-generate based on used elements
+    
+70. **Add Zone Labels** 🔴 - *New tool needed*
+    - Approach: Implement `add_zone_label` for clear identification
+    - Complexity: Low
+    - Support for consistent zone naming
+
+#### Export and Rendering
+71. **CLI Integration** 🔴 - *New tool needed*
+    - Approach: Implement proper draw.io CLI integration
+    - Complexity: Medium
+    - Required for image export and rendering
+
+72. **Custom Shape Libraries** 🔴 - *New tool needed*
+    - Approach: Implement support for loading custom shape libraries
+    - Complexity: High
+    - Include network equipment shapes
+
+73. **Shape Styling Templates** 🔴 - *New tool needed*
+    - Approach: Implement predefined style templates
+    - Complexity: Medium
+    - Support for consistent styling across components
+
+74. **Multi-layer Text** 🔴 - *New tool needed*
+    - Approach: Implement support for title, subtitle, and description text
+    - Complexity: Low
+    - Better labeling for complex components
+
+75. **Container Hierarchy** 🔴 - *New tool needed*
+    - Approach: Implement proper parent-child relationships
+    - Complexity: High
+    - Better zone and component organization
+
+#### Server Stability
+76. **Connection Management** 🔴 - *New feature needed*
+    - Approach: Implement robust connection handling
+    - Complexity: High
+    - Handle disconnects and reconnects gracefully
+
+77. **Session Persistence** 🔴 - *New feature needed*
+    - Approach: Implement session state management
+    - Complexity: Medium
+    - Maintain diagram state across reconnections
+
+78. **Error Recovery** 🔴 - *New feature needed*
+    - Approach: Implement automatic error recovery
+    - Complexity: Medium
+    - Handle and recover from common error conditions
+
+79. **Command Queueing** 🔴 - *New feature needed*
+    - Approach: Implement command queue with retry logic
+    - Complexity: Medium
+    - Ensure commands are not lost during disconnects
+
+80. **Health Monitoring** 🔴 - *New feature needed*
+    - Approach: Implement server health checks
+    - Complexity: Low
+    - Monitor server status and performance
+
 ## Core Architecture Enhancements
 
 ### Undo/Redo System Implementation
@@ -300,6 +420,18 @@ We recommend implementing tools in this order:
 7. **Specialized Tools** (39-42, 45-51)
    - Complete advanced functionality
    - Implement based on actual usage patterns
+
+8. **Network Diagram Specific Tools** (59-70)
+   - Network-specific capabilities
+   - Essential for professional network diagrams
+
+9. **Rendering and Styling** (71-75)
+   - CLI integration, shape libraries, styling templates, text handling, container management
+   - Critical for professional network diagrams
+
+10. **Server Stability** (76-80)
+    - Robust connection handling, state persistence, error recovery, command reliability, health monitoring
+    - Essential for reliable server operation and diagram creation
 
 ## Technical Approach
 
