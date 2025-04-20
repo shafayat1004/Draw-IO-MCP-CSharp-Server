@@ -51,6 +51,10 @@ namespace DrawIO.MCP.STDIO
                     "update_diagram_page" => await UpdateDiagramPageAsync(arguments, diagramsDirectory),
                     "delete_diagram_page" => await DeleteDiagramPageAsync(arguments, diagramsDirectory),
                     "move_cell_between_pages" => await MoveCellBetweenPagesAsync(arguments, diagramsDirectory),
+                    "find_elements_by_text" => await FindElementsByTextAsync(arguments, diagramsDirectory),
+                    "get_element_info" => await GetElementInfoAsync(arguments, diagramsDirectory),
+                    "list_neighbors" => await ListNeighborsAsync(arguments, diagramsDirectory),
+                    "get_diagram_bounds" => await GetDiagramBoundsAsync(arguments, diagramsDirectory),
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
@@ -1017,6 +1021,183 @@ namespace DrawIO.MCP.STDIO
             {
                 ["success"] = true,
                 ["message"] = $"Style of shape {shape_id} updated"
+            });
+        }
+
+        // Query tool implementations
+        
+        private static Task<object> FindElementsByTextAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string searchText = GetParameterString(parameters, "search_text");
+            int pageIndex = GetParameterInt(parameters, "page_index", 0);
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram and find elements by text
+            var diagramObj = LoadDiagram(filePath);
+            var results = DrawIO.MCP.Core.DiagramManipulation.findElementsByText(diagramObj, pageIndex, searchText);
+            
+            // Convert to a list of dictionaries for JSON response
+            var elementList = results
+                .Select(pair => new Dictionary<string, string>
+                {
+                    ["id"] = pair.Item1,
+                    ["text"] = pair.Item2
+                })
+                .ToList();
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["elements"] = elementList,
+                ["count"] = elementList.Count
+            });
+        }
+        
+        private static Task<object> GetElementInfoAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string elementId = GetParameterString(parameters, "element_id");
+            int pageIndex = GetParameterInt(parameters, "page_index", 0);
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram and get element info
+            var diagramObj = LoadDiagram(filePath);
+            var elementInfo = DrawIO.MCP.Core.DiagramManipulation.getElementInfo(diagramObj, pageIndex, elementId);
+            
+            if (elementInfo.IsNone())
+            {
+                return Task.FromResult<object>(new Dictionary<string, object>
+                {
+                    ["error"] = $"Element with ID '{elementId}' not found"
+                });
+            }
+            
+            // Extract the element info from the F# option
+            var info = elementInfo.Value;
+            
+            // Build a structured response
+            var result = new Dictionary<string, object>
+            {
+                ["id"] = info.Id,
+                ["type"] = info.Type,
+                ["value"] = info.Value,
+                ["style"] = info.Style,
+                ["parent"] = info.Parent
+            };
+            
+            // Add position if available
+            if (info.Position.IsSome())
+            {
+                var pos = info.Position.Value;
+                result["position"] = new Dictionary<string, double>
+                {
+                    ["x"] = (float)pos.X,
+                    ["y"] = pos.Y
+                };
+            }
+            
+            // Add size if available
+            if (info.Size.IsSome())
+            {
+                var size = info.Size.Value;
+                result["size"] = new Dictionary<string, float>
+                {
+                    ["width"] = (float)size.Width,
+                    ["height"] = (float)size.Height
+                };
+            }
+            
+            // Add connections
+            var connections = info.Connections
+                .Select(conn => new Dictionary<string, string>
+                {
+                    ["edgeId"] = conn.Item1,
+                    ["connectedTo"] = conn.Item2
+                })
+                .ToList();
+            
+            result["connections"] = connections;
+            
+            return Task.FromResult<object>(result);
+        }
+        
+        private static Task<object> ListNeighborsAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string elementId = GetParameterString(parameters, "element_id");
+            int pageIndex = GetParameterInt(parameters, "page_index", 0);
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram and list neighbors
+            var diagramObj = LoadDiagram(filePath);
+            var neighbors = DrawIO.MCP.Core.DiagramManipulation.listNeighbors(diagramObj, pageIndex, elementId);
+            
+            // Convert to a list of dictionaries for JSON response
+            var neighborsList = neighbors
+                .Select(tuple => new Dictionary<string, string>
+                {
+                    ["id"] = tuple.Item1,
+                    ["label"] = tuple.Item2,
+                    ["direction"] = tuple.Item3
+                })
+                .ToList();
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["neighbors"] = neighborsList,
+                ["count"] = neighborsList.Count
+            });
+        }
+        
+        private static Task<object> GetDiagramBoundsAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            int pageIndex = GetParameterInt(parameters, "page_index", 0);
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram and get bounds
+            var diagramObj = LoadDiagram(filePath);
+            var bounds = DrawIO.MCP.Core.DiagramManipulation.getDiagramBounds(diagramObj, pageIndex);
+            
+            if (bounds.IsNone())
+            {
+                return Task.FromResult<object>(new Dictionary<string, object>
+                {
+                    ["error"] = "No elements with geometry found in the diagram"
+                });
+            }
+            
+            // Extract bounds from the F# option
+            var boundingBox = bounds.Value;
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["minX"] = boundingBox.MinX,
+                ["minY"] = boundingBox.MinY,
+                ["maxX"] = boundingBox.MaxX,
+                ["maxY"] = boundingBox.MaxY,
+                ["width"] = boundingBox.Width,
+                ["height"] = boundingBox.Height
             });
         }
     }
