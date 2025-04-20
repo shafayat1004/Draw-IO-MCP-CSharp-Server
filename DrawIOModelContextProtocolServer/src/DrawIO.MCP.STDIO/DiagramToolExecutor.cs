@@ -137,11 +137,19 @@ namespace DrawIO.MCP.STDIO
             var newId = result.Item2;
             SaveDiagram(updatedDiagram, filePath);
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new 
             {
-                ["Status"] = "success",
-                ["ElementId"] = newId,
-                ["DiagramId"] = $"diagram://{diagram}"
+                Status = "success",
+                ElementId = newId,
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Added shape '{value}' with ID {newId}" 
+                    } 
+                }
             });
         }
 
@@ -183,11 +191,19 @@ namespace DrawIO.MCP.STDIO
             var newId = result.Item2;
             SaveDiagram(updatedDiagram, filePath);
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new 
             {
-                ["Status"] = "success",
-                ["ElementId"] = newId,
-                ["DiagramId"] = $"diagram://{diagram}"
+                Status = "success",
+                ElementId = newId,
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Created connector with ID {newId} between shapes {sourceId} and {targetId}" 
+                    } 
+                }
             });
         }
 
@@ -238,7 +254,15 @@ namespace DrawIO.MCP.STDIO
             {
                 Status = "created",
                 DiagramId = $"diagram://{name}",
-                FileName = name
+                FileName = name,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Created VPC diagram '{name}' with VPC and IGW components" 
+                    } 
+                }
             });
         }
         
@@ -271,7 +295,15 @@ namespace DrawIO.MCP.STDIO
             return Task.FromResult<object>(new
             {
                 Status = "success",
-                DiagramId = $"diagram://{diagram}"
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Deleted shape with ID {shapeId}" 
+                    } 
+                }
             });
         }
 
@@ -334,10 +366,18 @@ namespace DrawIO.MCP.STDIO
             var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(diagramObj, 0, shapeId, value, x, y, width, height, style);
             SaveDiagram(updatedDiagram, filePath);
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new 
             {
-                ["Status"] = "success",
-                ["DiagramId"] = $"diagram://{diagram}"
+                Status = "success",
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Updated shape with ID {shapeId}" 
+                    } 
+                }
             });
         }
 
@@ -408,11 +448,19 @@ namespace DrawIO.MCP.STDIO
             var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(diagramObj, 0, shapeId, null, null, null, null, null, styleString);
             SaveDiagram(updatedDiagram, filePath);
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new 
             {
-                ["Status"] = "success",
-                ["DiagramId"] = $"diagram://{diagram}",
-                ["Style"] = styleString
+                Status = "success",
+                DiagramId = $"diagram://{diagram}",
+                Style = styleString,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Applied style {styleString} to shape {shapeId}" 
+                    } 
+                }
             });
         }
 
@@ -448,10 +496,18 @@ namespace DrawIO.MCP.STDIO
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new
             {
-                ["success"] = true,
-                ["message"] = $"Diagram arranged using layout: {layout}"
+                success = true,
+                message = $"Diagram arranged using layout: {layout}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Diagram arranged using layout: {layout}" 
+                    } 
+                }
             });
         }
 
@@ -477,10 +533,18 @@ namespace DrawIO.MCP.STDIO
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new 
             {
-                ["success"] = true,
-                ["message"] = $"Shape {shape_id} moved to position ({x}, {y})"
+                success = true,
+                message = $"Shape {shape_id} moved to position ({x}, {y})",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Shape {shape_id} moved to position ({x}, {y})" 
+                    } 
+                }
             });
         }
         
@@ -511,7 +575,15 @@ namespace DrawIO.MCP.STDIO
             {
                 success = true,
                 page_id = pageId,
-                message = $"Created new page '{name}' with ID {pageId}"
+                message = $"Created new page '{name}' with ID {pageId}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Created new page '{name}' with ID {pageId}" 
+                    } 
+                }
             });
         }
         
@@ -592,6 +664,14 @@ namespace DrawIO.MCP.STDIO
                     id = page.Id,
                     name = page.Name,
                     cells = cells
+                },
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Page '{page.Name}' with ID {page.Id} has {cells.Count} cells" 
+                    } 
                 }
             });
         }
@@ -627,7 +707,15 @@ namespace DrawIO.MCP.STDIO
             return Task.FromResult<object>(new
             {
                 success = true,
-                message = $"Page {pageId} updated"
+                message = $"Page {pageId} updated",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Page {pageId} updated" + (name != null ? $" with new name '{name}'" : "") 
+                    } 
+                }
             });
         }
         
@@ -657,10 +745,20 @@ namespace DrawIO.MCP.STDIO
                 SaveDiagram(updatedDiagram, filePath);
             }
             
+            string message = deleted ? $"Page {pageId} deleted" : "Page could not be deleted (may be the only page)";
+            
             return Task.FromResult<object>(new
             {
                 success = deleted,
-                message = deleted ? $"Page {pageId} deleted" : "Page could not be deleted (may be the only page)"
+                message = message,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = message
+                    } 
+                }
             });
         }
         
@@ -686,10 +784,20 @@ namespace DrawIO.MCP.STDIO
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
             
+            string message = $"Cell {cellId} moved from page {sourcePageId} to page {targetPageId}";
+            
             return Task.FromResult<object>(new
             {
                 success = true,
-                message = $"Cell {cellId} moved from page {sourcePageId} to page {targetPageId}"
+                message = message,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = message
+                    } 
+                }
             });
         }
 
@@ -1019,10 +1127,19 @@ namespace DrawIO.MCP.STDIO
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new
             {
-                ["success"] = true,
-                ["message"] = $"Style of shape {shape_id} updated"
+                success = true,
+                message = $"Style of shape {shape_id} updated",
+                styleProperties = styleProperties,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Updated style of shape {shape_id} with properties: {styleString}" 
+                    } 
+                }
             });
         }
 
@@ -1053,10 +1170,18 @@ namespace DrawIO.MCP.STDIO
                 })
                 .ToList();
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new
             {
-                ["elements"] = elementList,
-                ["count"] = elementList.Count
+                elements = elementList,
+                count = elementList.Count,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Found {elementList.Count} elements containing '{searchText}'" 
+                    } 
+                }
             });
         }
         
@@ -1078,9 +1203,18 @@ namespace DrawIO.MCP.STDIO
             
             if (elementInfo.IsNone())
             {
-                return Task.FromResult<object>(new Dictionary<string, object>
+                return Task.FromResult<object>(new
                 {
-                    ["error"] = $"Element with ID '{elementId}' not found"
+                    error = $"Element with ID '{elementId}' not found",
+                    isError = true,
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Element with ID '{elementId}' not found" 
+                        } 
+                    }
                 });
             }
             
@@ -1130,7 +1264,25 @@ namespace DrawIO.MCP.STDIO
             
             result["connections"] = connections;
             
-            return Task.FromResult<object>(result);
+            return Task.FromResult<object>(new
+            {
+                id = info.Id,
+                type = info.Type,
+                value = info.Value,
+                style = info.Style,
+                parent = info.Parent,
+                position = info.Position.IsSome() ? new { x = info.Position.Value.X, y = info.Position.Value.Y } : null,
+                size = info.Size.IsSome() ? new { width = info.Size.Value.Width, height = info.Size.Value.Height } : null,
+                connections = connections,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Element info for '{info.Id}': {info.Type} with value '{info.Value}'" 
+                    } 
+                }
+            });
         }
         
         private static Task<object> ListNeighborsAsync(JsonElement parameters, string diagramsDirectory)
@@ -1159,10 +1311,18 @@ namespace DrawIO.MCP.STDIO
                 })
                 .ToList();
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new
             {
-                ["neighbors"] = neighborsList,
-                ["count"] = neighborsList.Count
+                neighbors = neighborsList,
+                count = neighborsList.Count,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Found {neighborsList.Count} neighbors for element {elementId}" 
+                    } 
+                }
             });
         }
         
@@ -1183,23 +1343,40 @@ namespace DrawIO.MCP.STDIO
             
             if (bounds.IsNone())
             {
-                return Task.FromResult<object>(new Dictionary<string, object>
+                return Task.FromResult<object>(new
                 {
-                    ["error"] = "No elements with geometry found in the diagram"
+                    error = "No elements with geometry found in the diagram",
+                    isError = true,
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = "No elements with geometry found in the diagram" 
+                        } 
+                    }
                 });
             }
             
             // Extract bounds from the F# option
             var boundingBox = bounds.Value;
             
-            return Task.FromResult<object>(new Dictionary<string, object>
+            return Task.FromResult<object>(new
             {
-                ["minX"] = boundingBox.MinX,
-                ["minY"] = boundingBox.MinY,
-                ["maxX"] = boundingBox.MaxX,
-                ["maxY"] = boundingBox.MaxY,
-                ["width"] = boundingBox.Width,
-                ["height"] = boundingBox.Height
+                minX = boundingBox.MinX,
+                minY = boundingBox.MinY,
+                maxX = boundingBox.MaxX,
+                maxY = boundingBox.MaxY,
+                width = boundingBox.Width,
+                height = boundingBox.Height,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Diagram bounds: ({boundingBox.MinX},{boundingBox.MinY}) to ({boundingBox.MaxX},{boundingBox.MaxY}), size: {boundingBox.Width}x{boundingBox.Height}" 
+                    } 
+                }
             });
         }
     }
