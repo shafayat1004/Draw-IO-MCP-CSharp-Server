@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Linq;
 
 namespace DrawIO.MCP.STDIO
 {
@@ -114,7 +115,16 @@ namespace DrawIO.MCP.STDIO
         [JsonPropertyName("description")]
         public string Description { get; set; }
         
-        [JsonPropertyName("schema_inputs")]
+        [JsonPropertyName("inputSchema")]
+        public object InputSchema => new
+        {
+            type = "object",
+            properties = SchemaInputs,
+            required = SchemaInputs.Where(p => p.Value.Required).Select(p => p.Key).ToArray()
+        };
+        
+        // Not directly serialized, used to build InputSchema
+        [JsonIgnore]
         public Dictionary<string, McpParameterDefinition> SchemaInputs { get; set; }
     }
 
@@ -127,7 +137,7 @@ namespace DrawIO.MCP.STDIO
         [JsonPropertyName("description")]
         public string Description { get; set; }
         
-        [JsonPropertyName("required")]
+        [JsonIgnore] // We handle required at the parent level in the InputSchema property
         public bool Required { get; set; }
     }
     
