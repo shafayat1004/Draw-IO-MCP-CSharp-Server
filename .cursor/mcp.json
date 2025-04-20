@@ -1,0 +1,18 @@
+{
+    "mcpServers": {
+        "drawio-mcp-server": {
+            "command": "/Volumes/HomeX/shafayat/.dotnet/dotnet",
+            "args": [
+                "run",
+                "--project",
+                "/Volumes/HomeX/shafayat/Documents/Draw-IO-MCP-CSharp-Server/DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/DrawIO.MCP.STDIO.csproj",
+                "--",
+                "--diagrams-dir",
+                "/Volumes/HomeX/shafayat/Documents/Draw-IO-MCP-CSharp-Server/diagrams",
+                "--verbose",
+                "--log-file",
+                "/Volumes/HomeX/shafayat/Documents/Draw-IO-MCP-CSharp-Server/mcp-debug.log"
+            ]
+        }
+    }
+}

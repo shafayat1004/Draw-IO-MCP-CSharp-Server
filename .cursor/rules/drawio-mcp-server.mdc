@@ -8,7 +8,7 @@ alwaysApply: true
 ## Testing
 - Always write a test if a functionality requires drawio manipulation (glueing connectors, changing colours, cells going to different pages, etc.).
 - After any slightly relevant change, run all tests.
-- Create and manage a central helper .sh tester for consistent test execution.
+- Use dotnet testing features
 - Test suites should be easy to run with one click:
   - One test suite should assert the core functionality and diagram manipulations
   - One should check the stdio server code
@@ -18,7 +18,7 @@ alwaysApply: true
 - Use pure functions and functional programming as much as possible.
 - DrawIO/XML manipulations should be done by pure functions.
 - Write reusable code whenever possible.
-- Modularize files so that each file does not exceed 800-1000 lines.
+- Modularize files so that each file does not exceed 800-900 lines.
 - Discourage creating too many files unless a specific file or logic needs to be separate.
 
 ## Documentation
@@ -28,14 +28,23 @@ alwaysApply: true
 - When needed, separate documentation into manageable components.
 
 ## Environment
-- Work in a containerized environment (conda for Python).
+- Work in a containerized environment.
 - Do not edit system files unless explicitly approved.
+- The SSE and STDIO project should start, restart, stop, live logs, and other relevant commands and hints.
+- I have `draw.io` as cli that you can use to check various things.
+
+## Project Structure
+- F# would be the primary language.
+- Solution will always have a core project. The core code would have the pure function XML manipulators.
+- The core should be robust and have detailed parameter descriptions and type safety.
+- The core should always give very detailed error messages and logs (if logs are set as verbose)
+- the SSE and STDIO projects will be separate.
+- Always maintain the swagger and the stdio apis.
 
 ## Reference Resources
 When lost, refer to these resources:
-- https://github.com/modelcontextprotocol/python-sdk
 - https://docs.cursor.com/context/model-context-protocol
-- https://github.com/modelcontextprotocol/python-sdk/pull/524
+- https://github.com/modelcontextprotocol/csharp-sdk
 - https://modelcontextprotocol.io/quickstart/server
 - https://www.drawio.com/doc/
 - https://github.com/jgraph/docker-drawio

@@ -1,0 +1,14 @@
+﻿{
+  "profiles": {
+    "DrawIO.MCP.SSE": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DIAGRAMS_DIR": "diagrams"
+      },
+      "applicationUrl": "http://localhost:5000"
+    }
+  }
+}

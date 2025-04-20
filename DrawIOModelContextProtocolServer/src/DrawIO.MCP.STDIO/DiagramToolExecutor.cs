@@ -1,0 +1,1028 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.FSharp.Core;
+using Microsoft.FSharp.Collections;
+using static DrawIO.MCP.STDIO.FileOperations;
+
+namespace DrawIO.MCP.STDIO
+{
+    /// <summary>
+    /// Handles execution of diagram manipulation tools
+    /// </summary>
+    public static class DiagramToolExecutor
+    {
+        /// <summary>
+        /// Execute a tool with the given name and arguments
+        /// </summary>
+        public static async Task<object> ExecuteToolAsync(string toolName, JsonElement arguments, string diagramsDirectory, TextWriter logWriter, bool verbose)
+        {
+            LogMessage(logWriter, verbose, $"Executing tool: {toolName}");
+            
+            try
+            {
+                // Execute the tool and get the result
+                object result = toolName switch
+                {
+                    "create_new_diagram" => await CreateNewDiagramAsync(arguments, diagramsDirectory),
+                    "add_shape" => await AddShapeAsync(arguments, diagramsDirectory),
+                    "connect_shapes" => await ConnectShapesAsync(arguments, diagramsDirectory),
+                    "generate_vpc" => await GenerateVpcDiagramAsync(arguments, diagramsDirectory),
+                    "get_diagram_image" => await GetDiagramImageAsync(arguments, diagramsDirectory, logWriter, verbose),
+                    "delete_shape" => await DeleteShapeAsync(arguments, diagramsDirectory),
+                    "update_shape" => await UpdateShapeAsync(arguments, diagramsDirectory),
+                    "style_shape" => await StyleShapeAsync(arguments, diagramsDirectory),
+                    "arrange_diagram" => await ArrangeDiagramAsync(arguments, diagramsDirectory),
+                    "move_shape" => await MoveShapeAsync(arguments, diagramsDirectory),
+                    "update_shape_style" => await UpdateShapeStyleAsync(arguments, diagramsDirectory),
+                    "create_diagram_page" => await CreateDiagramPageAsync(arguments, diagramsDirectory),
+                    "get_diagram_page" => await GetDiagramPageAsync(arguments, diagramsDirectory),
+                    "update_diagram_page" => await UpdateDiagramPageAsync(arguments, diagramsDirectory),
+                    "delete_diagram_page" => await DeleteDiagramPageAsync(arguments, diagramsDirectory),
+                    "move_cell_between_pages" => await MoveCellBetweenPagesAsync(arguments, diagramsDirectory),
+                    _ => throw new ArgumentException($"Unknown tool: {toolName}")
+                };
+
+                // Format the result according to MCP 2024-11-05 specification
+                // The result must be wrapped in a content array with proper type information
+                object contentItem;
+                
+                // For image results (from get_diagram_image)
+                if (result is Dictionary<string, object> dict && dict.ContainsKey("image") && dict.ContainsKey("format"))
+                {
+                    string base64Image = dict["image"].ToString();
+                    string format = dict["format"].ToString();
+                    
+                    contentItem = new 
+                    {
+                        type = "image",
+                        data = base64Image,
+                        mimeType = $"image/{format}"
+                    };
+                }
+                // For all other results, convert to text
+                else
+                {
+                    string resultJson = JsonSerializer.Serialize(result);
+                    contentItem = new
+                    {
+                        type = "text",
+                        text = resultJson
+                    };
+                }
+                
+                // Return properly formatted response with content array
+                return new
+                {
+                    content = new[] { contentItem }
+                };
+            }
+            catch (Exception ex)
+            {
+                LogMessage(logWriter, true, $"Error executing tool {toolName}: {ex.Message}");
+                
+                // Format error response according to MCP protocol
+                return new
+                {
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    },
+                    isError = true
+                };
+            }
+        }
+
+        private static void LogMessage(TextWriter logWriter, bool verbose, string message)
+        {
+            if (verbose)
+            {
+                var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                logWriter.WriteLine($"[{timestamp}] TOOL: {message}");
+            }
+        }
+
+        // Tool implementation methods
+
+        private static Task<object> CreateNewDiagramAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string name = GetParameterString(parameters, "name");
+            
+            if (string.IsNullOrEmpty(Path.GetExtension(name)))
+            {
+                name += ".drawio";
+            }
+            
+            string filePath = Path.Combine(diagramsDirectory, name);
+            
+            // Create the diagrams directory if it doesn't exist
+            if (!Directory.Exists(diagramsDirectory))
+            {
+                Directory.CreateDirectory(diagramsDirectory);
+            }
+            
+            // Create a new diagram using the Core library
+            var diagram = CreateNewDiagram(filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["Status"] = "success",
+                ["DiagramId"] = $"diagram://{name}",
+                ["FileName"] = name
+            });
+        }
+
+        private static Task<object> AddShapeAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string value = GetParameterString(parameters, "value");
+            float x = GetParameterFloat(parameters, "x");
+            float y = GetParameterFloat(parameters, "y");
+            float width = GetParameterFloat(parameters, "width");
+            float height = GetParameterFloat(parameters, "height");
+            string shape = GetParameterString(parameters, "shape", "rectangle");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram, add a shape, and save it
+            var diagramObj = LoadDiagram(filePath);
+            var (updatedDiagram, newId) = DiagramManipulation.AddShape(diagramObj, 0, value, x, y, width, height, shape);
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["Status"] = "success",
+                ["ElementId"] = newId,
+                ["DiagramId"] = $"diagram://{diagram}"
+            });
+        }
+
+        private static Task<object> ConnectShapesAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            
+            // Try both naming conventions for parameters
+            string sourceId;
+            if (parameters.TryGetProperty("sourceId", out var sourceIdElement))
+            {
+                sourceId = sourceIdElement.GetString();
+            }
+            else
+            {
+                sourceId = GetParameterString(parameters, "source_id");
+            }
+            
+            string targetId;
+            if (parameters.TryGetProperty("targetId", out var targetIdElement))
+            {
+                targetId = targetIdElement.GetString();
+            }
+            else
+            {
+                targetId = GetParameterString(parameters, "target_id");
+            }
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram, connect shapes, and save it
+            var diagramObj = LoadDiagram(filePath);
+            var (updatedDiagram, newId) = DiagramManipulation.ConnectShapes(diagramObj, 0, sourceId, targetId);
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["Status"] = "success",
+                ["ElementId"] = newId,
+                ["DiagramId"] = $"diagram://{diagram}"
+            });
+        }
+
+        private static Task<object> GenerateVpcDiagramAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string name = GetParameterString(parameters, "diagram_name", null);
+            
+            // If diagram_name is null, try the name parameter for backward compatibility
+            if (name == null)
+            {
+                name = GetParameterString(parameters, "name", "vpc.drawio");
+            }
+            
+            if (!name.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
+            {
+                name += ".drawio";
+            }
+            
+            string filePath = Path.Combine(diagramsDirectory, name);
+            
+            if (File.Exists(filePath))
+            {
+                throw new InvalidOperationException($"Diagram '{name}' already exists");
+            }
+            
+            // Create a new diagram
+            var diagram = CoreTypes.CreateEmptyDiagram();
+            
+            // Add VPC components
+            var (diagramWithVpc, vpcId) = DiagramManipulation.AddShape(diagram, 0, "VPC", 20, 20, 400, 300, "rectangle");
+            var (diagramWithPublicSubnet, publicSubnetId) = DiagramManipulation.AddShape(diagramWithVpc, 0, "Public Subnet", 40, 60, 150, 120, "rectangle");
+            var (diagramWithPrivateSubnet, privateSubnetId) = DiagramManipulation.AddShape(diagramWithPublicSubnet, 0, "Private Subnet", 240, 60, 150, 120, "rectangle");
+            var (diagramWithIgw, igwId) = DiagramManipulation.AddShape(diagramWithPrivateSubnet, 0, "Internet Gateway", 180, 0, 80, 40, "ellipse");
+            
+            // Connect components
+            var (diagramWithConnector1, _) = DiagramManipulation.ConnectShapes(diagramWithIgw, 0, igwId, vpcId);
+            var (diagramWithConnector2, _) = DiagramManipulation.ConnectShapes(diagramWithConnector1, 0, vpcId, publicSubnetId);
+            var (diagramWithConnector3, _) = DiagramManipulation.ConnectShapes(diagramWithConnector2, 0, vpcId, privateSubnetId);
+            
+            // Save the diagram
+            SaveDiagram(diagramWithConnector3, filePath);
+            
+            return Task.FromResult<object>(new
+            {
+                Status = "created",
+                DiagramId = $"diagram://{name}",
+                FileName = name
+            });
+        }
+        
+        private static Task<object> DeleteShapeAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            
+            // Try both naming conventions for parameters
+            string shapeId;
+            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+            {
+                shapeId = shapeIdElement.GetString();
+            }
+            else
+            {
+                shapeId = GetParameterString(parameters, "shape_id");
+            }
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram, delete the shape, and save it
+            var diagramObj = LoadDiagram(filePath);
+            var updatedDiagram = DiagramManipulation.DeleteShape(diagramObj, 0, shapeId);
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new
+            {
+                Status = "success",
+                DiagramId = $"diagram://{diagram}"
+            });
+        }
+
+        private static Task<object> UpdateShapeAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            
+            // Try both naming conventions for parameters
+            string shapeId;
+            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+            {
+                shapeId = shapeIdElement.GetString();
+            }
+            else
+            {
+                shapeId = GetParameterString(parameters, "shape_id");
+            }
+            
+            string value = GetParameterString(parameters, "value", null);
+            
+            float? x = null;
+            float? y = null;
+            float? width = null;
+            float? height = null;
+            
+            if (parameters.TryGetProperty("x", out var xElement))
+            {
+                x = xElement.GetSingle();
+            }
+            
+            if (parameters.TryGetProperty("y", out var yElement))
+            {
+                y = yElement.GetSingle();
+            }
+            
+            if (parameters.TryGetProperty("width", out var widthElement))
+            {
+                width = widthElement.GetSingle();
+            }
+            
+            if (parameters.TryGetProperty("height", out var heightElement))
+            {
+                height = heightElement.GetSingle();
+            }
+            
+            string style = null;
+            if (parameters.TryGetProperty("style", out var styleElement))
+            {
+                style = styleElement.GetString();
+            }
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram, update the shape, and save it
+            var diagramObj = LoadDiagram(filePath);
+            var updatedDiagram = DiagramManipulation.UpdateShape(diagramObj, 0, shapeId, value, x, y, width, height, style);
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["Status"] = "success",
+                ["DiagramId"] = $"diagram://{diagram}"
+            });
+        }
+
+        private static Task<object> StyleShapeAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            
+            // Try both naming conventions for parameters
+            string shapeId;
+            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+            {
+                shapeId = shapeIdElement.GetString();
+            }
+            else
+            {
+                shapeId = GetParameterString(parameters, "shape_id");
+            }
+            
+            string fillColor = null;
+            string strokeColor = null;
+            
+            if (parameters.TryGetProperty("fill_color", out var fillColorElement))
+            {
+                fillColor = fillColorElement.GetString();
+            }
+            else if (parameters.TryGetProperty("fillColor", out fillColorElement))
+            {
+                fillColor = fillColorElement.GetString();
+            }
+            
+            if (parameters.TryGetProperty("stroke_color", out var strokeColorElement))
+            {
+                strokeColor = strokeColorElement.GetString();
+            }
+            else if (parameters.TryGetProperty("strokeColor", out strokeColorElement))
+            {
+                strokeColor = strokeColorElement.GetString();
+            }
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Build style string
+            var styleBuilder = new System.Text.StringBuilder();
+            
+            if (!string.IsNullOrEmpty(fillColor))
+            {
+                styleBuilder.Append($"fillColor={fillColor};");
+            }
+            
+            if (!string.IsNullOrEmpty(strokeColor))
+            {
+                styleBuilder.Append($"strokeColor={strokeColor};");
+            }
+            
+            string styleString = styleBuilder.ToString();
+            
+            if (string.IsNullOrEmpty(styleString))
+            {
+                throw new ArgumentException("At least one style property (fill_color, stroke_color) must be provided");
+            }
+            
+            // Load the diagram, update style, and save it
+            var diagramObj = LoadDiagram(filePath);
+            var updatedDiagram = DiagramManipulation.UpdateShape(diagramObj, 0, shapeId, null, null, null, null, null, styleString);
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["Status"] = "success",
+                ["DiagramId"] = $"diagram://{diagram}",
+                ["Style"] = styleString
+            });
+        }
+
+        private static Task<object> ArrangeDiagramAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string layout = GetParameterString(parameters, "layout", "grid");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Get optional page_id parameter
+            string pageId = null;
+            if (parameters.TryGetProperty("page_id", out var pageIdElement))
+            {
+                pageId = pageIdElement.GetString();
+            }
+            
+            // Create the FSharpOption for page ID
+            var pageIdOption = string.IsNullOrEmpty(pageId) 
+                ? FSharpOption<string>.None 
+                : FSharpOption<string>.Some(pageId);
+            
+            // Arrange the diagram
+            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.ArrangeDiagram(loadedDiagram, pageIdOption);
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["success"] = true,
+                ["message"] = $"Diagram arranged using layout: {layout}"
+            });
+        }
+
+        private static Task<object> MoveShapeAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string shape_id = GetParameterString(parameters, "shape_id");
+            float x = GetParameterFloat(parameters, "x");
+            float y = GetParameterFloat(parameters, "y");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Move the shape
+            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.MoveShape(loadedDiagram, shape_id, x, y);
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["success"] = true,
+                ["message"] = $"Shape {shape_id} moved to position ({x}, {y})"
+            });
+        }
+        
+        private static Task<object> UpdateShapeStyleAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            
+            // Try both naming conventions for parameters
+            string shape_id;
+            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+            {
+                shape_id = shapeIdElement.GetString();
+            }
+            else
+            {
+                shape_id = GetParameterString(parameters, "shape_id");
+            }
+            
+            // Try both naming conventions for style properties
+            JsonElement stylePropertiesElement;
+            if (parameters.TryGetProperty("styleProperties", out var stylePropsElement))
+            {
+                stylePropertiesElement = stylePropsElement;
+            }
+            else
+            {
+                stylePropertiesElement = GetParameterObject(parameters, "style_properties");
+            }
+            
+            var styleProperties = stylePropertiesElement
+                .EnumerateObject()
+                .Select(p => new KeyValuePair<string, string>(p.Name, p.Value.GetString() ?? ""))
+                .ToDictionary(p => p.Key, p => p.Value);
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Update the shape style
+            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.UpdateShapeStyle(
+                loadedDiagram, 
+                shape_id,
+                FSharpWrappers.DictionaryToMap(styleProperties));
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["success"] = true,
+                ["message"] = $"Style of shape {shape_id} updated"
+            });
+        }
+        
+        private static Task<object> CreateDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string name = GetParameterString(parameters, "name");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Create a new page
+            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.CreateDiagramPage(loadedDiagram, name);
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            // Get the new page ID (last page in the list)
+            string pageId = updatedDiagram.Pages[updatedDiagram.Pages.Length - 1].Id;
+            
+            return Task.FromResult<object>(new
+            {
+                success = true,
+                page_id = pageId,
+                message = $"Created new page '{name}' with ID {pageId}"
+            });
+        }
+        
+        private static Task<object> GetDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            int page_index = GetParameterInt(parameters, "page_index");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Get the page
+            var page = DrawIO.MCP.STDIO.DiagramOperations.GetDiagramPage(loadedDiagram, page_index);
+            
+            if (page.IsNone())
+            {
+                throw new ArgumentException($"Page at index {page_index} not found");
+            }
+            
+            // Convert cells to a format suitable for JSON serialization
+            var cells = new List<Dictionary<string, object>>();
+            foreach (var cell in page.Value.Cells)
+            {
+                var cellObj = new Dictionary<string, object>
+                {
+                    { "id", cell.Id },
+                    { "value", cell.Value },
+                    { "style", cell.Style },
+                    { "isVertex", cell.IsVertex },
+                    { "isEdge", cell.IsEdge },
+                    { "parent", cell.Parent }
+                };
+                
+                if (cell.Source.IsSome())
+                {
+                    cellObj.Add("source", cell.Source.Value);
+                }
+                
+                if (cell.Target.IsSome())
+                {
+                    cellObj.Add("target", cell.Target.Value);
+                }
+                
+                if (cell.Geometry.IsSome())
+                {
+                    var geo = cell.Geometry.Value;
+                    cellObj.Add("geometry", new
+                    {
+                        x = geo.Position.X,
+                        y = geo.Position.Y,
+                        width = geo.Size.Width,
+                        height = geo.Size.Height,
+                        relative = geo.Relative
+                    });
+                }
+                
+                cells.Add(cellObj);
+            }
+            
+            return Task.FromResult<object>(new
+            {
+                success = true,
+                page = new
+                {
+                    id = page.Value.Id,
+                    name = page.Value.Name,
+                    cells = cells
+                }
+            });
+        }
+        
+        private static Task<object> UpdateDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string pageId = GetParameterString(parameters, "page_id");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Get the optional name parameter
+            string name = null;
+            if (parameters.TryGetProperty("name", out var nameElement))
+            {
+                name = nameElement.GetString();
+            }
+            
+            // Update the page
+            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.UpdateDiagramPage(loadedDiagram, pageId, 
+                string.IsNullOrEmpty(name) ? FSharpOption<string>.None : FSharpOption<string>.Some(name));
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new
+            {
+                success = true,
+                message = $"Page {pageId} updated"
+            });
+        }
+        
+        private static Task<object> DeleteDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string pageId = GetParameterString(parameters, "page_id");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Delete the page
+            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.DeleteDiagramPage(loadedDiagram, pageId);
+            
+            // Check if the diagram was modified (the page was deleted)
+            bool deleted = updatedDiagram.Pages.Length < loadedDiagram.Pages.Length;
+            
+            if (deleted)
+            {
+                // Save the updated diagram
+                SaveDiagram(updatedDiagram, filePath);
+            }
+            
+            return Task.FromResult<object>(new
+            {
+                success = deleted,
+                message = deleted ? $"Page {pageId} deleted" : "Page could not be deleted (may be the only page)"
+            });
+        }
+        
+        private static Task<object> MoveCellBetweenPagesAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string cellId = GetParameterString(parameters, "cell_id");
+            string sourcePageId = GetParameterString(parameters, "source_page_id");
+            string targetPageId = GetParameterString(parameters, "target_page_id");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Move the cell between pages
+            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.MoveCellBetweenPages(loadedDiagram, cellId, sourcePageId, targetPageId);
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new
+            {
+                success = true,
+                message = $"Cell {cellId} moved from page {sourcePageId} to page {targetPageId}"
+            });
+        }
+
+        private static async Task<object> GetDiagramImageAsync(JsonElement parameters, string diagramsDirectory, TextWriter logWriter, bool verbose)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            int page = parameters.TryGetProperty("page", out var pageElement) ? pageElement.GetInt32() : 0;
+            string format = parameters.TryGetProperty("format", out var formatElement) ? formatElement.GetString() : "png";
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            LogMessage(logWriter, verbose, $"Getting diagram image for {diagram}, page {page}, format {format}");
+            
+            try
+            {
+                // Check if draw.io CLI is available
+                bool drawIoAvailable = CheckDrawIoCliAvailable(logWriter, verbose);
+                if (!drawIoAvailable)
+                {
+                    LogMessage(logWriter, true, "draw.io CLI is not available. Returning diagram XML content instead.");
+                    
+                    // If draw.io is not available, return the diagram XML content instead
+                    string diagramXml = await File.ReadAllTextAsync(filePath);
+                    
+                    return new
+                    {
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Error: draw.io CLI not available. XML content: {diagramXml}"
+                            }
+                        },
+                        isError = true
+                    };
+                }
+                
+                // Create a temporary file to store the output image
+                string tempFileName = $"{Path.GetFileNameWithoutExtension(diagram)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
+                string outputImagePath = Path.Combine(diagramsDirectory, tempFileName);
+                
+                // Build the draw.io CLI command
+                var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "draw.io",
+                    Arguments = $"--export --format {format} --page-index {page} --output \"{outputImagePath}\" \"{filePath}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                LogMessage(logWriter, verbose, $"Executing command: {processStartInfo.FileName} {processStartInfo.Arguments}");
+                
+                // Execute the draw.io CLI command
+                using var process = System.Diagnostics.Process.Start(processStartInfo);
+                if (process == null)
+                {
+                    throw new Exception("Failed to start draw.io CLI process");
+                }
+                
+                string stdout = await process.StandardOutput.ReadToEndAsync();
+                string stderr = await process.StandardError.ReadToEndAsync();
+                await process.WaitForExitAsync();
+                
+                if (process.ExitCode != 0)
+                {
+                    LogMessage(logWriter, true, $"draw.io CLI failed with exit code {process.ExitCode}");
+                    LogMessage(logWriter, true, $"Stderr: {stderr}");
+                    
+                    // Return the diagram XML content as a fallback
+                    string diagramXml = await File.ReadAllTextAsync(filePath);
+                    
+                    return new
+                    {
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Error: {stderr}. XML content: {diagramXml}"
+                            }
+                        },
+                        isError = true
+                    };
+                }
+                
+                // Verify the file was created
+                if (!File.Exists(outputImagePath))
+                {
+                    LogMessage(logWriter, true, $"Output file not created: {outputImagePath}");
+                    
+                    // Return the diagram XML content as a fallback
+                    string diagramXml = await File.ReadAllTextAsync(filePath);
+                    
+                    return new
+                    {
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Error: Image file not created. XML content: {diagramXml}"
+                            }
+                        },
+                        isError = true
+                    };
+                }
+                
+                // Read the generated image and convert it to base64
+                byte[] imageBytes = await File.ReadAllBytesAsync(outputImagePath);
+                string base64Image = Convert.ToBase64String(imageBytes);
+                
+                // Clean up the temporary file
+                try
+                {
+                    File.Delete(outputImagePath);
+                }
+                catch (Exception ex)
+                {
+                    LogMessage(logWriter, verbose, $"Failed to delete temporary file {outputImagePath}: {ex.Message}");
+                }
+                
+                return new
+                {
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "image",
+                            data = base64Image,
+                            mimeType = $"image/{format.ToLower()}"
+                        }
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                LogMessage(logWriter, true, $"Error generating diagram image: {ex.Message}");
+                
+                // Return the diagram XML content as a fallback
+                string diagramXml = await File.ReadAllTextAsync(filePath);
+                
+                return new
+                {
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}. XML content: {diagramXml}"
+                        }
+                    },
+                    isError = true
+                };
+            }
+        }
+        
+        private static bool CheckDrawIoCliAvailable(TextWriter logWriter, bool verbose)
+        {
+            try
+            {
+                var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "draw.io",
+                    Arguments = "--version",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                
+                using var process = System.Diagnostics.Process.Start(processStartInfo);
+                if (process == null)
+                {
+                    LogMessage(logWriter, verbose, "Failed to start draw.io CLI process for version check");
+                    return false;
+                }
+                
+                process.WaitForExit(5000); // Wait up to 5 seconds
+                
+                if (process.ExitCode == 0)
+                {
+                    string version = process.StandardOutput.ReadToEnd().Trim();
+                    LogMessage(logWriter, verbose, $"draw.io CLI is available, version: {version}");
+                    return true;
+                }
+                
+                LogMessage(logWriter, verbose, $"draw.io CLI check failed with exit code {process.ExitCode}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LogMessage(logWriter, verbose, $"Error checking draw.io CLI availability: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Helper methods for parameter extraction
+
+        private static string GetParameterString(JsonElement parameters, string name, string defaultValue = null)
+        {
+            if (parameters.TryGetProperty(name, out var element))
+            {
+                return element.GetString() ?? defaultValue;
+            }
+            
+            if (defaultValue != null)
+            {
+                return defaultValue;
+            }
+            
+            throw new ArgumentException($"Required parameter '{name}' is missing. Expected type: string");
+        }
+
+        private static float GetParameterFloat(JsonElement parameters, string name)
+        {
+            if (!parameters.TryGetProperty(name, out var element))
+            {
+                throw new ArgumentException($"Required parameter '{name}' is missing. Expected type: number");
+            }
+            
+            try
+            {
+                return element.GetSingle();
+            }
+            catch (InvalidOperationException)
+            {
+                throw new ArgumentException($"Parameter '{name}' must be a valid number");
+            }
+        }
+
+        private static int GetParameterInt(JsonElement parameters, string name, int? defaultValue = null)
+        {
+            if (parameters.TryGetProperty(name, out var element))
+            {
+                try
+                {
+                    return element.GetInt32();
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new ArgumentException($"Parameter '{name}' must be a valid integer");
+                }
+            }
+            
+            if (defaultValue.HasValue)
+            {
+                return defaultValue.Value;
+            }
+            
+            throw new ArgumentException($"Required parameter '{name}' is missing. Expected type: integer");
+        }
+
+        private static JsonElement GetParameterObject(JsonElement parameters, string name)
+        {
+            if (parameters.TryGetProperty(name, out var element))
+            {
+                return element;
+            }
+            
+            throw new ArgumentException($"Required parameter '{name}' is missing. Expected type: object");
+        }
+    }
+} 

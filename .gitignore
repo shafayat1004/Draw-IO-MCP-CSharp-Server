@@ -1,0 +1,1509 @@
+.DS_Store
+DrawIOModelContextProtocolServer/.idea/.idea.DrawIO.MCP/.idea/.name
+DrawIOModelContextProtocolServer/.idea/.idea.DrawIO.MCP/.idea/indexLayout.xml
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/bin/
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/appsettings.Development.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/appsettings.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.Core.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.Core.xml
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE.deps.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE.runtimeconfig.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/FSharp.Core.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.AI.Abstractions.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.AI.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.Hosting.Abstractions.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.ObjectPool.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.Options.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.OpenApi.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/ModelContextProtocol.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Newtonsoft.Json.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Swashbuckle.AspNetCore.Swagger.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/System.Net.ServerSentEvents.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/cs/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/de/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/es/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/fr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/it/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/ja/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/ko/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/pl/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/pt-BR/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/ru/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/tr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/zh-Hant/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/DrawIO.MCP.SSE.csproj.nuget.dgspec.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/DrawIO.MCP.SSE.csproj.nuget.g.props
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/DrawIO.MCP.SSE.csproj.nuget.g.targets
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/project.assets.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/project.nuget.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/project.packagespec.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/rider.project.model.nuget.info
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/rider.project.restore.info
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/apphost
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.M.119350C4.Up2Date
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.AssemblyInfo.cs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.AssemblyInfoInputs.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.assets.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.csproj.AssemblyReference.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.csproj.CoreCompileInputs.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.csproj.FileListAbsolute.txt
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.GeneratedMSBuildEditorConfig.editorconfig
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.genruntimeconfig.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.GlobalUsings.g.cs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.MvcApplicationPartsAssemblyInfo.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.MvcApplicationPartsAssemblyInfo.cs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/staticwebassets.build.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/ref/DrawIO.MCP.SSE.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/refint/DrawIO.MCP.SSE.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/staticwebassets/msbuild.build.DrawIO.MCP.SSE.props
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.DrawIO.MCP.SSE.props
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.DrawIO.MCP.SSE.props
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/DrawIO.MCP.STDIO.csproj
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.Core.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.Core.xml
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO.deps.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO.runtimeconfig.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/FSharp.Core.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/cs/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/de/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/es/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/fr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/it/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ja/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ko/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/pl/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/pt-BR/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ru/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/tr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/zh-Hant/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/DrawIO.MCP.STDIO.csproj.nuget.dgspec.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/DrawIO.MCP.STDIO.csproj.nuget.g.props
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/DrawIO.MCP.STDIO.csproj.nuget.g.targets
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/project.assets.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/project.nuget.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/project.packagespec.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/rider.project.model.nuget.info
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/rider.project.restore.info
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/apphost
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.M.E3479288.Up2Date
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.AssemblyInfo.cs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.AssemblyInfoInputs.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.assets.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.csproj.AssemblyReference.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.csproj.CoreCompileInputs.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.csproj.FileListAbsolute.txt
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.GeneratedMSBuildEditorConfig.editorconfig
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.genruntimeconfig.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.GlobalUsings.g.cs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/ref/DrawIO.MCP.STDIO.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/refint/DrawIO.MCP.STDIO.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_DrawIO.MCP.Core.Tests
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.Tests.deps.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.Tests.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.Tests.runtimeconfig.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.xml
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/FSharp.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CommunicationUtilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CoreUtilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CrossPlatEngine.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.PlatformAbstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.Utilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.TestPlatform.Common.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/Newtonsoft.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/NuGet.Frameworks.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/testhost.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.assert.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.execution.dotnet.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.runner.reporters.netcoreapp10.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.runner.utility.netcoreapp10.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/cs/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/de/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/de/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/de/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/es/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/es/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/es/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/it/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pt-BR/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hant/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/DrawIO.MCP.Core.Tests.fsproj.nuget.dgspec.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/DrawIO.MCP.Core.Tests.fsproj.nuget.g.props
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/DrawIO.MCP.Core.Tests.fsproj.nuget.g.targets
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/project.assets.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/project.nuget.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/project.packagespec.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/rider.project.model.nuget.info
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/rider.project.restore.info
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.fs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.M.A64967CB.Up2Date
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.AssemblyInfo.fs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.AssemblyInfoInputs.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.assets.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.fsproj.AssemblyReference.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.fsproj.CoreCompileInputs.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.fsproj.FileListAbsolute.txt
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.genruntimeconfig.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/ref/DrawIO.MCP.Core.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/refint/DrawIO.MCP.Core.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/DrawIO.MCP.SSE.Tests.csproj
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/appsettings.Development.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/appsettings.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_DrawIO.MCP.SSE.Tests
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.xml
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.deps.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.runtimeconfig.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.Tests.deps.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.Tests.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.Tests.runtimeconfig.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/FSharp.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.AI.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.AI.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.Hosting.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.ObjectPool.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.Options.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.OpenApi.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CommunicationUtilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CoreUtilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CrossPlatEngine.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.PlatformAbstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.Utilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.TestPlatform.Common.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ModelContextProtocol.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Newtonsoft.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/NuGet.Frameworks.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Swashbuckle.AspNetCore.Swagger.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/System.Net.ServerSentEvents.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/testhost.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.assert.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.execution.dotnet.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.runner.reporters.netcoreapp10.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.runner.utility.netcoreapp10.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/DrawIO.MCP.SSE.Tests.csproj.nuget.dgspec.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/DrawIO.MCP.SSE.Tests.csproj.nuget.g.props
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/DrawIO.MCP.SSE.Tests.csproj.nuget.g.targets
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/project.assets.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/project.nuget.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/project.packagespec.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/rider.project.model.nuget.info
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/rider.project.restore.info
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.M.FC76CB06.Up2Date
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.AssemblyInfo.cs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.AssemblyInfoInputs.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.assets.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.csproj.AssemblyReference.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.csproj.CoreCompileInputs.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.csproj.FileListAbsolute.txt
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.GeneratedMSBuildEditorConfig.editorconfig
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.genruntimeconfig.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.GlobalUsings.g.cs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/ref/DrawIO.MCP.SSE.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/refint/DrawIO.MCP.SSE.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/DrawIO.MCP.STDIO.Tests.csproj
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_DrawIO.MCP.STDIO.Tests
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.xml
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.deps.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.runtimeconfig.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.Tests.deps.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.Tests.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.Tests.runtimeconfig.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/FSharp.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CommunicationUtilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CoreUtilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CrossPlatEngine.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.PlatformAbstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.Utilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.TestPlatform.Common.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/Newtonsoft.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/NuGet.Frameworks.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/testhost.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/xunit.abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/xunit.assert.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/xunit.core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/xunit.execution.dotnet.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/xunit.runner.reporters.netcoreapp10.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/xunit.runner.utility.netcoreapp10.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/cs/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/de/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/de/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/de/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/es/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/es/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/es/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/fr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/it/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ja/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ko/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pl/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pt-BR/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ru/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/tr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hant/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/DrawIO.MCP.STDIO.Tests.csproj.nuget.dgspec.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/DrawIO.MCP.STDIO.Tests.csproj.nuget.g.props
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/DrawIO.MCP.STDIO.Tests.csproj.nuget.g.targets
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/project.assets.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/project.nuget.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/project.packagespec.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/rider.project.model.nuget.info
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/rider.project.restore.info
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.M.55374DD6.Up2Date
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.AssemblyInfo.cs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.AssemblyInfoInputs.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.assets.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.csproj.AssemblyReference.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.csproj.CoreCompileInputs.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.csproj.FileListAbsolute.txt
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.GeneratedMSBuildEditorConfig.editorconfig
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.genruntimeconfig.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.GlobalUsings.g.cs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/DrawIO.MCP.STDIO.Tests.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/ref/DrawIO.MCP.STDIO.Tests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/obj/Debug/net8.0/refint/DrawIO.MCP.STDIO.Tests.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/System.CommandLine.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/System.IO.Pipelines.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/System.Text.Encodings.Web.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/System.Text.Json.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/cs/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/de/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/es/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/fr/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/it/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ja/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ko/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/pl/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/pt-BR/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ru/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/tr/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/zh-Hans/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/zh-Hant/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.deps.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.AspNetCore.Mvc.Testing.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.AspNetCore.TestHost.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.DependencyModel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/MvcTestingAppManifest.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Antiforgery.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.BearerToken.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.Cookies.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.OAuth.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authorization.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authorization.Policy.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Authorization.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Endpoints.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Forms.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Server.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Web.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Connections.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.CookiePolicy.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Cors.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Cryptography.Internal.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.DataProtection.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.DataProtection.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.DataProtection.Extensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Diagnostics.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Diagnostics.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Diagnostics.HealthChecks.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.HostFiltering.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Hosting.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Hosting.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Html.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Connections.Common.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Connections.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Extensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Features.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Results.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.HttpLogging.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.HttpOverrides.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.HttpsPolicy.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Identity.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Localization.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Localization.Routing.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Metadata.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.ApiExplorer.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Cors.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.DataAnnotations.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Formatters.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Formatters.Xml.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Localization.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Razor.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.RazorPages.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.TagHelpers.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.ViewFeatures.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.OutputCaching.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.RateLimiting.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Razor.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Razor.Runtime.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.RequestDecompression.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.ResponseCaching.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.ResponseCaching.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.ResponseCompression.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Rewrite.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Routing.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Routing.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.HttpSys.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.IIS.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.IISIntegration.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.Transport.NamedPipes.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.Transport.Quic.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Session.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.SignalR.Common.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.SignalR.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.SignalR.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.StaticFiles.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.WebSockets.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.WebUtilities.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.CSharp.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Caching.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Caching.Memory.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Binder.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.CommandLine.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.EnvironmentVariables.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.FileExtensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Ini.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.KeyPerFile.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.UserSecrets.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Xml.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.DependencyInjection.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Diagnostics.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Diagnostics.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Diagnostics.HealthChecks.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Features.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileProviders.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileProviders.Composite.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileProviders.Embedded.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileProviders.Physical.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileSystemGlobbing.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Hosting.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Hosting.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Http.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Identity.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Identity.Stores.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Localization.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Localization.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.Abstractions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.Configuration.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.Console.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.Debug.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.EventLog.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.EventSource.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.TraceSource.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.ObjectPool.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Options.ConfigurationExtensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Options.DataAnnotations.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Options.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.WebEncoders.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.JSInterop.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Net.Http.Headers.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.VisualBasic.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.VisualBasic.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Win32.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Win32.Registry.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/mscorlib.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/netstandard.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.AppContext.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Buffers.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.Concurrent.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.Immutable.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.NonGeneric.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.Specialized.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.Annotations.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.DataAnnotations.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.EventBasedAsync.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.TypeConverter.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Configuration.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Console.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Core.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Data.Common.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Data.DataSetExtensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Data.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Contracts.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Debug.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.DiagnosticSource.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.EventLog.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.FileVersionInfo.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Process.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.StackTrace.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.TextWriterTraceListener.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Tools.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.TraceSource.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Tracing.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Drawing.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Drawing.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Dynamic.Runtime.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Formats.Asn1.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Formats.Tar.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Globalization.Calendars.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Globalization.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Globalization.Extensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Compression.Brotli.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Compression.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Compression.FileSystem.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Compression.ZipFile.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.AccessControl.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.DriveInfo.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.Watcher.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.IsolatedStorage.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.MemoryMappedFiles.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Pipelines.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Pipes.AccessControl.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Pipes.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.UnmanagedMemoryStream.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Linq.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Linq.Expressions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Linq.Parallel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Linq.Queryable.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Memory.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Http.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Http.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.HttpListener.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Mail.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.NameResolution.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.NetworkInformation.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Ping.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Quic.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Requests.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Security.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.ServicePoint.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Sockets.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebClient.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebHeaderCollection.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebProxy.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebSockets.Client.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebSockets.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Numerics.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Numerics.Vectors.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ObjectModel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.DispatchProxy.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Emit.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Emit.ILGeneration.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Emit.Lightweight.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Extensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Metadata.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.TypeExtensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Resources.Reader.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Resources.ResourceManager.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Resources.Writer.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.CompilerServices.Unsafe.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.CompilerServices.VisualC.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Extensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Handles.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.InteropServices.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.InteropServices.JavaScript.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.InteropServices.RuntimeInformation.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Intrinsics.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Loader.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Numerics.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.Formatters.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.Xml.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.AccessControl.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Claims.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Algorithms.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Cng.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Csp.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Encoding.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.OpenSsl.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Primitives.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.X509Certificates.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Xml.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Principal.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Principal.Windows.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.SecureString.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ServiceModel.Web.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ServiceProcess.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Encoding.CodePages.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Encoding.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Encoding.Extensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Encodings.Web.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.RegularExpressions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Channels.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Overlapped.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.RateLimiting.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Tasks.Dataflow.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Tasks.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Tasks.Extensions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Tasks.Parallel.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Thread.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.ThreadPool.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Timer.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Transactions.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Transactions.Local.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ValueTuple.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Web.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Web.HttpUtility.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Windows.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.Linq.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.ReaderWriter.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.Serialization.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XDocument.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XmlDocument.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XmlSerializer.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XPath.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XPath.XDocument.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/WindowsBase.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/MvcTestingAppManifest.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/System.CommandLine.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/System.IO.Pipelines.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/System.Text.Encodings.Web.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/System.Text.Json.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/cs/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/de/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/es/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/fr/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/it/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ja/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ko/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pl/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/pt-BR/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/ru/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/tr/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hans/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/zh-Hant/System.CommandLine.resources.dll
+DrawIOModelContextProtocolServer/DrawIO.MCP.sln.DotSettings.user
+DrawIOModelContextProtocolServer/publish-core/DrawIO.MCP.Core.deps.json
+DrawIOModelContextProtocolServer/publish-core/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/publish-core/DrawIO.MCP.Core.pdb
+DrawIOModelContextProtocolServer/publish-core/DrawIO.MCP.Core.xml
+DrawIOModelContextProtocolServer/publish-core/FSharp.Core.dll
+DrawIOModelContextProtocolServer/publish-core/cs/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/de/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/es/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/fr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/it/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/ja/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/ko/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/pl/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/pt-BR/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/ru/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/tr/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/zh-Hans/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/publish-core/zh-Hant/FSharp.Core.resources.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/bin/Release/net8.0/DrawIO.MCP.Core.deps.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/bin/Release/net8.0/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/bin/Release/net8.0/DrawIO.MCP.Core.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/bin/Release/net8.0/DrawIO.MCP.Core.xml
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.fs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.AssemblyInfo.fs
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.AssemblyInfoInputs.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.assets.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.fsproj.AssemblyReference.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.fsproj.CoreCompileInputs.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.fsproj.FileListAbsolute.txt
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/DrawIO.MCP.Core.xml
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/PublishOutputs.2582c3ba04.txt
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/ref/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.Core/obj/Release/net8.0/refint/DrawIO.MCP.Core.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/appsettings 2.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/appsettings.Development 2.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE.deps 2.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE.runtimeconfig 2.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/FSharp.Core 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.AI 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.AI.Abstractions 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.Diagnostics.Abstractions 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.Hosting.Abstractions 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.ObjectPool 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.Extensions.Options 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Microsoft.OpenApi 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/ModelContextProtocol 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Newtonsoft.Json 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Swashbuckle.AspNetCore.Swagger 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerGen 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerUI 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/System.Net.ServerSentEvents 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/cs/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/de/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/es/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/fr/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/it/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/ja/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/ko/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/pl/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/pt-BR/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/ru/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/tr/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/zh-Hant/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.M.119350C4 2.Up2Date
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/DrawIO.MCP.SSE.genruntimeconfig 2.cache
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/staticwebassets.build 2.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/staticwebassets/msbuild.build.DrawIO.MCP.SSE 2.props
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.DrawIO.MCP.SSE 2.props
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.DrawIO.MCP.SSE 2.props
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO.deps 2.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO.runtimeconfig 2.json
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/FSharp.Core 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/System.CommandLine 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/cs/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/cs/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/de/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/de/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/es/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/es/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/fr/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/fr/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/it/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/it/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ja/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ja/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ko/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ko/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/pl/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/pl/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/pt-BR/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/pt-BR/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ru/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/ru/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/tr/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/tr/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/zh-Hans/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/zh-Hant/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/zh-Hant/System.CommandLine.resources 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.M.E3479288 2.Up2Date
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/DrawIO.MCP.STDIO.genruntimeconfig 2.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.Tests.deps 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.Tests.runtimeconfig 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.runner.reporters.netcoreapp10 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.runner.utility.netcoreapp10 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/xunit.runner.visualstudio.dotnetcore.testadapter 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.M.A64967CB 2.Up2Date
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/DrawIO.MCP.Core.Tests.genruntimeconfig 2.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/appsettings 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/appsettings.Development 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_DrawIO.MCP.SSE 2.Tests
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.Tests.deps 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.Tests.runtimeconfig 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/FSharp.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.AspNetCore.Mvc.Testing 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.AspNetCore.TestHost 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.AI 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.AI.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.DependencyModel 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.Diagnostics.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.Hosting.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.ObjectPool 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.Extensions.Options 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CommunicationUtilities 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CoreUtilities 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.CrossPlatEngine 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.PlatformAbstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.TestPlatform.Utilities 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.CodeCoverage.Shim 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.TestPlatform.Common 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.VisualStudio.TestPlatform.ObjectModel 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ModelContextProtocol 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Newtonsoft.Json 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/NuGet.Frameworks 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/System.Net.ServerSentEvents 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/testhost 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.assert 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.execution.dotnet 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.runner.reporters.netcoreapp10 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.runner.utility.netcoreapp10 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/xunit.runner.visualstudio.dotnetcore.testadapter 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/cs/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/de/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/es/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/fr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/it/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ja/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ko/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pl/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/pt-BR/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Antiforgery 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.BearerToken 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authorization 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Server 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.DataProtection 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Diagnostics 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Diagnostics.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.HostFiltering 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Hosting.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Connections.Common 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.HttpOverrides 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.HttpsPolicy 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Metadata 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.RazorPages 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.ViewFeatures 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Razor.Runtime 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.ResponseCaching.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.HttpSys 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.SignalR 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.WebUtilities 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.CSharp 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Ini 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.DependencyInjection 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.DependencyInjection.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Diagnostics.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileProviders.Composite 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileSystemGlobbing 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Hosting 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.Console 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.Debug 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.TraceSource 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.WebEncoders 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.VisualBasic 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Win32.Registry 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.NonGeneric 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/ru/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/tr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/FSharp.Core.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CommunicationUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.M.FC76CB06 2.Up2Date
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests 2.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.AssemblyInfo 2.cs
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.csproj.CoreCompileInputs 2.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/DrawIO.MCP.SSE.Tests.genruntimeconfig 2.cache
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/MvcTestingAppManifest 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/refint/DrawIO.MCP.SSE.Tests 2.dll
+fixed-log.txt
+mcp-server.log
+test-log.txt
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP 2.SSE
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.Core 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.Core 2.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.Core 2.xml
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/bin/Debug/net8.0/DrawIO.MCP.SSE 2.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.SSE/obj/Debug/net8.0/ref/DrawIO.MCP.SSE 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP 2.STDIO
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.Core 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.Core 2.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.Core 2.xml
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/DrawIO.MCP.STDIO 2.pdb
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/System.IO.Pipelines 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/System.Text.Encodings.Web 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/System.Text.Json 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web 2.dll
+DrawIOModelContextProtocolServer/src/DrawIO.MCP.STDIO/obj/Debug/net8.0/ref/DrawIO.MCP.STDIO 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.xml
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.Tests 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.Tests 2.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.Core.Tests/obj/Debug/net8.0/ref/DrawIO.MCP.Core.Tests 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP 2.SSE
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.xml
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.Core.deps 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE 2.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.deps 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.runtimeconfig 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.Tests 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/DrawIO.MCP.SSE.Tests 2.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Microsoft.OpenApi 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/MvcTestingAppManifest 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Swashbuckle.AspNetCore.Swagger 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerGen 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerUI 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.Cookies 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authentication.OAuth 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Authorization.Policy 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Authorization 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Endpoints 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Forms 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Components.Web 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Connections.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.CookiePolicy 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Cors 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Cryptography.Internal 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Cryptography.KeyDerivation 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.DataProtection.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.DataProtection.Extensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Diagnostics.HealthChecks 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Hosting 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Hosting.Server.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Html.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Connections 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Extensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Features 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Http.Results 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.HttpLogging 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Identity 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Localization 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Localization.Routing 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.ApiExplorer 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Cors 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.DataAnnotations 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Formatters.Json 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Formatters.Xml 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Localization 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.Razor 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Mvc.TagHelpers 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.OutputCaching 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.RateLimiting 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Razor 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.RequestDecompression 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.ResponseCaching 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.ResponseCompression 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Rewrite 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Routing 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Routing.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.IIS 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.IISIntegration 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.Transport.NamedPipes 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.Transport.Quic 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.Session 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.SignalR.Common 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.SignalR.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.SignalR.Protocols.Json 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.StaticFiles 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.AspNetCore.WebSockets 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Caching.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Caching.Memory 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Binder 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.CommandLine 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.EnvironmentVariables 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.FileExtensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Json 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.KeyPerFile 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.UserSecrets 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Configuration.Xml 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Diagnostics 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Diagnostics.HealthChecks 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Features 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileProviders.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileProviders.Embedded 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.FileProviders.Physical 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Hosting.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Http 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Identity.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Identity.Stores 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Localization 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Localization.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.Abstractions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.Configuration 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.EventLog 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Logging.EventSource 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.ObjectPool 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Options 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Options.ConfigurationExtensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Options.DataAnnotations 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Extensions.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.JSInterop 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Net.Http.Headers 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.VisualBasic.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/Microsoft.Win32.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/mscorlib 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/netstandard 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.AppContext 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Buffers 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.Concurrent 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.Immutable 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Collections.Specialized 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.Annotations 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.DataAnnotations 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.EventBasedAsync 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ComponentModel.TypeConverter 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Configuration 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Console 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Data 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Data.Common 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Data.DataSetExtensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Contracts 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Debug 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.DiagnosticSource 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.EventLog 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.FileVersionInfo 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Process 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.StackTrace 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.TextWriterTraceListener 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Tools 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.TraceSource 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Diagnostics.Tracing 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Drawing 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Drawing.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Dynamic.Runtime 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Formats.Asn1 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Formats.Tar 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Globalization 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Globalization.Calendars 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Globalization.Extensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Compression 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Compression.Brotli 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Compression.FileSystem 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Compression.ZipFile 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.AccessControl 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.DriveInfo 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.FileSystem.Watcher 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.IsolatedStorage 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.MemoryMappedFiles 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Pipelines 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Pipes 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.Pipes.AccessControl 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.IO.UnmanagedMemoryStream 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Linq 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Linq.Expressions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Linq.Parallel 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Linq.Queryable 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Memory 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Http 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Http.Json 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.HttpListener 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Mail 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.NameResolution 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.NetworkInformation 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Ping 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Quic 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Requests 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Security 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.ServicePoint 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.Sockets 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebClient 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebHeaderCollection 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebProxy 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebSockets 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Net.WebSockets.Client 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Numerics 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Numerics.Vectors 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ObjectModel 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.DispatchProxy 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Emit 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Emit.ILGeneration 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Emit.Lightweight 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Extensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Metadata 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Reflection.TypeExtensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Resources.Reader 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Resources.ResourceManager 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Resources.Writer 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.CompilerServices.Unsafe 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.CompilerServices.VisualC 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Extensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Handles 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.InteropServices 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.InteropServices.JavaScript 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.InteropServices.RuntimeInformation 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Intrinsics 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Loader 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Numerics 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.Formatters 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.Json 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Runtime.Serialization.Xml 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.AccessControl 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Claims 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Algorithms 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Cng 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Csp 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Encoding 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.OpenSsl 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Primitives 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.X509Certificates 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Cryptography.Xml 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Principal 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.Principal.Windows 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Security.SecureString 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ServiceModel.Web 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ServiceProcess 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Encoding 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Encoding.CodePages 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Encoding.Extensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Encodings.Web 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.Json 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Text.RegularExpressions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Channels 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Overlapped 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.RateLimiting 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Tasks 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Tasks.Dataflow 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Tasks.Extensions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Tasks.Parallel 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Thread 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.ThreadPool 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Threading.Timer 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Transactions 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Transactions.Local 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.ValueTuple 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Web 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Web.HttpUtility 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Windows 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.Linq 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.ReaderWriter 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.Serialization 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XDocument 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XmlDocument 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XmlSerializer 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XPath 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/System.Xml.XPath.XDocument 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/bin/Debug/net8.0/refs/WindowsBase 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.SSE.Tests/obj/Debug/net8.0/ref/DrawIO.MCP.SSE.Tests 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP 2.STDIO
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.Core 2.xml
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO 2.pdb
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.deps 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.runtimeconfig 2.json
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.Tests 2.dll
+DrawIOModelContextProtocolServer/tests/DrawIO.MCP.STDIO.Tests/bin/Debug/net8.0/DrawIO.MCP.STDIO.Tests 2.pdb
+
+.fake
