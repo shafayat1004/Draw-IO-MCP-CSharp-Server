@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# DrawIO MCP Server Project Rules
+
+## Testing
+- Always write a test if a functionality requires drawio manipulation (glueing connectors, changing colours, cells going to different pages, etc.).
+- After any slightly relevant change, run all tests.
+- Create and manage a central helper .sh tester for consistent test execution.
+- Test suites should be easy to run with one click:
+  - One test suite should assert the core functionality and diagram manipulations
+  - One should check the stdio server code
+  - Another should check the SSE code
+
+## Code Style
+- Use pure functions and functional programming as much as possible.
+- DrawIO/XML manipulations should be done by pure functions.
+- Write reusable code whenever possible.
+- Modularize files so that each file does not exceed 800-1000 lines.
+- Discourage creating too many files unless a specific file or logic needs to be separate.
+
+## Documentation
+- Maintain a learning folder and update it with lessons learned.
+- Update the learning folder whenever we successfully debug or fix something (with user approval).
+- Always keep the README up-to-date.
+- When needed, separate documentation into manageable components.
+
+## Environment
+- Work in a containerized environment (conda for Python).
+- Do not edit system files unless explicitly approved.
+
+## Reference Resources
+When lost, refer to these resources:
+- https://github.com/modelcontextprotocol/python-sdk
+- https://docs.cursor.com/context/model-context-protocol
+- https://github.com/modelcontextprotocol/python-sdk/pull/524
+- https://modelcontextprotocol.io/quickstart/server
+- https://www.drawio.com/doc/
+- https://github.com/jgraph/docker-drawio
+- https://code.visualstudio.com/docs/copilot/chat/mcp-servers 
