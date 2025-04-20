@@ -13,6 +13,8 @@ A Model Context Protocol (MCP) server implementation for draw.io (diagrams.net) 
 - Robust error handling and detailed logging
 - Comprehensive styling options for diagram elements
 - Diagram auto-arrangement capabilities
+- Multi-page diagram support with page management operations
+- Image export capabilities
 
 ## Project Structure
 
@@ -25,7 +27,8 @@ A Model Context Protocol (MCP) server implementation for draw.io (diagrams.net) 
 │   ├── DrawIO.MCP.Core.Tests
 │   ├── DrawIO.MCP.STDIO.Tests
 │   └── DrawIO.MCP.SSE.Tests
-└── diagrams                   # Directory for storing diagram files
+├── diagrams                   # Directory for storing diagram files
+└── learning                   # Documentation of lessons learned and best practices
 ```
 
 ## Installation & Running
@@ -34,6 +37,7 @@ A Model Context Protocol (MCP) server implementation for draw.io (diagrams.net) 
 
 - .NET 8.0 SDK
 - Visual Studio 2022, VS Code, or Rider (optional)
+- draw.io CLI (optional, required for image export)
 
 ### Building the Solution
 
@@ -115,9 +119,26 @@ The server exposes the following MCP tools:
 - `connect_shapes` - Connect two shapes with an arrow
 - `delete_shape` - Delete a shape from a diagram
 - `update_shape` - Update properties of an existing shape
-- `style_shape` - Apply predefined styles to shapes (AWS, Azure, GCP, and common diagram styles)
-- `arrange_diagram` - Automatically organize shapes in a diagram
+- `style_shape` - Apply styles to shapes (colors, borders, etc.)
+- `arrange_diagram` - Automatically organize shapes in a diagram (horizontal, vertical, or grid layout)
 - `generate_vpc` - Generate a sample AWS VPC layout diagram
+- `get_diagram_image` - Export a diagram as an image (requires draw.io CLI)
+- `move_shape` - Move a shape to a new position in the diagram
+- `update_shape_style` - Update specific style properties of a shape
+- `create_diagram_page` - Create a new page in a multi-page diagram
+- `get_diagram_page` - Retrieve details of a specific diagram page
+- `update_diagram_page` - Update properties of a diagram page
+- `delete_diagram_page` - Delete a page from a diagram
+- `move_cell_between_pages` - Move a cell (shape/connector) from one page to another
+
+## Future Enhancements
+
+Planned enhancements to improve the server's capabilities:
+
+- Component overlap detection for identifying when shapes intersect
+- Targeted query capabilities for filtering diagram elements
+- Step-by-step diagram generation for incremental building
+- More comprehensive shape libraries and templates
 
 ## Running Tests
 
