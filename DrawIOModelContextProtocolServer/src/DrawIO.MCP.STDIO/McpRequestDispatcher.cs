@@ -29,6 +29,7 @@ namespace DrawIO.MCP.STDIO
             _methodHandlers = new Dictionary<string, Func<JsonElement, Task<object>>>
             {
                 { "initialize", InitializeAsync },
+                { "mcp/initialize", InitializeAsync },
                 { "notifications/initialized", NotificationsInitializedAsync },
                 { "tools/list", ListToolsAsync },
                 { "tools/call", ExecuteToolAsync },
@@ -406,7 +407,9 @@ namespace DrawIO.MCP.STDIO
             try
             {
                 // Use the tool executor to execute the tool
-                return await DiagramToolExecutor.ExecuteToolAsync(toolName, arguments, _diagramsDirectory, _logWriter, _verbose);
+                // DiagramToolExecutor now handles all tools, including query tools
+                object result = await DiagramToolExecutor.ExecuteToolAsync(toolName, arguments, _diagramsDirectory, _logWriter, _verbose);
+                return result;
             }
             catch (ArgumentException ex) when (ex.Message.Contains("parameter"))
             {

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Microsoft.FSharp.Core;
 using static DrawIO.MCP.STDIO.FileOperations;
@@ -19,229 +21,687 @@ namespace DrawIO.MCP.STDIO
         /// </summary>
         public static Task<object> ListToolsAsync(this McpRequestDispatcher dispatcher, JsonElement parameters, TextWriter logWriter, bool verbose)
         {
-            if (verbose)
+            var tools = new List<McpToolDefinition>
             {
-                var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                logWriter.WriteLine($"[{timestamp}] INFO: Listing tools");
-            }
-            
-            var tools = new List<object>
-            {
-                new {
-                    name = "create_new_diagram",
-                    description = "Create a new empty diagram file",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            name = new { type = "string", description = "Name of the diagram to create (will add .drawio if missing)" }
-                        },
-                        required = new[] { "name" }
+                // Essential creation and editing tools
+                new McpToolDefinition
+                {
+                    Name = "create_new_diagram",
+                    Description = "Create a new empty diagram file",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "name",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Name of the diagram to create (will add .drawio if missing)",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "generate_vpc",
-                    description = "Generate a sample AWS VPC layout diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram_name = new { 
-                                type = "string",
-                                description = "Name for the diagram file (will add .drawio if missing)"
+                new McpToolDefinition
+                {
+                    Name = "generate_vpc",
+                    Description = "Generate a sample AWS VPC layout diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram_name",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Name for the diagram file (will add .drawio if missing)",
+                                Required = true
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "add_shape",
+                    Description = "Add a new shape to a diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
                             }
                         },
-                        required = new[] { "diagram_name" }
+                        {
+                            "value",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Shape label/text",
+                                Required = true
+                            }
+                        },
+                        {
+                            "x",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "X position",
+                                Required = true
+                            }
+                        },
+                        {
+                            "y",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Y position",
+                                Required = true
+                            }
+                        },
+                        {
+                            "width",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Width of shape",
+                                Required = true
+                            }
+                        },
+                        {
+                            "height",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Height of shape",
+                                Required = true
+                            }
+                        },
+                        {
+                            "shape",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Shape type (rectangle, ellipse, etc.)",
+                                Required = false
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "add_shape",
-                    description = "Add a new shape to a diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            value = new { type = "string", description = "Shape label/text" },
-                            x = new { type = "number", description = "X position" },
-                            y = new { type = "number", description = "Y position" },
-                            width = new { type = "number", description = "Width of shape" },
-                            height = new { type = "number", description = "Height of shape" },
-                            shape = new { type = "string", description = "Shape type (rectangle, ellipse, etc.)" }
+                new McpToolDefinition
+                {
+                    Name = "connect_shapes",
+                    Description = "Connect two shapes with an arrow",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "value", "x", "y", "width", "height" }
+                        {
+                            "source_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the source shape",
+                                Required = true
+                            }
+                        },
+                        {
+                            "target_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the target shape",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "connect_shapes",
-                    description = "Connect two shapes with an arrow",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            source_id = new { type = "string", description = "ID of the source shape" },
-                            target_id = new { type = "string", description = "ID of the target shape" }
+                new McpToolDefinition
+                {
+                    Name = "get_diagram_image",
+                    Description = "Get a diagram as a base64-encoded image",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "source_id", "target_id" }
+                        {
+                            "format",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Image format (png, jpeg, etc.)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "page",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Page index (defaults to 0)",
+                                Required = false
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "get_diagram_image",
-                    description = "Get a diagram as a base64-encoded image",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            page = new { type = "integer", description = "Page index (defaults to 0)" },
-                            format = new { type = "string", description = "Image format (png, jpeg, etc.)" }
+                new McpToolDefinition
+                {
+                    Name = "delete_shape",
+                    Description = "Delete a shape from a diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram" }
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to delete",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "delete_shape",
-                    description = "Delete a shape from a diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            shape_id = new { type = "string", description = "ID of the shape to delete" }
+                new McpToolDefinition
+                {
+                    Name = "update_shape",
+                    Description = "Update a shape's properties in a diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "shape_id" }
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to update",
+                                Required = true
+                            }
+                        },
+                        {
+                            "value",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "New label/text for the shape",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "update_shape",
-                    description = "Update a shape's properties in a diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            shape_id = new { type = "string", description = "ID of the shape to update" },
-                            value = new { type = "string", description = "New label/text for the shape" }
+                new McpToolDefinition
+                {
+                    Name = "style_shape",
+                    Description = "Apply style to a shape in a diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "shape_id", "value" }
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to style",
+                                Required = true
+                            }
+                        },
+                        {
+                            "fill_color",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Fill color (hex format)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "stroke_color",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Stroke color (hex format)",
+                                Required = false
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "style_shape",
-                    description = "Apply style to a shape in a diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            shape_id = new { type = "string", description = "ID of the shape to style" },
-                            fill_color = new { type = "string", description = "Fill color (hex format)" },
-                            stroke_color = new { type = "string", description = "Stroke color (hex format)" }
+                new McpToolDefinition
+                {
+                    Name = "arrange_diagram",
+                    Description = "Auto-arrange the layout of a diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "shape_id" }
+                        {
+                            "layout",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Layout algorithm to use (horizontal, vertical, radial)",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "arrange_diagram",
-                    description = "Auto-arrange the layout of a diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            layout = new { type = "string", description = "Layout algorithm to use (horizontal, vertical, radial)" }
+                new McpToolDefinition
+                {
+                    Name = "move_shape",
+                    Description = "Move a shape to a new position in the diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "layout" }
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to move",
+                                Required = true
+                            }
+                        },
+                        {
+                            "x",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "New X position",
+                                Required = true
+                            }
+                        },
+                        {
+                            "y",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "New Y position",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "move_shape",
-                    description = "Move a shape to a new position in the diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            shape_id = new { type = "string", description = "ID of the shape to move" },
-                            x = new { type = "number", description = "New X position" },
-                            y = new { type = "number", description = "New Y position" }
+                new McpToolDefinition
+                {
+                    Name = "update_shape_style",
+                    Description = "Update a shape's style properties",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "shape_id", "x", "y" }
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to update",
+                                Required = true
+                            }
+                        },
+                        {
+                            "style_properties",
+                            new McpParameterDefinition
+                            {
+                                Type = "object",
+                                Description = "Style properties to update",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "update_shape_style",
-                    description = "Update a shape's style properties",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            shape_id = new { type = "string", description = "ID of the shape to update" },
-                            style_properties = new { type = "object", description = "Style properties to update" }
+                new McpToolDefinition
+                {
+                    Name = "create_diagram_page",
+                    Description = "Create a new page in a diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "shape_id", "style_properties" }
+                        {
+                            "name",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Name for the new page",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "create_diagram_page",
-                    description = "Create a new page in a diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            name = new { type = "string", description = "Name for the new page" }
+                new McpToolDefinition
+                {
+                    Name = "get_diagram_page",
+                    Description = "Get the details of a diagram page",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "name" }
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page to retrieve",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "get_diagram_page",
-                    description = "Get the details of a diagram page",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            page_index = new { type = "integer", description = "Index of the page to retrieve" }
+                new McpToolDefinition
+                {
+                    Name = "update_diagram_page",
+                    Description = "Update a diagram page's properties",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "page_index" }
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page to update",
+                                Required = true
+                            }
+                        },
+                        {
+                            "name",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "New name for the page",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "update_diagram_page",
-                    description = "Update a diagram page's properties",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            page_index = new { type = "integer", description = "Index of the page to update" },
-                            name = new { type = "string", description = "New name for the page" }
+                new McpToolDefinition
+                {
+                    Name = "delete_diagram_page",
+                    Description = "Delete a page from a diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "page_index", "name" }
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page to delete",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "delete_diagram_page",
-                    description = "Delete a page from a diagram",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            page_index = new { type = "integer", description = "Index of the page to delete" }
+                new McpToolDefinition
+                {
+                    Name = "move_cell_between_pages",
+                    Description = "Move a cell (shape or connector) from one page to another",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "page_index" }
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the cell to move",
+                                Required = true
+                            }
+                        },
+                        {
+                            "source_page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the source page",
+                                Required = true
+                            }
+                        },
+                        {
+                            "target_page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the target page",
+                                Required = true
+                            }
+                        }
                     }
                 },
-                new {
-                    name = "move_cell_between_pages",
-                    description = "Move a cell (shape or connector) from one page to another",
-                    inputSchema = new {
-                        type = "object",
-                        properties = new {
-                            diagram = new { type = "string", description = "Diagram filename" },
-                            shape_id = new { type = "string", description = "ID of the cell to move" },
-                            source_page_index = new { type = "integer", description = "Index of the source page" },
-                            target_page_index = new { type = "integer", description = "Index of the target page" }
+                // New query tools added here
+                new McpToolDefinition
+                {
+                    Name = "find_elements_by_text",
+                    Description = "Find diagram elements containing the specified text",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
                         },
-                        required = new[] { "diagram", "shape_id", "source_page_index", "target_page_index" }
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page to search in (defaults to 0)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "search_text",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Text to search for in element labels (case-insensitive)",
+                                Required = true
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "get_element_info",
+                    Description = "Get detailed information about a specific diagram element",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page containing the element (defaults to 0)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "element_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the element to get information about",
+                                Required = true
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "list_neighbors",
+                    Description = "List all elements connected to the specified element",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page containing the element (defaults to 0)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "element_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the element to find neighbors for",
+                                Required = true
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "get_diagram_bounds",
+                    Description = "Get the bounding box coordinates of all elements in the diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page to get bounds for (defaults to 0)",
+                                Required = false
+                            }
+                        }
                     }
                 }
             };
-            
-            return Task.FromResult<object>(new
-            {
-                tools = tools.ToArray()
-            });
+
+            // Return a result with the array of tools properly structured
+            return Task.FromResult<object>(new { tools });
         }
     }
 } 

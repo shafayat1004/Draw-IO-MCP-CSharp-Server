@@ -53,6 +53,28 @@ module Types =
         Modified: DateTime
         Pages: Page list
     }
+    
+    /// Query result for element info
+    type ElementInfo = {
+        Id: string
+        Type: string
+        Value: string
+        Position: Position option
+        Size: Size option
+        Style: string
+        Parent: string
+        Connections: (string * string) list
+    }
+    
+    /// Bounding box of a diagram
+    type BoundingBox = {
+        MinX: float
+        MinY: float
+        MaxX: float
+        MaxY: float
+        Width: float
+        Height: float
+    }
 
 /// Functions for parsing and manipulating DrawIO XML
 module XmlParser =
@@ -803,6 +825,133 @@ module DiagramManipulation =
                         { page with Cells = otherCells @ arrangedVertices @ arrangedEdges }
                     else
                         page) }
+
+    /// Find elements by text content (case-insensitive partial match)
+    let findElementsByText (diagram: Diagram) (pageIndex: int) (searchText: string) : (string * string) list =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        let searchTextLower = searchText.ToLowerInvariant()
+        
+        page.Cells
+        |> List.filter (fun cell -> 
+            cell.Id <> "0" && cell.Id <> "1" && 
+            cell.Value.ToLowerInvariant().Contains(searchTextLower))
+        |> List.map (fun cell -> (cell.Id, cell.Value))
+    
+    /// Get detailed information about a specific element
+    let getElementInfo (diagram: Diagram) (pageIndex: int) (elementId: string) : ElementInfo option =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        match page.Cells |> List.tryFind (fun cell -> cell.Id = elementId) with
+        | None -> None
+        | Some element ->
+            // Find connections where this element is source or target
+            let connections = 
+                page.Cells
+                |> List.filter (fun cell -> 
+                    cell.IsEdge && 
+                    (cell.Source = Some elementId || cell.Target = Some elementId))
+                |> List.choose (fun edge ->
+                    match edge.Source, edge.Target with
+                    | Some source, Some target ->
+                        if source = elementId then 
+                            Some (edge.Id, target) // Outgoing connection
+                        else 
+                            Some (edge.Id, source) // Incoming connection
+                    | _ -> None)
+            
+            let elementType = 
+                if element.IsVertex then "vertex"
+                elif element.IsEdge then "edge"
+                else "unknown"
+            
+            let position, size =
+                match element.Geometry with
+                | Some geo -> Some geo.Position, Some geo.Size
+                | None -> None, None
+            
+            Some {
+                Id = element.Id
+                Type = elementType
+                Value = element.Value
+                Position = position
+                Size = size
+                Style = element.Style
+                Parent = element.Parent
+                Connections = connections
+            }
+    
+    /// List all neighboring elements connected to the specified element
+    let listNeighbors (diagram: Diagram) (pageIndex: int) (elementId: string) : (string * string * string) list =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        // Verify the element exists
+        match page.Cells |> List.tryFind (fun cell -> cell.Id = elementId) with
+        | None -> [] // Element not found
+        | Some _ ->
+            // Find edges connected to this element
+            page.Cells
+            |> List.filter (fun cell -> 
+                cell.IsEdge && 
+                (cell.Source = Some elementId || cell.Target = Some elementId))
+            |> List.choose (fun edge ->
+                match edge.Source, edge.Target with
+                | Some source, Some target ->
+                    // Get the neighbor element id (the other end of the connection)
+                    let neighborId = if source = elementId then target else source
+                    // Find the neighbor element to get its label
+                    let neighborLabel = 
+                        page.Cells 
+                        |> List.tryFind (fun c -> c.Id = neighborId) 
+                        |> Option.map (fun c -> c.Value)
+                        |> Option.defaultValue ""
+                    
+                    let direction = 
+                        if source = elementId then "outgoing" // Element -> Neighbor
+                        else "incoming" // Neighbor -> Element
+                    
+                    Some (neighborId, neighborLabel, direction)
+                | _ -> None)
+    
+    /// Calculate the bounding box of all elements in the diagram
+    let getDiagramBounds (diagram: Diagram) (pageIndex: int) : BoundingBox option =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        // Get all elements with geometry
+        let elementsWithGeometry = 
+            page.Cells
+            |> List.filter (fun cell -> 
+                cell.Geometry.IsSome && cell.Id <> "0" && cell.Id <> "1")
+            |> List.map (fun cell -> cell.Geometry.Value)
+        
+        if elementsWithGeometry.IsEmpty then
+            None // No elements with geometry
+        else
+            // Calculate min/max coordinates
+            let minX = elementsWithGeometry |> List.map (fun geo -> geo.Position.X) |> List.min
+            let minY = elementsWithGeometry |> List.map (fun geo -> geo.Position.Y) |> List.min
+            let maxX = elementsWithGeometry |> List.map (fun geo -> geo.Position.X + geo.Size.Width) |> List.max
+            let maxY = elementsWithGeometry |> List.map (fun geo -> geo.Position.Y + geo.Size.Height) |> List.max
+            
+            Some {
+                MinX = minX
+                MinY = minY
+                MaxX = maxX
+                MaxY = maxY
+                Width = maxX - minX
+                Height = maxY - minY
+            }
 
 /// Functions for serializing DrawIO diagrams to XML
 module XmlSerializer =

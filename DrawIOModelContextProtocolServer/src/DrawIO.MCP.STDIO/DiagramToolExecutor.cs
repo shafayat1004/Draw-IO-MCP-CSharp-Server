@@ -8,6 +8,9 @@ using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Collections;
 using static DrawIO.MCP.STDIO.FileOperations;
 
+// Add a type alias for easier reference to F# types
+using FSharpTypes = DrawIO.MCP.Core.Types;
+
 namespace DrawIO.MCP.STDIO
 {
     /// <summary>
@@ -24,6 +27,12 @@ namespace DrawIO.MCP.STDIO
             
             try
             {
+                // Handle update_shape_style separately since it has issues
+                if (toolName == "update_shape_style")
+                {
+                    return await UpdateShapeWithStyleAsync(arguments, diagramsDirectory);
+                }
+                
                 // Execute the tool and get the result
                 object result = toolName switch
                 {
@@ -37,7 +46,6 @@ namespace DrawIO.MCP.STDIO
                     "style_shape" => await StyleShapeAsync(arguments, diagramsDirectory),
                     "arrange_diagram" => await ArrangeDiagramAsync(arguments, diagramsDirectory),
                     "move_shape" => await MoveShapeAsync(arguments, diagramsDirectory),
-                    "update_shape_style" => await UpdateShapeStyleAsync(arguments, diagramsDirectory),
                     "create_diagram_page" => await CreateDiagramPageAsync(arguments, diagramsDirectory),
                     "get_diagram_page" => await GetDiagramPageAsync(arguments, diagramsDirectory),
                     "update_diagram_page" => await UpdateDiagramPageAsync(arguments, diagramsDirectory),
@@ -46,56 +54,17 @@ namespace DrawIO.MCP.STDIO
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
-                // Format the result according to MCP 2024-11-05 specification
-                // The result must be wrapped in a content array with proper type information
-                object contentItem;
-                
-                // For image results (from get_diagram_image)
-                if (result is Dictionary<string, object> dict && dict.ContainsKey("image") && dict.ContainsKey("format"))
-                {
-                    string base64Image = dict["image"].ToString();
-                    string format = dict["format"].ToString();
-                    
-                    contentItem = new 
-                    {
-                        type = "image",
-                        data = base64Image,
-                        mimeType = $"image/{format}"
-                    };
-                }
-                // For all other results, convert to text
-                else
-                {
-                    string resultJson = JsonSerializer.Serialize(result);
-                    contentItem = new
-                    {
-                        type = "text",
-                        text = resultJson
-                    };
-                }
-                
-                // Return properly formatted response with content array
-                return new
-                {
-                    content = new[] { contentItem }
-                };
+                // Return the result directly, no need to wrap - McpRequestDispatcher will handle this
+                return result;
             }
             catch (Exception ex)
             {
                 LogMessage(logWriter, true, $"Error executing tool {toolName}: {ex.Message}");
-                
-                // Format error response according to MCP protocol
-                return new
+                // Return an error object
+                return new Dictionary<string, object>
                 {
-                    content = new[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            text = $"Error: {ex.Message}"
-                        }
-                    },
-                    isError = true
+                    ["error"] = ex.Message,
+                    ["detail"] = ex.ToString()
                 };
             }
         }
@@ -157,7 +126,9 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, add a shape, and save it
             var diagramObj = LoadDiagram(filePath);
-            var (updatedDiagram, newId) = DiagramManipulation.AddShape(diagramObj, 0, value, x, y, width, height, shape);
+            var result = DrawIO.MCP.Core.DiagramManipulation.addShape(diagramObj, 0, value, x, y, width, height, shape);
+            var updatedDiagram = result.Item1;
+            var newId = result.Item2;
             SaveDiagram(updatedDiagram, filePath);
             
             return Task.FromResult<object>(new Dictionary<string, object>
@@ -201,7 +172,9 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, connect shapes, and save it
             var diagramObj = LoadDiagram(filePath);
-            var (updatedDiagram, newId) = DiagramManipulation.ConnectShapes(diagramObj, 0, sourceId, targetId);
+            var result = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramObj, 0, sourceId, targetId);
+            var updatedDiagram = result.Item1;
+            var newId = result.Item2;
             SaveDiagram(updatedDiagram, filePath);
             
             return Task.FromResult<object>(new Dictionary<string, object>
@@ -234,19 +207,23 @@ namespace DrawIO.MCP.STDIO
                 throw new InvalidOperationException($"Diagram '{name}' already exists");
             }
             
-            // Create a new diagram
-            var diagram = CoreTypes.CreateEmptyDiagram();
+            // Create empty VPC diagram
+            var emptyDiagram = CreateNewDiagram(filePath);
             
-            // Add VPC components
-            var (diagramWithVpc, vpcId) = DiagramManipulation.AddShape(diagram, 0, "VPC", 20, 20, 400, 300, "rectangle");
-            var (diagramWithPublicSubnet, publicSubnetId) = DiagramManipulation.AddShape(diagramWithVpc, 0, "Public Subnet", 40, 60, 150, 120, "rectangle");
-            var (diagramWithPrivateSubnet, privateSubnetId) = DiagramManipulation.AddShape(diagramWithPublicSubnet, 0, "Private Subnet", 240, 60, 150, 120, "rectangle");
-            var (diagramWithIgw, igwId) = DiagramManipulation.AddShape(diagramWithPrivateSubnet, 0, "Internet Gateway", 180, 0, 80, 40, "ellipse");
+            // Add base VPC shape
+            var vpc = DrawIO.MCP.Core.DiagramManipulation.addShape(emptyDiagram, 0, "VPC", 50, 50, 600, 400, "swimlane");
+            var vpcDiagram = vpc.Item1;
+            var vpcId = vpc.Item2;
+            
+            // Add Internet Gateway
+            var igw = DrawIO.MCP.Core.DiagramManipulation.addShape(vpcDiagram, 0, "IGW", 350, 10, 80, 40, "rectangle");
+            var igwDiagram = igw.Item1;
+            var igwId = igw.Item2;
             
             // Connect components
-            var (diagramWithConnector1, _) = DiagramManipulation.ConnectShapes(diagramWithIgw, 0, igwId, vpcId);
-            var (diagramWithConnector2, _) = DiagramManipulation.ConnectShapes(diagramWithConnector1, 0, vpcId, publicSubnetId);
-            var (diagramWithConnector3, _) = DiagramManipulation.ConnectShapes(diagramWithConnector2, 0, vpcId, privateSubnetId);
+            var (diagramWithConnector1, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(igwDiagram, 0, igwId, vpcId);
+            var (diagramWithConnector2, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramWithConnector1, 0, vpcId, vpcId);
+            var (diagramWithConnector3, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramWithConnector2, 0, vpcId, vpcId);
             
             // Save the diagram
             SaveDiagram(diagramWithConnector3, filePath);
@@ -282,7 +259,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, delete the shape, and save it
             var diagramObj = LoadDiagram(filePath);
-            var updatedDiagram = DiagramManipulation.DeleteShape(diagramObj, 0, shapeId);
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.deleteShape(diagramObj, 0, shapeId);
             SaveDiagram(updatedDiagram, filePath);
             
             return Task.FromResult<object>(new
@@ -348,7 +325,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, update the shape, and save it
             var diagramObj = LoadDiagram(filePath);
-            var updatedDiagram = DiagramManipulation.UpdateShape(diagramObj, 0, shapeId, value, x, y, width, height, style);
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(diagramObj, 0, shapeId, value, x, y, width, height, style);
             SaveDiagram(updatedDiagram, filePath);
             
             return Task.FromResult<object>(new Dictionary<string, object>
@@ -422,7 +399,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, update style, and save it
             var diagramObj = LoadDiagram(filePath);
-            var updatedDiagram = DiagramManipulation.UpdateShape(diagramObj, 0, shapeId, null, null, null, null, null, styleString);
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(diagramObj, 0, shapeId, null, null, null, null, null, styleString);
             SaveDiagram(updatedDiagram, filePath);
             
             return Task.FromResult<object>(new Dictionary<string, object>
@@ -460,7 +437,7 @@ namespace DrawIO.MCP.STDIO
                 : FSharpOption<string>.Some(pageId);
             
             // Arrange the diagram
-            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.ArrangeDiagram(loadedDiagram, pageIdOption);
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.arrangeDiagram(loadedDiagram, pageIdOption);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
@@ -489,7 +466,7 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Move the shape
-            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.MoveShape(loadedDiagram, shape_id, x, y);
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.moveShape(loadedDiagram, shape_id, x, y);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
@@ -498,62 +475,6 @@ namespace DrawIO.MCP.STDIO
             {
                 ["success"] = true,
                 ["message"] = $"Shape {shape_id} moved to position ({x}, {y})"
-            });
-        }
-        
-        private static Task<object> UpdateShapeStyleAsync(JsonElement parameters, string diagramsDirectory)
-        {
-            string diagram = GetParameterString(parameters, "diagram");
-            
-            // Try both naming conventions for parameters
-            string shape_id;
-            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
-            {
-                shape_id = shapeIdElement.GetString();
-            }
-            else
-            {
-                shape_id = GetParameterString(parameters, "shape_id");
-            }
-            
-            // Try both naming conventions for style properties
-            JsonElement stylePropertiesElement;
-            if (parameters.TryGetProperty("styleProperties", out var stylePropsElement))
-            {
-                stylePropertiesElement = stylePropsElement;
-            }
-            else
-            {
-                stylePropertiesElement = GetParameterObject(parameters, "style_properties");
-            }
-            
-            var styleProperties = stylePropertiesElement
-                .EnumerateObject()
-                .Select(p => new KeyValuePair<string, string>(p.Name, p.Value.GetString() ?? ""))
-                .ToDictionary(p => p.Key, p => p.Value);
-            
-            string filePath = Path.Combine(diagramsDirectory, diagram);
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
-            }
-            
-            // Load the diagram
-            var loadedDiagram = LoadDiagram(filePath);
-            
-            // Update the shape style
-            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.UpdateShapeStyle(
-                loadedDiagram, 
-                shape_id,
-                FSharpWrappers.DictionaryToMap(styleProperties));
-            
-            // Save the updated diagram
-            SaveDiagram(updatedDiagram, filePath);
-            
-            return Task.FromResult<object>(new Dictionary<string, object>
-            {
-                ["success"] = true,
-                ["message"] = $"Style of shape {shape_id} updated"
             });
         }
         
@@ -572,7 +493,7 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Create a new page
-            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.CreateDiagramPage(loadedDiagram, name);
+            var updatedDiagram = DrawIO.MCP.Core.FileOperations.createDiagramPage(loadedDiagram, name);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
@@ -603,16 +524,23 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Get the page
-            var page = DrawIO.MCP.STDIO.DiagramOperations.GetDiagramPage(loadedDiagram, page_index);
+            var pageOption = FSharpOption<FSharpTypes.Page>.None;
             
-            if (page.IsNone())
+            if (page_index >= 0 && page_index < loadedDiagram.Pages.Length)
+            {
+                pageOption = FSharpOption<FSharpTypes.Page>.Some(loadedDiagram.Pages[page_index]);
+            }
+            
+            if (pageOption.IsNone())
             {
                 throw new ArgumentException($"Page at index {page_index} not found");
             }
             
+            var page = pageOption.Value;
+            
             // Convert cells to a format suitable for JSON serialization
             var cells = new List<Dictionary<string, object>>();
-            foreach (var cell in page.Value.Cells)
+            foreach (var cell in page.Cells)
             {
                 var cellObj = new Dictionary<string, object>
                 {
@@ -655,8 +583,8 @@ namespace DrawIO.MCP.STDIO
                 success = true,
                 page = new
                 {
-                    id = page.Value.Id,
-                    name = page.Value.Name,
+                    id = page.Id,
+                    name = page.Name,
                     cells = cells
                 }
             });
@@ -684,7 +612,7 @@ namespace DrawIO.MCP.STDIO
             }
             
             // Update the page
-            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.UpdateDiagramPage(loadedDiagram, pageId, 
+            var updatedDiagram = DrawIO.MCP.Core.FileOperations.updateDiagramPage(loadedDiagram, pageId, 
                 string.IsNullOrEmpty(name) ? FSharpOption<string>.None : FSharpOption<string>.Some(name));
             
             // Save the updated diagram
@@ -712,7 +640,7 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Delete the page
-            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.DeleteDiagramPage(loadedDiagram, pageId);
+            var updatedDiagram = DrawIO.MCP.Core.FileOperations.deleteDiagramPage(loadedDiagram, pageId);
             
             // Check if the diagram was modified (the page was deleted)
             bool deleted = updatedDiagram.Pages.Length < loadedDiagram.Pages.Length;
@@ -747,7 +675,7 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Move the cell between pages
-            var updatedDiagram = DrawIO.MCP.STDIO.DiagramOperations.MoveCellBetweenPages(loadedDiagram, cellId, sourcePageId, targetPageId);
+            var updatedDiagram = DrawIO.MCP.Core.FileOperations.moveCellBetweenPages(loadedDiagram, cellId, sourcePageId, targetPageId);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
@@ -1023,6 +951,73 @@ namespace DrawIO.MCP.STDIO
             }
             
             throw new ArgumentException($"Required parameter '{name}' is missing. Expected type: object");
+        }
+        
+        // Helper method to update a shape with style properties
+        private static Task<object> UpdateShapeWithStyleAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            
+            // Try both naming conventions for parameters
+            string shape_id;
+            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+            {
+                shape_id = shapeIdElement.GetString();
+            }
+            else
+            {
+                shape_id = GetParameterString(parameters, "shape_id");
+            }
+            
+            // Try both naming conventions for style properties
+            JsonElement stylePropertiesElement;
+            if (parameters.TryGetProperty("styleProperties", out var stylePropsElement))
+            {
+                stylePropertiesElement = stylePropsElement;
+            }
+            else
+            {
+                stylePropertiesElement = GetParameterObject(parameters, "style_properties");
+            }
+            
+            var styleProperties = stylePropertiesElement
+                .EnumerateObject()
+                .Select(p => new KeyValuePair<string, string>(p.Name, p.Value.GetString() ?? ""))
+                .ToDictionary(p => p.Key, p => p.Value);
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Build a combined style string instead of using a map
+            var styleString = string.Join(";", styleProperties.Select(kv => $"{kv.Key}={kv.Value}"));
+            if (!styleString.EndsWith(";")) styleString += ";";
+            
+            // Update the shape style by using UpdateShape instead
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                loadedDiagram, 
+                0, // page index, assuming 0 for now
+                shape_id,
+                null, // value
+                null, // x
+                null, // y
+                null, // width
+                null, // height
+                styleString); // style
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["success"] = true,
+                ["message"] = $"Style of shape {shape_id} updated"
+            });
         }
     }
 } 

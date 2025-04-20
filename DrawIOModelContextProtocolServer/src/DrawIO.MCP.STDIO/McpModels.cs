@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -101,6 +102,32 @@ namespace DrawIO.MCP.STDIO
         public string Name { get; set; }
         public string Type { get; set; }
         public string Description { get; set; }
+        public bool Required { get; set; }
+    }
+    
+    // MCP Tool definition for ListToolsAsync
+    public class McpToolDefinition
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+        
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+        
+        [JsonPropertyName("schema_inputs")]
+        public Dictionary<string, McpParameterDefinition> SchemaInputs { get; set; }
+    }
+
+    // MCP Parameter definition for tool inputs
+    public class McpParameterDefinition
+    {
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
+        
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+        
+        [JsonPropertyName("required")]
         public bool Required { get; set; }
     }
     
