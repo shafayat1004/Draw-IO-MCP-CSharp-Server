@@ -817,7 +817,7 @@ namespace DrawIO.MCP.STDIO
             
             try
             {
-                // Check if draw.io CLI is available
+                // Check if drawio CLI is available
                 bool drawIoAvailable = CheckDrawIoCliAvailable(logWriter, verbose);
                 if (!drawIoAvailable)
                 {
@@ -829,7 +829,7 @@ namespace DrawIO.MCP.STDIO
                             new
                             {
                                 type = "text",
-                                text = "Error: draw.io CLI is not available. Please install draw.io CLI to enable image export."
+                                text = "Error: drawio CLI is not available. Please install drawio CLI to enable image export."
                             }
                         }
                     };
@@ -839,10 +839,10 @@ namespace DrawIO.MCP.STDIO
                 string tempFileName = $"{Path.GetFileNameWithoutExtension(diagram)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
                 string outputImagePath = Path.Combine(diagramsDirectory, tempFileName);
                 
-                // Build the draw.io CLI command
+                // Build the drawio CLI command
                 var processStartInfo = new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName = "draw.io",
+                    FileName = "drawio",
                     Arguments = $"--export --format {format} --page-index {page} --output \"{outputImagePath}\" \"{filePath}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -852,7 +852,7 @@ namespace DrawIO.MCP.STDIO
 
                 LogMessage(logWriter, verbose, $"Executing command: {processStartInfo.FileName} {processStartInfo.Arguments}");
                 
-                // Execute the draw.io CLI command
+                // Execute the drawio CLI command
                 using var process = System.Diagnostics.Process.Start(processStartInfo);
                 if (process == null)
                 {
@@ -864,7 +864,7 @@ namespace DrawIO.MCP.STDIO
                             new
                             {
                                 type = "text",
-                                text = "Error: Failed to start draw.io CLI process"
+                                text = "Error: Failed to start drawio CLI process"
                             }
                         }
                     };
@@ -876,7 +876,7 @@ namespace DrawIO.MCP.STDIO
                 
                 if (process.ExitCode != 0)
                 {
-                    LogMessage(logWriter, true, $"draw.io CLI failed with exit code {process.ExitCode}");
+                    LogMessage(logWriter, true, $"drawio CLI failed with exit code {process.ExitCode}");
                     LogMessage(logWriter, true, $"Stderr: {stderr}");
                     
                     return new
@@ -887,7 +887,7 @@ namespace DrawIO.MCP.STDIO
                             new
                             {
                                 type = "text",
-                                text = $"Error: draw.io CLI failed: {stderr}"
+                                text = $"Error: drawio CLI failed: {stderr}"
                             }
                         }
                     };
@@ -906,7 +906,7 @@ namespace DrawIO.MCP.STDIO
                             new
                             {
                                 type = "text",
-                                text = "Error: Image file was not created by draw.io CLI"
+                                text = "Error: Image file was not created by drawio CLI"
                             }
                         }
                     };
@@ -964,7 +964,7 @@ namespace DrawIO.MCP.STDIO
             {
                 var processStartInfo = new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName = "draw.io",
+                    FileName = "drawio",
                     Arguments = "--version",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -975,7 +975,7 @@ namespace DrawIO.MCP.STDIO
                 using var process = System.Diagnostics.Process.Start(processStartInfo);
                 if (process == null)
                 {
-                    LogMessage(logWriter, verbose, "Failed to start draw.io CLI process for version check");
+                    LogMessage(logWriter, verbose, "Failed to start drawio CLI process for version check");
                     return false;
                 }
                 
@@ -984,16 +984,16 @@ namespace DrawIO.MCP.STDIO
                 if (process.ExitCode == 0)
                 {
                     string version = process.StandardOutput.ReadToEnd().Trim();
-                    LogMessage(logWriter, verbose, $"draw.io CLI is available, version: {version}");
+                    LogMessage(logWriter, verbose, $"drawio CLI is available, version: {version}");
                     return true;
                 }
                 
-                LogMessage(logWriter, verbose, $"draw.io CLI check failed with exit code {process.ExitCode}");
+                LogMessage(logWriter, verbose, $"drawio CLI check failed with exit code {process.ExitCode}");
                 return false;
             }
             catch (Exception ex)
             {
-                LogMessage(logWriter, verbose, $"Error checking draw.io CLI availability: {ex.Message}");
+                LogMessage(logWriter, verbose, $"Error checking drawio CLI availability: {ex.Message}");
                 return false;
             }
         }

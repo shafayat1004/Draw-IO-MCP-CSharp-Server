@@ -10,13 +10,13 @@ I want to be able to run the docker container locally. and use cursor or copilot
 
 I’ll also generate the full project structure, Dockerfile, and helper scripts so you can run and develop in Cursor or VS Code. I’ll update you once it’s ready.
 
-# MCP Draw.io Diagram Server Prototype
+# MCP drawio Diagram Server Prototype
 
-This answer presents a **Model Context Protocol (MCP)** server implementation for draw.io (diagrams.net) diagrams. The server is self-contained in a Docker container and allows an AI agent (via IDE plugins or codegen tools) to **read, generate, and edit** `.drawio` diagram files. It uses Python (FastAPI) for the web server, and the draw.io Desktop CLI for diagram processing. The solution parses `.drawio` files (which are basically XML, often stored as a deflated base64 string ([Extracting the XML from mxfiles - draw.io](https://drawio-app.com/blog/extracting-the-xml-from-mxfiles/#:~:text=The%20default%20format%20for%20saving,how%20the%20diagram%20is%20constructed))) into a JSON structure suitable for LLM consumption, and provides HTTP endpoints (resources and tools) following MCP concepts ([Introduction - Model Context Protocol](https://modelcontextprotocol.io/introduction#:~:text=MCP%20is%20an%20open%20protocol,different%20data%20sources%20and%20tools)).
+This answer presents a **Model Context Protocol (MCP)** server implementation for drawio (diagrams.net) diagrams. The server is self-contained in a Docker container and allows an AI agent (via IDE plugins or codegen tools) to **read, generate, and edit** `.drawio` diagram files. It uses Python (FastAPI) for the web server, and the drawio Desktop CLI for diagram processing. The solution parses `.drawio` files (which are basically XML, often stored as a deflated base64 string ([Extracting the XML from mxfiles - drawio](https://drawio-app.com/blog/extracting-the-xml-from-mxfiles/#:~:text=The%20default%20format%20for%20saving,how%20the%20diagram%20is%20constructed))) into a JSON structure suitable for LLM consumption, and provides HTTP endpoints (resources and tools) following MCP concepts ([Introduction - Model Context Protocol](https://modelcontextprotocol.io/introduction#:~:text=MCP%20is%20an%20open%20protocol,different%20data%20sources%20and%20tools)).
 
 ## Directory Structure
 
-Below is the project structure for the MCP draw.io server. All code and config files are included for building and running the server locally or in Docker:
+Below is the project structure for the MCP drawio server. All code and config files are included for building and running the server locally or in Docker:
 
 ```plaintext
 ├── Dockerfile
@@ -30,7 +30,7 @@ Below is the project structure for the MCP draw.io server. All code and config f
     └── ... (directory for storing .drawio diagram files)
 ```
 
-- **Dockerfile** – Defines the Docker image (Python + draw.io CLI).
+- **Dockerfile** – Defines the Docker image (Python + drawio CLI).
 - **docker-compose.yaml** – (Optional) Compose file to run the container.
 - **requirements.txt** – Python dependencies (FastAPI, Uvicorn, etc).
 - **run_local.sh** – Helper script to run the server locally (for development).
@@ -39,12 +39,12 @@ Below is the project structure for the MCP draw.io server. All code and config f
 
 ## Dockerfile
 
-The Dockerfile uses a slim Python base image and installs the draw.io Desktop CLI (via the official .deb package). This allows the server to use the draw.io command-line for exporting diagrams to images or creating files. No database or external services are needed. **Note:** In a real deployment, you'd add specific version numbers and handle the Electron dependencies more carefully, but this approach keeps it simple.
+The Dockerfile uses a slim Python base image and installs the drawio Desktop CLI (via the official .deb package). This allows the server to use the drawio command-line for exporting diagrams to images or creating files. No database or external services are needed. **Note:** In a real deployment, you'd add specific version numbers and handle the Electron dependencies more carefully, but this approach keeps it simple.
 
 ```Dockerfile
 FROM python:3.11-slim
 
-# Install draw.io CLI (drawio-desktop in headless mode)
+# Install drawio CLI (drawio-desktop in headless mode)
 RUN apt-get update && apt-get install -y wget curl libgtk-3-0 libxss1 libasound2 && \
     curl -s https://api.github.com/repos/jgraph/drawio-desktop/releases/latest | grep browser_download_url | grep '\.deb' | cut -d '"' -f 4 | wget -i - && \
     apt-get install -y ./drawio-amd64-*.deb && rm -f drawio-amd64-*.deb && \
@@ -59,7 +59,7 @@ EXPOSE 8000
 CMD ["python", "-m", "mcp_drawio.server"]
 ```
 
-This Dockerfile fetches the latest **draw.io Desktop** release and installs it. The draw.io binary (`drawio`) will be available in the PATH for our server to call. It then copies the Python code and installs the requirements, and sets the container to run our FastAPI app. 
+This Dockerfile fetches the latest **drawio Desktop** release and installs it. The drawio binary (`drawio`) will be available in the PATH for our server to call. It then copies the Python code and installs the requirements, and sets the container to run our FastAPI app. 
 
 ## docker-compose.yaml
 
@@ -91,10 +91,10 @@ The core server logic is implemented in **FastAPI** (a lightweight web framework
 - **Resources** endpoints for accessing diagram data (`GET /mcp/resources/...`)
 - **Tools** endpoints for diagram operations (`POST /mcp/tools/...`)
 
-The server uses the draw.io file format: it reads and writes `.drawio` files (which are XML). If the XML content is compressed (draw.io saves diagrams as compressed XML by default ([Extracting the XML from mxfiles - draw.io](https://drawio-app.com/blog/extracting-the-xml-from-mxfiles/#:~:text=The%20default%20format%20for%20saving,how%20the%20diagram%20is%20constructed))), the server decodes it (inflate from base64) to get the raw XML structure. We then parse the XML into an internal model (using Python's `xml.etree.ElementTree`). The server manipulates this XML in memory for edits (adding shapes, connecting shapes, etc.), and serializes back to XML when saving. For simplicity, we save diagrams in uncompressed XML form (which draw.io can still open) to avoid dealing with compression on each edit.
+The server uses the drawio file format: it reads and writes `.drawio` files (which are XML). If the XML content is compressed (drawio saves diagrams as compressed XML by default ([Extracting the XML from mxfiles - drawio](https://drawio-app.com/blog/extracting-the-xml-from-mxfiles/#:~:text=The%20default%20format%20for%20saving,how%20the%20diagram%20is%20constructed))), the server decodes it (inflate from base64) to get the raw XML structure. We then parse the XML into an internal model (using Python's `xml.etree.ElementTree`). The server manipulates this XML in memory for edits (adding shapes, connecting shapes, etc.), and serializes back to XML when saving. For simplicity, we save diagrams in uncompressed XML form (which drawio can still open) to avoid dealing with compression on each edit.
 
 Key implementation details:
-- **Parsing .drawio files**: If a `<diagram>` section contains compressed content, we base64-decode and decompress it (using zlib with raw deflate) and parse the XML ([Extracting the XML from mxfiles - draw.io](https://drawio-app.com/blog/extracting-the-xml-from-mxfiles/#:~:text=The%20default%20format%20for%20saving,how%20the%20diagram%20is%20constructed)). This yields an `<mxGraphModel>` which contains all diagram cells (shapes and connectors).
+- **Parsing .drawio files**: If a `<diagram>` section contains compressed content, we base64-decode and decompress it (using zlib with raw deflate) and parse the XML ([Extracting the XML from mxfiles - drawio](https://drawio-app.com/blog/extracting-the-xml-from-mxfiles/#:~:text=The%20default%20format%20for%20saving,how%20the%20diagram%20is%20constructed)). This yields an `<mxGraphModel>` which contains all diagram cells (shapes and connectors).
 - **JSON structure**: We convert the XML graph model into a JSON structure with a hierarchy: *pages* (diagrams can have multiple pages) → *cells*. Each cell includes attributes like `id`, `value` (text label), `style` (defines shape or connector style), coordinates (`geometry` with x, y, width, height), and flags for `vertex` (shape) or `edge` (connector).
 - **Tools**: We define several actions (MCP *tools*) as HTTP POST endpoints:
   - `add_shape`: Add a new shape (vertex) to a diagram.
@@ -104,7 +104,7 @@ Key implementation details:
   - `GET /mcp/resources` lists available diagram files.
   - `GET /mcp/resources/{name}` returns the diagram’s JSON data (pages and cells).
   - `POST /mcp/resources` creates a new empty diagram.
-  - `GET /mcp/resources/{name}/export` exports the diagram as an image (PNG by default) using the draw.io CLI.
+  - `GET /mcp/resources/{name}/export` exports the diagram as an image (PNG by default) using the drawio CLI.
 
 Below is the **`mcp_drawio/server.py`** code:
 
@@ -117,7 +117,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 import subprocess
 
-app = FastAPI(title="MCP Draw.io Server", description="MCP server for draw.io diagrams")
+app = FastAPI(title="MCP drawio Server", description="MCP server for drawio diagrams")
 
 # Directory to store diagram files (can be overridden by DIAGRAM_DIR env var)
 DIAGRAM_DIR = os.environ.get("DIAGRAM_DIR", "diagrams")
@@ -127,7 +127,7 @@ os.makedirs(DIAGRAM_DIR, exist_ok=True)
 diagrams = {}
 
 def decode_drawio(data_b64: str) -> ET.Element:
-    """Decode a base64-compressed draw.io diagram string into an XML Element."""
+    """Decode a base64-compressed drawio diagram string into an XML Element."""
     raw = base64.b64decode(data_b64)
     # Decompress using raw DEFLATE (no zlib header)
     xml_bytes = zlib.decompress(raw, wbits=-15)
@@ -150,7 +150,7 @@ def load_diagram(file_name: str):
     tree = ET.parse(path)
     root = tree.getroot()
     if root.tag != 'mxfile':
-        raise ValueError("Invalid draw.io file format")
+        raise ValueError("Invalid drawio file format")
     # Decode compressed content in each <diagram> (if any)
     for diag in root.findall('diagram'):
         if len(diag) == 0 and diag.text:  # no child means content is in text (probably compressed)
@@ -333,19 +333,19 @@ def generate_vpc_diagram(file_name: str) -> str:
     return file_name
 
 def export_diagram_image(file_name: str, page_index: int = 0, fmt: str = "png") -> str:
-    """Export the diagram to an image file using draw.io CLI. Returns the output file path."""
+    """Export the diagram to an image file using drawio CLI. Returns the output file path."""
     in_path = os.path.join(DIAGRAM_DIR, file_name)
     if not os.path.isfile(in_path):
         raise FileNotFoundError("Diagram file not found")
     out_file = file_name.replace(".drawio", f"_{page_index}.{fmt}")
     out_path = os.path.join(DIAGRAM_DIR, out_file)
-    # Use draw.io CLI to export (e.g., to PNG)
+    # Use drawio CLI to export (e.g., to PNG)
     result = subprocess.run(
         ["drawio", "-x", "-f", fmt, "--page-index", str(page_index), "-o", out_path, in_path],
         check=False
     )
     if result.returncode != 0:
-        raise RuntimeError("draw.io CLI export failed")
+        raise RuntimeError("drawio CLI export failed")
     return out_path
 
 # --- MCP Resource Endpoints ---
@@ -453,7 +453,7 @@ if __name__ == "__main__":
 
 A few points about the code:
 - It uses **in-memory caching** of loaded diagrams for quick edits. For simplicity, it does not implement complex multi-page editing or concurrent editing.
-- New shape and edge IDs are generated as `"mcp1", "mcp2", ..."` to ensure they don't clash with existing IDs (which are usually either numeric or random strings from draw.io).
+- New shape and edge IDs are generated as `"mcp1", "mcp2", ..."` to ensure they don't clash with existing IDs (which are usually either numeric or random strings from drawio).
 - The `export_diagram_image` function calls the `drawio` CLI to export the file to an image (which can then be retrieved via the `/export` endpoint). For example, it uses `drawio -x -f png ...` to produce a PNG image.
 
 **Authentication:** As requested, the server has **no auth** by default. In a real scenario, you'd protect these endpoints (for example, expecting a JWT in an `Authorization` header). We left a comment in the code indicating where to add such checks. (For instance, using FastAPI dependencies or middleware to verify tokens for each request.)
@@ -590,17 +590,17 @@ Finally, let's demonstrate how an LLM agent (in an IDE like VS Code or Cursor) c
 
    If needed, the agent could then connect this new node to an existing subnet by calling `connect_shapes` with the appropriate source and target IDs.
 
-4. **Export diagram (optional):** After modifications, the agent (or user) might want to see the diagram visually. The server supports exporting to PNG/SVG via the draw.io CLI. For example:
+4. **Export diagram (optional):** After modifications, the agent (or user) might want to see the diagram visually. The server supports exporting to PNG/SVG via the drawio CLI. For example:
    ```http
    GET /mcp/resources/aws_vpc_example.drawio/export?format=png
    ```
-   This will produce a PNG image of the diagram. The response is the image file itself (which the IDE or agent can display to the user). The server uses the draw.io headless mode to generate this image behind the scenes.
+   This will produce a PNG image of the diagram. The response is the image file itself (which the IDE or agent can display to the user). The server uses the drawio headless mode to generate this image behind the scenes.
 
 Throughout this process, **no manual GUI steps are needed** – the LLM, through the MCP server, can manipulate the diagram structure. The **MCP paradigm** treats the diagram as a contextual resource and the diagram operations as tools/functions that the LLM can call autonomously ([Introduction - Model Context Protocol](https://modelcontextprotocol.io/introduction#:~:text=MCP%20is%20an%20open%20protocol,different%20data%20sources%20and%20tools)) ([A Deep Dive into Model Context Protocol Integration | by Shelwyn Corte | Mar, 2025 | Medium](https://shelwyncorte.medium.com/a-deep-dive-into-model-context-protocol-integration-3150d60c5896#:~:text=Requests%20and%20Responses%3A%20Clients%20%28e,%E2%80%9Cid%E2%80%9D%3A%201%2C%20%E2%80%9Cjsonrpc%E2%80%9D%3A%20%E2%80%9C2.0%E2%80%9D)). This enables advanced workflows, such as an AI-assisted network diagramming tool where the AI can add components, connect them, and keep the diagram file updated in real-time.
 
 ### Running the Server Locally
 
-For development or testing without Docker, you can run the server with the provided script. Ensure you have Python and the requirements installed, and a draw.io binary available:
+For development or testing without Docker, you can run the server with the provided script. Ensure you have Python and the requirements installed, and a drawio binary available:
 ```bash
 # Install dependencies
 pip install -r requirements.txt
@@ -615,5 +615,5 @@ This starts the FastAPI server on port 8000. You can then use tools like `curl` 
 **References:**
 
 - Anthropic, *"Model Context Protocol (MCP) Introduction"* – MCP standardizes how AI applications connect to tools and data ([Introduction - Model Context Protocol](https://modelcontextprotocol.io/introduction#:~:text=MCP%20is%20an%20open%20protocol,different%20data%20sources%20and%20tools)).  
-- Diagrams.net, *"Extracting the XML from .drawio files"* – `.drawio` files are XML-based, defaulting to compressed (deflate) storage ([Extracting the XML from mxfiles - draw.io](https://drawio-app.com/blog/extracting-the-xml-from-mxfiles/#:~:text=The%20default%20format%20for%20saving,how%20the%20diagram%20is%20constructed)), which we decode to manipulate diagram content.  
+- Diagrams.net, *"Extracting the XML from .drawio files"* – `.drawio` files are XML-based, defaulting to compressed (deflate) storage ([Extracting the XML from mxfiles - drawio](https://drawio-app.com/blog/extracting-the-xml-from-mxfiles/#:~:text=The%20default%20format%20for%20saving,how%20the%20diagram%20is%20constructed)), which we decode to manipulate diagram content.  
 - Shelwyn Corte, *"Deep Dive into MCP Integration"* – describes how tools are listed/invoked in MCP (e.g., `tools/list`, `tools/call`) ([A Deep Dive into Model Context Protocol Integration | by Shelwyn Corte | Mar, 2025 | Medium](https://shelwyncorte.medium.com/a-deep-dive-into-model-context-protocol-integration-3150d60c5896#:~:text=Requests%20and%20Responses%3A%20Clients%20%28e,%E2%80%9Cid%E2%80%9D%3A%201%2C%20%E2%80%9Cjsonrpc%E2%80%9D%3A%20%E2%80%9C2.0%E2%80%9D)).

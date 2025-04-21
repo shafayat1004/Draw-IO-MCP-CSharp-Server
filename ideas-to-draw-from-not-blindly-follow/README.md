@@ -1,6 +1,6 @@
-# MCP Draw.io Server
+# MCP drawio Server
 
-A Model Context Protocol (MCP) server implementation for draw.io (diagrams.net) diagrams. This server allows AI agents (via IDE plugins or codegen tools) to read, generate, and edit `.drawio` diagram files.
+A Model Context Protocol (MCP) server implementation for drawio (diagrams.net) diagrams. This server allows AI agents (via IDE plugins or codegen tools) to read, generate, and edit `.drawio` diagram files.
 
 > **Important Note:** The Server-Sent Events (SSE) functionality is **NOT YET IMPLEMENTED**. Only the basic HTTP API functionality for diagram manipulation is working as expected. The server provides direct API endpoints but the MCP protocol integration via SSE is still under development.
 
@@ -155,7 +155,7 @@ python -m mcp_drawio.server --port 8888 --reload
 
 ## MCP Integration
 
-The MCP Draw.io Server implements the Model Context Protocol, a standardized way for AI models to interact with external tools and data sources. As an MCP server, it allows AI assistants to:
+The MCP drawio Server implements the Model Context Protocol, a standardized way for AI models to interact with external tools and data sources. As an MCP server, it allows AI assistants to:
 
 1. Discover available diagram resources (`diagram://` resources)
 2. Create and modify diagram files through standardized tools
@@ -323,7 +323,7 @@ This creates a test diagram with shapes and connectors and exports it as a PNG i
 
 ## Docker Support
 
-The MCP Draw.io Server can be run in a Docker container. This is the recommended way to deploy the service, as it ensures all dependencies are correctly installed and configured.
+The MCP drawio Server can be run in a Docker container. This is the recommended way to deploy the service, as it ensures all dependencies are correctly installed and configured.
 
 ### Building and Running with Docker Compose
 

@@ -1,6 +1,6 @@
 # DrawIO MCP Server
 
-A Model Context Protocol (MCP) server implementation for draw.io (diagrams.net) diagrams. This server allows AI agents (via IDE plugins or codegen tools) to read, generate, and edit `.drawio` diagram files.
+A Model Context Protocol (MCP) server implementation for drawio (diagrams.net) diagrams. This server allows AI agents (via IDE plugins or codegen tools) to read, generate, and edit `.drawio` diagram files.
 
 ## Features
 
@@ -37,7 +37,7 @@ A Model Context Protocol (MCP) server implementation for draw.io (diagrams.net) 
 
 - .NET 8.0 SDK
 - Visual Studio 2022, VS Code, or Rider (optional)
-- draw.io CLI (optional, required for image export)
+- drawio CLI (optional, required for image export)
 
 ### Building the Solution
 
@@ -122,7 +122,7 @@ The server exposes the following MCP tools:
 - `style_shape` - Apply styles to shapes (colors, borders, etc.)
 - `arrange_diagram` - Automatically organize shapes in a diagram (horizontal, vertical, or grid layout)
 - `generate_vpc` - Generate a sample AWS VPC layout diagram
-- `get_diagram_image` - Export a diagram as an image (requires draw.io CLI)
+- `get_diagram_image` - Export a diagram as an image (requires drawio CLI)
 - `move_shape` - Move a shape to a new position in the diagram
 - `update_shape_style` - Update specific style properties of a shape
 - `create_diagram_page` - Create a new page in a multi-page diagram
@@ -153,4 +153,4 @@ MIT
 ## Acknowledgements
 
 - [Model Context Protocol Project](https://modelcontextprotocol.io)
-- [draw.io](https://www.drawio.com)
+- [drawio](https://www.drawio.com)

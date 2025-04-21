@@ -80,7 +80,7 @@ module Types =
 module XmlParser =
     open Types
     
-    /// Decode a base64-compressed draw.io diagram string into an XML Element
+    /// Decode a base64-compressed drawio diagram string into an XML Element
     let decodeDrawioXml (data: string) =
         try
             let rawBytes = Convert.FromBase64String(data)
@@ -214,7 +214,7 @@ module XmlParser =
             let root = doc.Root
             
             if root.Name.LocalName <> "mxfile" then
-                raise <| Exception("Invalid draw.io file format")
+                raise <| Exception("Invalid drawio file format")
             
             let modified = 
                 match root.Attribute(XName.Get("modified")) with

@@ -6,21 +6,32 @@ This document outlines a structured implementation plan for the tools requested 
 
 The DrawIO MCP Server currently implements the following tools:
 
-### Already Implemented
+### Already Implemented and Confirmed Working
 - ✅ Create New Diagram (`create_new_diagram`)
-- ✅ Add Shape (`add_shape`)
-- ✅ Add Connector (`connect_shapes`)
-- ✅ Delete Element (`delete_shape`)
+- ✅ Generate Sample VPC Layout (`generate_vpc`)
+- ✅ Add Shape (`add_shape`) with basic shapes (rectangle, ellipse, cylinder)
+- ✅ Connect Shapes (`connect_shapes`)
+- ✅ Style Shape (`style_shape`) with:
+  - Fill Color
+  - Border Color
 - ✅ Move Shape (`move_shape`)
-- ✅ Set Label/Text (via `update_shape`)
-- ✅ Set Fill Color (via `style_shape`)
-- ✅ Set Border Color (via `style_shape`)
-- ✅ Auto-arrange layouts (basic versions via `arrange_diagram`)
-- ✅ Export to image (`get_diagram_image`)
-- ✅ Multi-page support (`create_diagram_page`, `get_diagram_page`, etc.)
-- ✅ Update style properties (`update_shape_style`)
+- ✅ Create Diagram Page (`create_diagram_page`)
+- ✅ Get Diagram Page (`get_diagram_page`)
+- ✅ Get Element Info (`get_element_info`)
+- ✅ Find Elements by Text (`find_elements_by_text`)
+- ✅ List Neighbors (`list_neighbors`)
+- ✅ Get Diagram Bounds (`get_diagram_bounds`)
+- ✅ Update Shape (`update_shape`)
 
-### Partially Implemented
+### Needs Visual Verification
+- 🟨 Delete Shape (`delete_shape`) - Implementation appears to work but needs visual confirmation
+- 🟨 Update Shape Style (`update_shape_style`) - Changes applied but needs visual confirmation
+- 🟨 Auto-arrange Layouts (`arrange_diagram`) - Layout changes need visual confirmation
+
+### Configuration Required
+- 🟨 Export to Image (`get_diagram_image`) - drawio CLI found but not working properly
+
+### Known Missing Features
 - 🟨 Set Line Style (partial via `style_shape`, but not all options)
 - 🟨 Set Arrow Style (partial via `style_shape`)
 - 🟨 Styling capabilities (limited set of style properties)
@@ -33,7 +44,7 @@ The DrawIO MCP Server currently implements the following tools:
 1. **Create New Diagram** ✅ - *Already implemented*
 2. **Add Shape** ✅ - *Already implemented*
 3. **Add Connector** ✅ - *Already implemented*
-4. **Delete Element** ✅ - *Already implemented*
+4. **Delete Element** 🟨 - *Implementation status unclear*
 5. **Move Shape** ✅ - *Already implemented*
 6. **Resize Shape** 🔴 - *Implement as new `resize_shape` tool*
    - Approach: Modify shape geometry's width and height
@@ -67,25 +78,10 @@ The DrawIO MCP Server currently implements the following tools:
     - Complexity: Low
 
 #### Queries & Introspection
-15. **Find Elements by Text** 🔴 - *New tool needed*
-    - Approach: Implement `find_elements_by_text` to search through cell values
-    - Complexity: Low
-    - Returns array of matching element IDs
-    
-16. **Get Element Info** 🔴 - *New tool needed*
-    - Approach: Implement `get_element_info` to return detailed properties
-    - Complexity: Low
-    - Essential for many operations
-    
-17. **List Neighbors of Node** 🔴 - *New tool needed*
-    - Approach: Implement `list_neighbors` to find connected shapes
-    - Complexity: Medium
-    - Requires traversing edge connections
-    
-18. **Get Diagram Bounding Box / Size** 🔴 - *New tool needed*
-    - Approach: Implement `get_diagram_bounds` to calculate extent
-    - Complexity: Low
-    - Useful for layout decisions
+15. **Find Elements by Text** ✅ - *Already implemented*
+16. **Get Element Info** ✅ - *Already implemented*
+17. **List Neighbors of Node** ✅ - *Already implemented*
+18. **Get Diagram Bounding Box / Size** ✅ - *Already implemented*
 
 ### Tier 2: Advanced Editing & Layout Tools
 
@@ -197,13 +193,13 @@ The DrawIO MCP Server currently implements the following tools:
 ### Feedback & Export Tools
 
 #### Visual Feedback Loop
-52-54. **Render & Preview** ✅ - *Already implemented via `get_diagram_image`*
+52-54. **Render & Preview** 🟨 - *Partially implemented, extend `get_diagram_image`*
 
 #### Validation & Output
 55-58. **Export Options** 🟨 - *Partially implemented, extend `get_diagram_image`*
     - Approach: Add support for more formats and options
     - Complexity: Medium
-    - Requires draw.io CLI capability tests
+    - Requires drawio CLI capability tests
 
 ### Tier 4: Network Diagram Specific Tools
 
@@ -275,7 +271,7 @@ The DrawIO MCP Server currently implements the following tools:
 
 #### Export and Rendering
 71. **CLI Integration** 🔴 - *New tool needed*
-    - Approach: Implement proper draw.io CLI integration
+    - Approach: Implement proper drawio CLI integration
     - Complexity: Medium
     - Required for image export and rendering
 

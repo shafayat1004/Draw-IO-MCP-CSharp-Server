@@ -31,7 +31,8 @@ alwaysApply: true
 - Work in a containerized environment.
 - Do not edit system files unless explicitly approved.
 - The SSE and STDIO project should start, restart, stop, live logs, and other relevant commands and hints.
-- I have `draw.io` as cli that you can use to check various things.
+- I have `drawio` as cli that you can use to check various things.
+- Prefer bash commands as my development machine is Linux or MacOs.
 
 ## Project Structure
 - F# would be the primary language.
