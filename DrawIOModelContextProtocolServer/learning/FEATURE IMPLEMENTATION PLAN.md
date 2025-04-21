@@ -6,10 +6,10 @@ This document outlines a structured implementation plan for the tools requested 
 
 The DrawIO MCP Server currently implements the following tools:
 
-### Already Implemented and Confirmed Working
+### Fully Implemented and Confirmed Working
 - ✅ Create New Diagram (`create_new_diagram`)
 - ✅ Generate Sample VPC Layout (`generate_vpc`)
-- ✅ Add Shape (`add_shape`) with basic shapes (rectangle, ellipse, cylinder)
+- ✅ Add Shape (`add_shape`) with basic shapes (rectangle, ellipse)
 - ✅ Connect Shapes (`connect_shapes`)
 - ✅ Style Shape (`style_shape`) with:
   - Fill Color
@@ -22,19 +22,30 @@ The DrawIO MCP Server currently implements the following tools:
 - ✅ List Neighbors (`list_neighbors`)
 - ✅ Get Diagram Bounds (`get_diagram_bounds`)
 - ✅ Update Shape (`update_shape`)
+- ✅ Auto-arrange Layouts (`arrange_diagram`) with:
+  - Horizontal layout
+  - More layouts to be implemented
 
-### Needs Visual Verification
-- 🟨 Delete Shape (`delete_shape`) - Implementation appears to work but needs visual confirmation
-- 🟨 Update Shape Style (`update_shape_style`) - Changes applied but needs visual confirmation
-- 🟨 Auto-arrange Layouts (`arrange_diagram`) - Layout changes need visual confirmation
-
-### Configuration Required
-- 🟨 Export to Image (`get_diagram_image`) - drawio CLI found but not working properly
+### Needs Investigation
+- 🟨 Get Diagram Image (`get_diagram_image`) - drawio CLI integration issues:
+  - CLI is installed and available
+  - Image generation works but file creation reports errors
+  - Need to investigate file paths and permissions
+  - Consider alternative export methods if CLI issues persist
 
 ### Known Missing Features
-- 🟨 Set Line Style (partial via `style_shape`, but not all options)
-- 🟨 Set Arrow Style (partial via `style_shape`)
-- 🟨 Styling capabilities (limited set of style properties)
+- 🔴 Set Line Style (not implemented via `style_shape`)
+- 🔴 Set Arrow Style (not implemented)
+- 🔴 Advanced styling capabilities:
+  - Font styles
+  - Text alignment
+  - Line patterns
+  - Gradient fills
+- 🔴 Shape resizing
+- 🔴 Group management
+- 🔴 Layer support
+- 🔴 Custom shape libraries
+- 🔴 Undo/Redo support
 
 ## Implementation Plan by Tier
 
@@ -69,11 +80,11 @@ The DrawIO MCP Server currently implements the following tools:
     - Approach: Update `fontStyle` style property
     - Complexity: Low
     
-13. **Set Line Style** 🟨 - *Partially implemented, enhance existing `style_shape`*
+13. **Set Line Style** 🔴 - *Not implemented*
     - Approach: Add support for `dashed`, `strokeWidth` properties
     - Complexity: Low
     
-14. **Set Arrow Style** 🟨 - *Partially implemented, enhance existing `style_shape`*
+14. **Set Arrow Style** 🔴 - *Not implemented*
     - Approach: Add support for `endArrow`, `startArrow` properties
     - Complexity: Low
 
@@ -147,7 +158,7 @@ The DrawIO MCP Server currently implements the following tools:
     - Requires proper embedding and sizing
 
 #### Layer Management
-32-36. **Layer Management** 🟨 - *Partially implemented via page management tools*
+32-36. **Layer Management** 🔴 - *New tool needed*
     - Approach: Add dedicated layer tools or document how to use pages as layers
     - Complexity: Medium
     - Evaluate if separate implementation needed beyond pages
@@ -270,10 +281,10 @@ The DrawIO MCP Server currently implements the following tools:
     - Support for consistent zone naming
 
 #### Export and Rendering
-71. **CLI Integration** 🔴 - *New tool needed*
-    - Approach: Implement proper drawio CLI integration
+71. **CLI Integration** 🟨 - *Partially working*
+    - Approach: Fix drawio CLI integration issues
     - Complexity: Medium
-    - Required for image export and rendering
+    - Required for reliable image export
 
 72. **Custom Shape Libraries** 🔴 - *New tool needed*
     - Approach: Implement support for loading custom shape libraries
@@ -320,6 +331,11 @@ The DrawIO MCP Server currently implements the following tools:
     - Approach: Implement server health checks
     - Complexity: Low
     - Monitor server status and performance
+
+81. **Graceful Shutdown** 🔴 - *New feature needed*
+    - Approach: Implement proper shutdown sequence
+    - Complexity: Medium
+    - Save state and clean up resources
 
 ## Core Architecture Enhancements
 

@@ -58,20 +58,51 @@ namespace DrawIO.MCP.STDIO
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
-                // Return the result directly, no need to wrap - McpRequestDispatcher will handle this
-                return result;
+                return ConvertToDictionary(result);
             }
             catch (Exception ex)
             {
                 LogMessage(logWriter, true, $"Error executing tool {toolName}: {ex.Message}");
-                // Return an error object
-                return new 
+                // Return an error object as Dictionary<string, object>
+                return new Dictionary<string, object>
                 {
-                    error = ex.Message,
-                    detail = ex.ToString(),
-                    content = new object[] { } // Add empty content array to satisfy MCP protocol
+                    ["error"] = ex.Message,
+                    ["detail"] = ex.ToString(),
+                    ["content"] = new object[] { } // Add empty content array to satisfy MCP protocol
                 };
             }
+        }
+
+        private static object ConvertToDictionary(object obj)
+        {
+            if (obj == null) return null;
+
+            // If it's already a dictionary, return as is
+            if (obj is Dictionary<string, object>) return obj;
+
+            var type = obj.GetType();
+
+            // Handle arrays and lists
+            if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
+            {
+                var list = ((IEnumerable<object>)obj).Cast<object>().Select(item => ConvertToDictionary(item)).ToList();
+                return list;
+            }
+
+            // If it's an anonymous type or a complex object, convert to dictionary
+            if (type.Name.StartsWith("<>f__AnonymousType") || (!type.IsPrimitive && type != typeof(string)))
+            {
+                var dict = new Dictionary<string, object>();
+                foreach (var prop in type.GetProperties())
+                {
+                    var value = prop.GetValue(obj);
+                    dict[prop.Name] = ConvertToDictionary(value);
+                }
+                return dict;
+            }
+
+            // Return primitive types and strings as is
+            return obj;
         }
 
         private static void LogMessage(TextWriter logWriter, bool verbose, string message)
@@ -839,45 +870,95 @@ namespace DrawIO.MCP.STDIO
                 string tempFileName = $"{Path.GetFileNameWithoutExtension(diagram)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
                 string outputImagePath = Path.Combine(diagramsDirectory, tempFileName);
                 
-                // Build the drawio CLI command
-                var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                // Build the drawio CLI command with proper escaping
+                string drawioCommand = $"drawio --export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
+                
+                // Try bash first
+                var bashStartInfo = new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName = "drawio",
-                    Arguments = $"--export --format {format} --page-index {page} --output \"{outputImagePath}\" \"{filePath}\"",
+                    FileName = "bash",
+                    Arguments = $"-c \"{drawioCommand}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
 
-                LogMessage(logWriter, verbose, $"Executing command: {processStartInfo.FileName} {processStartInfo.Arguments}");
+                LogMessage(logWriter, verbose, $"Attempting to export with bash: {bashStartInfo.FileName} {bashStartInfo.Arguments}");
                 
-                // Execute the drawio CLI command
-                using var process = System.Diagnostics.Process.Start(processStartInfo);
-                if (process == null)
+                bool exportSuccess = false;
+                string stderr = "";
+                
+                try
                 {
-                    return new
+                    using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
+                    if (bashProcess != null)
                     {
-                        isError = true,
-                        content = new[]
+                        string stdout = await bashProcess.StandardOutput.ReadToEndAsync();
+                        stderr = await bashProcess.StandardError.ReadToEndAsync();
+                        await bashProcess.WaitForExitAsync();
+
+                        if (bashProcess.ExitCode == 0)
                         {
-                            new
-                            {
-                                type = "text",
-                                text = "Error: Failed to start drawio CLI process"
-                            }
+                            exportSuccess = true;
                         }
-                    };
+                        else
+                        {
+                            LogMessage(logWriter, verbose, $"bash export failed: {stderr}");
+                        }
+                    }
                 }
-                
-                string stdout = await process.StandardOutput.ReadToEndAsync();
-                string stderr = await process.StandardError.ReadToEndAsync();
-                await process.WaitForExitAsync();
-                
-                if (process.ExitCode != 0)
+                catch (Exception ex)
                 {
-                    LogMessage(logWriter, true, $"drawio CLI failed with exit code {process.ExitCode}");
-                    LogMessage(logWriter, true, $"Stderr: {stderr}");
+                    LogMessage(logWriter, verbose, $"bash export failed: {ex.Message}");
+                }
+
+                // If bash failed, try direct drawio call (for PowerShell)
+                if (!exportSuccess)
+                {
+                    LogMessage(logWriter, verbose, "Falling back to direct drawio CLI call...");
+                    var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "drawio",
+                        Arguments = $"--export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    LogMessage(logWriter, verbose, $"Executing command: {processStartInfo.FileName} {processStartInfo.Arguments}");
+                    
+                    using var process = System.Diagnostics.Process.Start(processStartInfo);
+                    if (process == null)
+                    {
+                        return new
+                        {
+                            isError = true,
+                            content = new[]
+                            {
+                                new
+                                {
+                                    type = "text",
+                                    text = "Error: Failed to start drawio CLI process"
+                                }
+                            }
+                        };
+                    }
+                    
+                    string stdout = await process.StandardOutput.ReadToEndAsync();
+                    stderr = await process.StandardError.ReadToEndAsync();
+                    await process.WaitForExitAsync();
+                    
+                    if (process.ExitCode == 0)
+                    {
+                        exportSuccess = true;
+                    }
+                }
+
+                if (!exportSuccess)
+                {
+                    LogMessage(logWriter, true, $"drawio CLI export failed. Error: {stderr}");
                     
                     return new
                     {
@@ -962,6 +1043,43 @@ namespace DrawIO.MCP.STDIO
         {
             try
             {
+                // Try bash first
+                var bashStartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "bash",
+                    Arguments = "-c \"drawio --version\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                LogMessage(logWriter, verbose, "Attempting to check drawio CLI with bash...");
+                
+                try
+                {
+                    using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
+                    if (bashProcess != null)
+                    {
+                        string stdout = bashProcess.StandardOutput.ReadToEnd();
+                        string stderr = bashProcess.StandardError.ReadToEnd();
+                        bashProcess.WaitForExit(5000); // Wait up to 5 seconds
+
+                        if (bashProcess.ExitCode == 0)
+                        {
+                            LogMessage(logWriter, verbose, $"drawio CLI is available via bash, version: {stdout.Trim()}");
+                            return true;
+                        }
+                        LogMessage(logWriter, verbose, $"bash drawio check failed: {stderr}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogMessage(logWriter, verbose, $"bash drawio check failed: {ex.Message}");
+                }
+
+                // Fallback to direct drawio call (for PowerShell)
+                LogMessage(logWriter, verbose, "Falling back to direct drawio CLI check...");
                 var processStartInfo = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = "drawio",
@@ -975,20 +1093,21 @@ namespace DrawIO.MCP.STDIO
                 using var process = System.Diagnostics.Process.Start(processStartInfo);
                 if (process == null)
                 {
-                    LogMessage(logWriter, verbose, "Failed to start drawio CLI process for version check");
+                    LogMessage(logWriter, verbose, "Failed to start drawio CLI process");
                     return false;
                 }
                 
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
                 process.WaitForExit(5000); // Wait up to 5 seconds
                 
                 if (process.ExitCode == 0)
                 {
-                    string version = process.StandardOutput.ReadToEnd().Trim();
-                    LogMessage(logWriter, verbose, $"drawio CLI is available, version: {version}");
+                    LogMessage(logWriter, verbose, $"drawio CLI is available via direct call, version: {output.Trim()}");
                     return true;
                 }
                 
-                LogMessage(logWriter, verbose, $"drawio CLI check failed with exit code {process.ExitCode}");
+                LogMessage(logWriter, verbose, $"Direct drawio CLI check failed with exit code {process.ExitCode}. Error: {error}");
                 return false;
             }
             catch (Exception ex)
@@ -1160,25 +1279,27 @@ namespace DrawIO.MCP.STDIO
             
             // Convert to a list of dictionaries for JSON response
             var elementList = results
-                .Select(pair => new Dictionary<string, string>
+                .Select<Tuple<string, string>, Dictionary<string, string>>(pair => new Dictionary<string, string>
                 {
                     ["id"] = pair.Item1,
                     ["text"] = pair.Item2
                 })
                 .ToList();
-            
-            return Task.FromResult<object>(new
-            {
-                elements = elementList,
-                count = elementList.Count,
-                content = new[] 
+
+            var messageContent = new[] 
+            { 
+                new Dictionary<string, string>
                 { 
-                    new 
-                    { 
-                        type = "text", 
-                        text = $"Found {elementList.Count} elements containing '{searchText}'" 
-                    } 
-                }
+                    ["type"] = "text", 
+                    ["text"] = $"Found {elementList.Count} elements containing '{searchText}'" 
+                } 
+            };
+
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["elements"] = elementList,
+                ["count"] = elementList.Count,
+                ["content"] = messageContent
             });
         }
         
@@ -1200,86 +1321,76 @@ namespace DrawIO.MCP.STDIO
             
             if (elementInfo.IsNone())
             {
-                return Task.FromResult<object>(new
-                {
-                    error = $"Element with ID '{elementId}' not found",
-                    isError = true,
-                    content = new[] 
+                var errorMessage = new[] 
+                { 
+                    new Dictionary<string, string>
                     { 
-                        new 
-                        { 
-                            type = "text", 
-                            text = $"Element with ID '{elementId}' not found" 
-                        } 
-                    }
+                        ["type"] = "text", 
+                        ["text"] = $"Element with ID '{elementId}' not found" 
+                    } 
+                };
+
+                return Task.FromResult<object>(new Dictionary<string, object>
+                {
+                    ["error"] = $"Element with ID '{elementId}' not found",
+                    ["isError"] = true,
+                    ["content"] = errorMessage
                 });
             }
             
             // Extract the element info from the F# option
             var info = elementInfo.Value;
             
-            // Build a structured response
+            // Convert connections to list of dictionaries
+            var connections = info.Connections
+                .Select<Tuple<string, string>, Dictionary<string, string>>(conn => new Dictionary<string, string>
+                {
+                    ["edgeId"] = conn.Item1,
+                    ["connectedTo"] = conn.Item2
+                })
+                .ToList();
+
+            var infoMessage = new[] 
+            { 
+                new Dictionary<string, string>
+                { 
+                    ["type"] = "text", 
+                    ["text"] = $"Element info for '{info.Id}': {info.Type} with value '{info.Value}'" 
+                } 
+            };
+
             var result = new Dictionary<string, object>
             {
                 ["id"] = info.Id,
                 ["type"] = info.Type,
                 ["value"] = info.Value,
                 ["style"] = info.Style,
-                ["parent"] = info.Parent
+                ["parent"] = info.Parent,
+                ["connections"] = connections,
+                ["content"] = infoMessage
             };
-            
-            // Add position if available
+
             if (info.Position.IsSome())
             {
                 var pos = info.Position.Value;
                 result["position"] = new Dictionary<string, double>
                 {
-                    ["x"] = (float)pos.X,
+                    ["x"] = pos.X,
                     ["y"] = pos.Y
                 };
             }
-            
-            // Add size if available
+
             if (info.Size.IsSome())
             {
                 var size = info.Size.Value;
-                result["size"] = new Dictionary<string, float>
+                result["size"] = new Dictionary<string, double>
                 {
-                    ["width"] = (float)size.Width,
-                    ["height"] = (float)size.Height
+                    ["width"] = size.Width,
+                    ["height"] = size.Height
                 };
             }
-            
-            // Add connections
-            var connections = info.Connections
-                .Select(conn => new Dictionary<string, string>
-                {
-                    ["edgeId"] = conn.Item1,
-                    ["connectedTo"] = conn.Item2
-                })
-                .ToList();
-            
-            result["connections"] = connections;
-            
-            return Task.FromResult<object>(new
-            {
-                id = info.Id,
-                type = info.Type,
-                value = info.Value,
-                style = info.Style,
-                parent = info.Parent,
-                position = info.Position.IsSome() ? new { x = info.Position.Value.X, y = info.Position.Value.Y } : null,
-                size = info.Size.IsSome() ? new { width = info.Size.Value.Width, height = info.Size.Value.Height } : null,
-                connections = connections,
-                content = new[] 
-                { 
-                    new 
-                    { 
-                        type = "text", 
-                        text = $"Element info for '{info.Id}': {info.Type} with value '{info.Value}'" 
-                    } 
-                }
-            });
+
+            return Task.FromResult<object>(result);
         }
         
         private static Task<object> ListNeighborsAsync(JsonElement parameters, string diagramsDirectory)
@@ -1300,26 +1411,28 @@ namespace DrawIO.MCP.STDIO
             
             // Convert to a list of dictionaries for JSON response
             var neighborsList = neighbors
-                .Select(tuple => new Dictionary<string, string>
+                .Select<Tuple<string, string, string>, Dictionary<string, string>>(tuple => new Dictionary<string, string>
                 {
                     ["id"] = tuple.Item1,
                     ["label"] = tuple.Item2,
                     ["direction"] = tuple.Item3
                 })
                 .ToList();
-            
-            return Task.FromResult<object>(new
-            {
-                neighbors = neighborsList,
-                count = neighborsList.Count,
-                content = new[] 
+
+            var neighborMessage = new[] 
+            { 
+                new Dictionary<string, string>
                 { 
-                    new 
-                    { 
-                        type = "text", 
-                        text = $"Found {neighborsList.Count} neighbors for element {elementId}" 
-                    } 
-                }
+                    ["type"] = "text", 
+                    ["text"] = $"Found {neighborsList.Count} neighbors for element {elementId}" 
+                } 
+            };
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["neighbors"] = neighborsList,
+                ["count"] = neighborsList.Count,
+                ["content"] = neighborMessage
             });
         }
         
@@ -1340,40 +1453,44 @@ namespace DrawIO.MCP.STDIO
             
             if (bounds.IsNone())
             {
-                return Task.FromResult<object>(new
-                {
-                    error = "No elements with geometry found in the diagram",
-                    isError = true,
-                    content = new[] 
+                var errorMessage = new[] 
+                { 
+                    new Dictionary<string, string>
                     { 
-                        new 
-                        { 
-                            type = "text", 
-                            text = "No elements with geometry found in the diagram" 
-                        } 
-                    }
+                        ["type"] = "text", 
+                        ["text"] = "No elements with geometry found in the diagram" 
+                    } 
+                };
+
+                return Task.FromResult<object>(new Dictionary<string, object>
+                {
+                    ["error"] = "No elements with geometry found in the diagram",
+                    ["isError"] = true,
+                    ["content"] = errorMessage
                 });
             }
             
             // Extract bounds from the F# option
             var boundingBox = bounds.Value;
-            
-            return Task.FromResult<object>(new
-            {
-                minX = boundingBox.MinX,
-                minY = boundingBox.MinY,
-                maxX = boundingBox.MaxX,
-                maxY = boundingBox.MaxY,
-                width = boundingBox.Width,
-                height = boundingBox.Height,
-                content = new[] 
+
+            var boundsMessage = new[] 
+            { 
+                new Dictionary<string, string>
                 { 
-                    new 
-                    { 
-                        type = "text", 
-                        text = $"Diagram bounds: ({boundingBox.MinX},{boundingBox.MinY}) to ({boundingBox.MaxX},{boundingBox.MaxY}), size: {boundingBox.Width}x{boundingBox.Height}" 
-                    } 
-                }
+                    ["type"] = "text", 
+                    ["text"] = $"Diagram bounds retrieved successfully" 
+                } 
+            };
+            
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["minX"] = boundingBox.MinX,
+                ["minY"] = boundingBox.MinY,
+                ["maxX"] = boundingBox.MaxX,
+                ["maxY"] = boundingBox.MaxY,
+                ["width"] = boundingBox.Width,
+                ["height"] = boundingBox.Height,
+                ["content"] = boundsMessage
             });
         }
     }
