@@ -36,7 +36,8 @@ namespace DrawIO.MCP.STDIO
                 { "tools/execute", ExecuteToolAsync },
                 { "resources/list", ListResourcesAsync },
                 { "resources/read", ReadResourceAsync },
-                { "prompts/list", ListPromptsAsync }
+                { "prompts/list", ListPromptsAsync },
+                { "mcp/shutdown", ShutdownAsync }
             };
         }
 
@@ -429,6 +430,15 @@ namespace DrawIO.MCP.STDIO
             // This method would return the tool information for detailed error reports
             // For brevity, returning null for now - would be implemented with actual tool info
             return null;
+        }
+
+        private async Task<object> ShutdownAsync(JsonElement parameters)
+        {
+            this.LogInfo("Received shutdown request");
+            // Add a small delay to ensure the response is sent before shutdown
+            await Task.Delay(100);
+            // Return success response
+            return new { success = true };
         }
     }
 } 

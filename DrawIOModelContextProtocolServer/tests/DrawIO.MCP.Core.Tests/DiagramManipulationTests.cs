@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using DrawIO.MCP.Core;
 using Xunit;
 
@@ -138,6 +139,121 @@ namespace DrawIO.MCP.Core.Tests
             }
             
             Assert.True(anyPositionChanged, "At least one shape should have changed position after layout arrangement");
+        }
+
+        [Fact]
+        public void SetLineStyle_ShouldModifyConnectorStyle()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.updateShape(diagramWithConnector, 0, connectorId, null, null, null, null, null, "dashed=1;strokeWidth=2.5;");
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            var connector = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == connectorId);
+            Assert.NotNull(connector);
+            Assert.Contains("dashed=1", connector.Style);
+            Assert.Contains("strokeWidth=2.5", connector.Style);
+        }
+
+        [Fact]
+        public void SetArrowStyle_ShouldModifyConnectorArrows()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.updateShape(diagramWithConnector, 0, connectorId, null, null, null, null, null, "startArrow=diamond;endArrow=classic;");
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            var connector = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == connectorId);
+            Assert.NotNull(connector);
+            Assert.Contains("startArrow=diamond", connector.Style);
+            Assert.Contains("endArrow=classic", connector.Style);
+        }
+
+        [Fact]
+        public void ResetConnector_ShouldRemoveCustomRouting()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // First add some custom routing
+            var customRoutedDiagram = DiagramManipulation.updateShape(diagramWithConnector, 0, connectorId, null, null, null, null, null, "edgeStyle=orthogonalEdgeStyle;curved=1;");
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.updateShape(customRoutedDiagram, 0, connectorId, null, null, null, null, null, "noJump=0;orthogonalLoop=1;jettySize=auto;");
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            var connector = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == connectorId);
+            Assert.NotNull(connector);
+            Assert.Contains("noJump=0", connector.Style);
+            Assert.Contains("orthogonalLoop=1", connector.Style);
+            Assert.Contains("jettySize=auto", connector.Style);
+            Assert.DoesNotContain("curved=1", connector.Style);
+        }
+
+        [Fact]
+        public void ReverseConnector_ShouldSwapSourceAndTarget()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Add some style to verify it's preserved
+            var styledDiagram = DiagramManipulation.updateShape(diagramWithConnector, 0, connectorId, "Test Label", null, null, null, null, "startArrow=diamond;endArrow=classic;");
+            
+            // Act
+            var (updatedDiagram, newConnectorId) = DiagramManipulation.connectShapes(styledDiagram, 0, shape2Id, shape1Id);
+            DiagramManipulation.deleteShape(updatedDiagram, 0, connectorId);
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            var newConnector = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == newConnectorId);
+            Assert.NotNull(newConnector);
+            Assert.Equal(shape2Id, newConnector.Source.Value);
+            Assert.Equal(shape1Id, newConnector.Target.Value);
+            Assert.Equal("Test Label", newConnector.Value);
+            Assert.Contains("startArrow=diamond", newConnector.Style);
+            Assert.Contains("endArrow=classic", newConnector.Style);
+        }
+
+        [Fact]
+        public void ConnectorStyle_ShouldPreserveExistingStyles()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Act
+            var diagramWithLineStyle = DiagramManipulation.updateShape(diagramWithConnector, 0, connectorId, null, null, null, null, null, "dashed=1;strokeWidth=2.5;");
+            var diagramWithArrowStyle = DiagramManipulation.updateShape(diagramWithLineStyle, 0, connectorId, null, null, null, null, null, "startArrow=diamond;endArrow=classic;");
+            
+            // Assert
+            Assert.NotNull(diagramWithArrowStyle);
+            var connector = Array.Find(diagramWithArrowStyle.Pages[0].Cells, cell => cell.Id == connectorId);
+            Assert.NotNull(connector);
+            Assert.Contains("dashed=1", connector.Style);
+            Assert.Contains("strokeWidth=2.5", connector.Style);
+            Assert.Contains("startArrow=diamond", connector.Style);
+            Assert.Contains("endArrow=classic", connector.Style);
         }
     }
 } 

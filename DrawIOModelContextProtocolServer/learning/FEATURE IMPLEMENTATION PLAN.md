@@ -6,7 +6,7 @@ This document outlines a structured implementation plan for the tools requested 
 
 The DrawIO MCP Server currently implements the following tools:
 
-### Fully Implemented and Confirmed Working
+### Fully Implemented and Tested Working
 - ✅ Create New Diagram (`create_new_diagram`)
 - ✅ Generate Sample VPC Layout (`generate_vpc`)
 - ✅ Add Shape (`add_shape`) with basic shapes (rectangle, ellipse)
@@ -25,6 +25,19 @@ The DrawIO MCP Server currently implements the following tools:
 - ✅ Auto-arrange Layouts (`arrange_diagram`) with:
   - Horizontal layout
   - More layouts to be implemented
+- ✅ Set Text Style (`set_text_style`) with:
+  - Font color
+  - Font size
+  - Font style (bold, italic)
+- ✅ Set Line Style (`set_line_style`) with:
+  - Line pattern (solid, dashed)
+  - Line width
+- ✅ Set Arrow Style (`set_arrow_style`) with:
+  - Start arrow type
+  - End arrow type
+- ✅ Reset Connector (`reset_connector`)
+- ✅ Reverse Connector (`reverse_connector`)
+- ✅ Resize Shape (`resize_shape`)
 
 ### Needs Investigation
 - 🟨 Get Diagram Image (`get_diagram_image`) - drawio CLI integration issues:
@@ -34,433 +47,211 @@ The DrawIO MCP Server currently implements the following tools:
   - Consider alternative export methods if CLI issues persist
 
 ### Known Missing Features
-- 🔴 Set Line Style (not implemented via `style_shape`)
-- 🔴 Set Arrow Style (not implemented)
-- 🔴 Advanced styling capabilities:
-  - Font styles
-  - Text alignment
-  - Line patterns
-  - Gradient fills
-- 🔴 Shape resizing
-- 🔴 Group management
-- 🔴 Layer support
+Based on testing and documentation review:
+
+#### Shape and Text Manipulation
+- 🔴 Group/Ungroup shapes
+- 🔴 Rotate shapes
+- 🔴 Flip shapes horizontally/vertically
+- 🔴 Lock/unlock elements
+- 🔴 Autosize shapes to fit text
+- 🔴 Add custom fonts support
+- 🔴 Text formatting (superscript, subscript)
+- 🔴 Change text writing direction
+- 🔴 Copy/paste styles between shapes
+
+#### Connector Features
+- 🔴 Add/remove waypoints on connectors
+- 🔴 Connect to arbitrary points on shapes
+- 🔴 Hide connection arrows
+- 🔴 Hide fixed connection points
+- 🔴 Animate connectors
+- 🔴 Bidirectional arrows
+- 🔴 Join connectors
+- 🔴 Copy on Connect feature
+
+#### Layout and Organization
+- 🔴 Layer support (add, remove, move between)
+- 🔴 Background image support
+- 🔴 Change page size and orientation
+- 🔴 Grid customization
+- 🔴 Snap to grid/points
 - 🔴 Custom shape libraries
+- 🔴 Container shapes with collapse/expand
+- 🔴 Tables and cross-functional tables
+- 🔴 Merge/unmerge table cells
+
+#### Advanced Features
+- 🔴 Custom properties
+- 🔴 Global styles
+- 🔴 Mathematical typesetting
+- 🔴 Comments support
+- 🔴 Revision history
 - 🔴 Undo/Redo support
+- 🔴 Export to various formats (PDF, SVG, etc.)
+- 🔴 Import from other formats
+- 🔴 Plugins support
 
 ## Implementation Plan by Tier
 
-### Tier 1: Essential Creation & Editing Tools
+### Tier 1: Essential Creation & Editing Tools (Current Focus)
 
 #### Shape & Connector Management
-1. **Create New Diagram** ✅ - *Already implemented*
-2. **Add Shape** ✅ - *Already implemented*
-3. **Add Connector** ✅ - *Already implemented*
-4. **Delete Element** 🟨 - *Implementation status unclear*
-5. **Move Shape** ✅ - *Already implemented*
-6. **Resize Shape** 🔴 - *Implement as new `resize_shape` tool*
-   - Approach: Modify shape geometry's width and height
-   - Complexity: Low
-   - Similar to existing `move_shape` implementation but for dimensions
-   
-7. **Set Label/Text** ✅ - *Already implemented via `update_shape`*
+1. **Create New Diagram** ✅ - *Implemented and tested*
+2. **Add Shape** ✅ - *Implemented and tested*
+3. **Add Connector** ✅ - *Implemented and tested*
+4. **Delete Element** ✅ - *Implemented and tested*
+5. **Move Shape** ✅ - *Implemented and tested*
+6. **Resize Shape** ✅ - *Implemented and tested*
+7. **Set Label/Text** ✅ - *Implemented via `update_shape`*
 
 #### Basic Styling
-8. **Set Fill Color** ✅ - *Already implemented via `style_shape`*
-9. **Set Border Color** ✅ - *Already implemented via `style_shape`*
-10. **Set Text Color** 🔴 - *Implement via extension to `style_shape` or new tool*
-    - Approach: Update `fontColor` style property
-    - Complexity: Low
-    - Reuse style parsing/setting logic from existing tools
-    
-11. **Set Font Size** 🔴 - *Implement via extension to `style_shape` or new tool*
-    - Approach: Update `fontSize` style property
-    - Complexity: Low
-    
-12. **Toggle Bold/Italic** 🔴 - *Implement via extension to `style_shape` or new tool*
-    - Approach: Update `fontStyle` style property
-    - Complexity: Low
-    
-13. **Set Line Style** 🔴 - *Not implemented*
-    - Approach: Add support for `dashed`, `strokeWidth` properties
-    - Complexity: Low
-    
-14. **Set Arrow Style** 🔴 - *Not implemented*
-    - Approach: Add support for `endArrow`, `startArrow` properties
-    - Complexity: Low
+8. **Set Fill Color** ✅ - *Implemented via `style_shape`*
+9. **Set Border Color** ✅ - *Implemented via `style_shape`*
+10. **Set Text Color** ✅ - *Implemented via `set_text_style`*
+11. **Set Font Size** ✅ - *Implemented via `set_text_style`*
+12. **Toggle Bold/Italic** ✅ - *Implemented via `set_text_style`*
+13. **Set Line Style** ✅ - *Implemented via `set_line_style`*
+14. **Set Arrow Style** ✅ - *Implemented via `set_arrow_style`*
 
 #### Queries & Introspection
-15. **Find Elements by Text** ✅ - *Already implemented*
-16. **Get Element Info** ✅ - *Already implemented*
-17. **List Neighbors of Node** ✅ - *Already implemented*
-18. **Get Diagram Bounding Box / Size** ✅ - *Already implemented*
+15. **Find Elements by Text** ✅ - *Implemented and tested*
+16. **Get Element Info** ✅ - *Implemented and tested*
+17. **List Neighbors** ✅ - *Implemented and tested*
+18. **Get Diagram Bounds** ✅ - *Implemented and tested*
 
-### Tier 2: Advanced Editing & Layout Tools
+### Tier 2: Advanced Editing & Layout Tools (Next Priority)
 
 #### Layout & Positioning
-19. **Align Shapes** 🟨 - *Partially implemented via `arrange_diagram`*
-    - Approach: Enhance `arrange_diagram` to support additional alignment options
+19. **Align Shapes** 🟨 - *Partially via `arrange_diagram`*
+    - Approach: Add specific alignment options
     - Complexity: Medium
     
-20. **Distribute Shapes** 🟨 - *Partially implemented via `arrange_diagram`*
-    - Approach: Enhance with horizontal/vertical distribution options
+20. **Distribute Shapes** 🟨 - *Partially via `arrange_diagram`*
+    - Approach: Add distribution options
     - Complexity: Medium
     
-21. **Precisely Nudge Shape** 🔴 - *New tool needed*
-    - Approach: Implement `nudge_shape` with fine-grained movement
-    - Complexity: Low
-    - Can reuse `move_shape` with small deltas
+21. **Add/Remove Waypoints** 🔴 - *New tool needed*
+    - Approach: Implement waypoint manipulation
+    - Complexity: Medium
+    - Essential for complex routing
 
 #### Grouping & Layering
-22. **Group Shapes** 🔴 - *New tool needed*
-    - Approach: Implement `group_shapes` to create group container
-    - Complexity: Medium
-    - Requires understanding parent-child relationships
-    
-23. **Ungroup Shapes** 🔴 - *New tool needed*
-    - Approach: Implement `ungroup_shapes` to unlink from group
-    - Complexity: Medium
-    
-24. **Send to Front / Back** 🔴 - *New tool needed*
-    - Approach: Implement `reorder_shape` with z-index changes
-    - Complexity: Medium
-    - Requires XML order manipulation
-    
-25. **Bring Forward / Send Backward** 🔴 - *New tool needed*
-    - Approach: Combine with `reorder_shape` functionality
-    - Complexity: Medium
-
-#### Geometry & Appearance
-26. **Rotate Shape** 🔴 - *New tool needed*
-    - Approach: Implement `rotate_shape` to modify `rotation` style
-    - Complexity: Low
-    
-27. **Flip Shape** 🔴 - *New tool needed*
-    - Approach: Implement `flip_shape` to handle `flipH`/`flipV` styles
-    - Complexity: Low
-    
-28. **Reset Connector Path** 🔴 - *New tool needed*
-    - Approach: Implement `reset_connector` to clear waypoints
-    - Complexity: Medium
-    
-29. **Reverse Connector Direction** 🔴 - *New tool needed*
-    - Approach: Implement `reverse_connector` to swap source/target
-    - Complexity: Low
-    
-30. **Change Shape Type** 🔴 - *New tool needed*
-    - Approach: Implement `change_shape_type` to modify shape style
-    - Complexity: Medium
-    - Must handle different shape requirements
-
-#### Media & Resources
-31. **Insert Image** 🔴 - *New tool needed*
-    - Approach: Implement `add_image` with data URI handling
-    - Complexity: Medium-High
-    - Requires proper embedding and sizing
-
-#### Layer Management
-32-36. **Layer Management** 🔴 - *New tool needed*
-    - Approach: Add dedicated layer tools or document how to use pages as layers
-    - Complexity: Medium
-    - Evaluate if separate implementation needed beyond pages
-
-#### Style Management
-37-38. **Copy/Paste Style** 🔴 - *New tools needed*
-    - Approach: Implement `copy_style`/`paste_style` to transfer properties
-    - Complexity: Medium
-    - Extract style from one shape, apply to others
-
-### Tier 3: Specialized & Refinement Tools
-
-#### Connectivity & Routing
-39-42. **Connector Controls** 🔴 - *New tools needed*
-    - Approach: Implement waypoint and connection management tools
+22. **Group Shapes** 🔴 - *High priority*
+    - Approach: Implement parent-child relationships
     - Complexity: High
-    - Will require detailed edge geometry manipulation
-
-#### Metadata
-43-44. **Metadata Management** 🔴 - *New tools needed*
-    - Approach: Implement metadata storage in unused XML attributes
-    - Complexity: Medium
-    - Define conventions for storing metadata
-
-#### Diagram Settings
-45-47. **Diagram Settings** 🔴 - *New tools needed*
-    - Approach: Implement global diagram property manipulation
-    - Complexity: Medium
-    - Update mxGraphModel attributes
-
-#### Auto & Global Adjustments
-48-49. **Auto Layout Functions** 🟨 - *Partially implemented via `arrange_diagram`*
-    - Approach: Enhance with additional layout algorithms
-    - Complexity: High
-    - Consider library integration for advanced layouts
-
-#### Undo/Redo
-50-51. **Undo/Redo** 🔴 - *New architecture needed*
-    - Approach: Implement state management for diagram changes
-    - Complexity: High
-    - Core architectural change (see below)
-
-### Feedback & Export Tools
-
-#### Visual Feedback Loop
-52-54. **Render & Preview** 🟨 - *Partially implemented, extend `get_diagram_image`*
-
-#### Validation & Output
-55-58. **Export Options** 🟨 - *Partially implemented, extend `get_diagram_image`*
-    - Approach: Add support for more formats and options
-    - Complexity: Medium
-    - Requires drawio CLI capability tests
-
-### Tier 4: Network Diagram Specific Tools
-
-#### Canvas Management
-59. **Set Canvas Size** 🔴 - *New tool needed*
-    - Approach: Implement `set_canvas_size` to modify diagram dimensions
-    - Complexity: Low
-    - Essential for large network diagrams
+    - Essential for diagram organization
     
-60. **Set Canvas Background** 🔴 - *New tool needed*
-    - Approach: Implement `set_background` for zone coloring
-    - Complexity: Low
-    - Support for zone differentiation
-
-#### Network-Specific Shapes
-61. **Add Network Component** 🔴 - *New tool needed*
-    - Approach: Implement `add_network_component` with predefined network shapes
-    - Complexity: Medium
-    - Include server, firewall, switch, router icons
-    
-62. **Add Connection Line** 🔴 - *New tool needed*
-    - Approach: Implement `add_connection` with network-specific line styles
-    - Complexity: Medium
-    - Support for different connection types (VPN, HTTPS, etc.)
-
-#### Zone Management
-63. **Create Zone** 🔴 - *New tool needed*
-    - Approach: Implement `create_zone` for network segmentation
-    - Complexity: Medium
-    - Support for zone coloring and labeling
-    
-64. **Group Components in Zone** 🔴 - *New tool needed*
-    - Approach: Implement `group_in_zone` for logical grouping
-    - Complexity: Medium
-    - Maintain zone relationships
-
-#### Network-Specific Styling
-65. **Set Connection Type** 🔴 - *New tool needed*
-    - Approach: Implement `set_connection_type` for line patterns
-    - Complexity: Low
-    - Support for dotted, dashed, colored lines
-    
-66. **Add Network Icon** 🔴 - *New tool needed*
-    - Approach: Implement `add_network_icon` for standard network symbols
-    - Complexity: Medium
-    - Include common network icon library
-
-#### Layout Assistance
-67. **Auto-arrange Network Layout** 🔴 - *New tool needed*
-    - Approach: Enhance `arrange_diagram` with network-specific layouts
+23. **Layer Management** 🔴 - *High priority*
+    - Approach: Implement layer hierarchy
     - Complexity: High
-    - Support for hierarchical network layouts
+    - Required for complex diagrams
+
+#### Advanced Styling
+24. **Copy/Paste Styles** 🔴 - *Medium priority*
+    - Approach: Store and apply style templates
+    - Complexity: Medium
     
-68. **Align to Network Grid** 🔴 - *New tool needed*
-    - Approach: Implement `align_to_grid` for clean positioning
+25. **Global Styles** 🔴 - *Medium priority*
+    - Approach: Implement style inheritance
     - Complexity: Medium
-    - Maintain professional spacing
 
-#### Documentation
-69. **Add Network Legend** 🔴 - *New tool needed*
-    - Approach: Implement `add_legend` for connection types
-    - Complexity: Low
-    - Auto-generate based on used elements
+### Tier 3: Enhanced Features (Future Implementation)
+
+#### Text and Labels
+26. **Autosize to Text** 🔴
+    - Approach: Calculate text bounds
+    - Complexity: Medium
     
-70. **Add Zone Labels** 🔴 - *New tool needed*
-    - Approach: Implement `add_zone_label` for clear identification
-    - Complexity: Low
-    - Support for consistent zone naming
-
-#### Export and Rendering
-71. **CLI Integration** 🟨 - *Partially working*
-    - Approach: Fix drawio CLI integration issues
-    - Complexity: Medium
-    - Required for reliable image export
-
-72. **Custom Shape Libraries** 🔴 - *New tool needed*
-    - Approach: Implement support for loading custom shape libraries
+27. **Custom Fonts** 🔴
+    - Approach: Font embedding/linking
     - Complexity: High
-    - Include network equipment shapes
 
-73. **Shape Styling Templates** 🔴 - *New tool needed*
-    - Approach: Implement predefined style templates
-    - Complexity: Medium
-    - Support for consistent styling across components
-
-74. **Multi-layer Text** 🔴 - *New tool needed*
-    - Approach: Implement support for title, subtitle, and description text
+#### Advanced Connectors
+28. **Bidirectional Arrows** 🔴
+    - Approach: Extend arrow styling
     - Complexity: Low
-    - Better labeling for complex components
-
-75. **Container Hierarchy** 🔴 - *New tool needed*
-    - Approach: Implement proper parent-child relationships
+    
+29. **Join Connectors** 🔴
+    - Approach: Implement connection points
     - Complexity: High
-    - Better zone and component organization
 
-#### Server Stability
-76. **Connection Management** 🔴 - *New feature needed*
-    - Approach: Implement robust connection handling
+#### Container Features
+30. **Collapse/Expand** 🔴
+    - Approach: Implement container logic
     - Complexity: High
-    - Handle disconnects and reconnects gracefully
+    
+31. **Tables** 🔴
+    - Approach: Special container type
+    - Complexity: High
 
-77. **Session Persistence** 🔴 - *New feature needed*
-    - Approach: Implement session state management
+### Tier 4: Professional Features (Long-term Goals)
+
+#### Advanced Export/Import
+32. **Multiple Formats** 🔴
+    - Approach: Implement format converters
+    - Complexity: High
+    
+33. **High-Resolution Export** 🔴
+    - Approach: Scale rendering
     - Complexity: Medium
-    - Maintain diagram state across reconnections
 
-78. **Error Recovery** 🔴 - *New feature needed*
-    - Approach: Implement automatic error recovery
+#### Collaboration Features
+34. **Comments** 🔴
+    - Approach: Metadata storage
     - Complexity: Medium
-    - Handle and recover from common error conditions
-
-79. **Command Queueing** 🔴 - *New feature needed*
-    - Approach: Implement command queue with retry logic
-    - Complexity: Medium
-    - Ensure commands are not lost during disconnects
-
-80. **Health Monitoring** 🔴 - *New feature needed*
-    - Approach: Implement server health checks
-    - Complexity: Low
-    - Monitor server status and performance
-
-81. **Graceful Shutdown** 🔴 - *New feature needed*
-    - Approach: Implement proper shutdown sequence
-    - Complexity: Medium
-    - Save state and clean up resources
+    
+35. **Revision History** 🔴
+    - Approach: State management
+    - Complexity: High
 
 ## Core Architecture Enhancements
 
-### Undo/Redo System Implementation
-The undo/redo functionality will require a significant architectural enhancement:
+### Immediate Priorities
+1. **Fix Image Export**
+   - Investigate CLI integration
+   - Implement reliable export pipeline
+   - Support multiple formats
 
-1. **Memento Pattern**
-   - Track diagram states in a history stack
-   - Pure functional approach with immutable states
-   - Each operation creates a new diagram state
+2. **Enhanced Layout Engine**
+   - Implement more layout algorithms
+   - Add alignment options
+   - Support distribution patterns
 
-2. **Implementation Approach**
-   ```fsharp
-   type EditorState = {
-       Current: DiagramModel
-       UndoStack: DiagramModel list
-       RedoStack: DiagramModel list
-   }
-   ```
+3. **Style System Refactor**
+   - Create style templates
+   - Implement inheritance
+   - Support global styles
 
-3. **Action Wrapper**
-   - Wrap all modification tools to automatically push to undo stack
-   - Keep read-only tools outside undo management
+### Future Enhancements
+1. **State Management**
+   - Implement undo/redo
+   - Support revision history
+   - Enable collaboration
 
-4. **Storage Optimization**
-   - Use structural sharing for efficiency
-   - Consider cleanup of image data duplicates
+2. **Plugin Architecture**
+   - Design plugin interface
+   - Support custom shapes
+   - Enable extensions
 
-### Overlap Detection Implementation
-For the requested overlap detection:
+## Implementation Strategy
 
-1. **Detection Algorithm**
-   - Calculate bounding box intersections
-   - Optional: pixel-perfect detection for complex shapes
+1. **Complete Tier 1 Polish**
+   - Fix any remaining issues
+   - Improve error handling
+   - Add comprehensive tests
 
-2. **Implementation Approach**
-   ```fsharp
-   let detectOverlap (diagram: DiagramModel, shape1Id: string, shape2Id: string) : bool =
-       // Get geometries
-       // Calculate intersection
-       // Return true if shapes overlap
-   ```
+2. **Tier 2 Implementation**
+   - Focus on grouping and layers
+   - Enhance connector features
+   - Add advanced styling
 
-3. **API Design**
-   - `detect_overlapping_shapes` - Return all overlapping pairs
-   - `is_shape_overlapping` - Check if specific shape overlaps with any others
-
-## Targeted Query Implementation
-For enhanced querying capabilities:
-
-1. **Filtering Mechanism**
-   - Support filtering by type, text, style, position
-   - Return properly formatted results or sub-diagrams
-
-2. **Implementation Approach**
-   ```fsharp
-   let queryDiagram (diagram: DiagramModel, criteria: QueryCriteria) : Element list =
-       // Filter diagram elements based on criteria
-       // Return matching elements
-   ```
-
-3. **API Design**
-   - `query_diagram_elements` - Flexible filtering tool
-   - `get_element_details` - Detailed view of specific element
-
-## Implementation Priority
-
-We recommend implementing tools in this order:
-
-1. **Essential Query Tools** (15-18)
-   - These enable intelligent operations on existing diagrams
-   - Fundamental for LLM reasoning about diagrams
-
-2. **Basic Shape Manipulation** (6, 10-12)
-   - Complete the essential shape editing capabilities
-   - Relatively simple implementations
-
-3. **Connector Enhancement** (13-14, 28-29)
-   - Improve line styles and connector manipulation
-   - Medium complexity, high impact
-
-4. **Advanced Layout** (19-21, 26-27)
-   - Alignment, distribution, rotation capabilities
-   - Significant UX improvement
-
-5. **Metadata & Structure** (22-25, 37-38, 43-44)
-   - Grouping, layering, metadata
-   - Foundation for complex diagrams
-
-6. **Undo/Redo Architecture**
-   - Core capability for editing confidence
-   - Should be carefully designed and tested
-
-7. **Specialized Tools** (39-42, 45-51)
-   - Complete advanced functionality
-   - Implement based on actual usage patterns
-
-8. **Network Diagram Specific Tools** (59-70)
-   - Network-specific capabilities
-   - Essential for professional network diagrams
-
-9. **Rendering and Styling** (71-75)
-   - CLI integration, shape libraries, styling templates, text handling, container management
-   - Critical for professional network diagrams
-
-10. **Server Stability** (76-80)
-    - Robust connection handling, state persistence, error recovery, command reliability, health monitoring
-    - Essential for reliable server operation and diagram creation
-
-## Technical Approach
-
-1. **Add Core F# Functions**
-   - Implement pure functions in DrawIO.MCP.Core/Library.fs
-   - Maintain functional approach for consistency
-
-2. **Expose through MCP Tools**
-   - Add corresponding tool definitions in STDIO/SSE implementations
-   - Follow existing parameter/return patterns
-
-3. **Testing Strategy**
-   - Unit test core functions
-   - Integration test through actual diagram manipulation
-   - Visual verification with image export
+3. **Core Architecture**
+   - Implement state management
+   - Enhance style system
+   - Fix image export
 
 4. **Documentation**
-   - Update README.md with new capabilities
-   - Add examples to USAGE_EXAMPLES.md
-   - Create specific tool documentation 
+   - Update API documentation
+   - Add usage examples
+   - Create tutorials 

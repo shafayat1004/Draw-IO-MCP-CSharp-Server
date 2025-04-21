@@ -308,27 +308,7 @@ namespace DrawIO.MCP.STDIO
                         string line = null;
                         try
                         {
-                            var readTask = Console.In.ReadLineAsync();
-                            if (await Task.WhenAny(readTask, Task.Delay(60000)) == readTask) // 60 second timeout
-                            {
-                                line = await readTask;
-                            }
-                            else
-                            {
-                                LogMessage("WARNING: ReadLine timed out after 60 seconds. Checking if stdin is still valid...");
-                                
-                                // Try a quick read to check if stdin is still valid
-                                if (Console.KeyAvailable)
-                                {
-                                    LogMessage("Stdin appears to be active (keys available), continuing...");
-                                    continue;
-                                }
-                                else 
-                                {
-                                    LogMessage("No keyboard input available, but will continue waiting...");
-                                    continue;
-                                }
-                            }
+                            line = await Console.In.ReadLineAsync();
                         }
                         catch (Exception ex)
                         {
@@ -348,9 +328,6 @@ namespace DrawIO.MCP.STDIO
                             continue;
                         }
                         
-                        // Reset error counter on successful read
-                        consecutiveErrors = 0;
-                        
                         // Skip empty lines and log appropriately
                         if (string.IsNullOrEmpty(line))
                         {
@@ -364,6 +341,14 @@ namespace DrawIO.MCP.STDIO
                             using var doc = JsonDocument.Parse(line);
                             var method = doc.RootElement.GetProperty("method").GetString();
                             LogMessage($"Read input line: {method} request received");
+
+                            // Check for shutdown request
+                            if (method == "mcp/shutdown")
+                            {
+                                LogMessage("Shutdown request received, initiating graceful shutdown");
+                                stdioValid = false;
+                                break;
+                            }
                         }
                         catch (JsonException)
                         {

@@ -697,6 +697,270 @@ namespace DrawIO.MCP.STDIO
                             }
                         }
                     }
+                },
+                new McpToolDefinition
+                {
+                    Name = "resize_shape",
+                    Description = "Resize a shape to specified dimensions",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to resize",
+                                Required = true
+                            }
+                        },
+                        {
+                            "width",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "New width for the shape",
+                                Required = true
+                            }
+                        },
+                        {
+                            "height",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "New height for the shape",
+                                Required = true
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "set_text_style",
+                    Description = "Set text styling properties for a shape",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to style",
+                                Required = true
+                            }
+                        },
+                        {
+                            "font_color",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Text color (hex format)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "font_size",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Font size in points",
+                                Required = false
+                            }
+                        },
+                        {
+                            "font_style",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Font style (normal, bold, italic, bolditalic)",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "set_line_style",
+                    Description = "Set line style properties for a connector",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to style",
+                                Required = true
+                            }
+                        },
+                        {
+                            "line_style",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Line style (solid, dashed, dotted)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "line_width",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Line width in pixels",
+                                Required = false
+                            }
+                        },
+                        {
+                            "edge_style",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Edge style (sharp, rounded, curved)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "routing_style",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Line routing style (straight, orthogonal, curved)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "jump_style",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Line jump style (overlapped, arc, gap)",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "set_arrow_style",
+                    Description = "Set arrow style properties for a connector",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to style",
+                                Required = true
+                            }
+                        },
+                        {
+                            "start_arrow",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Start arrow style (none, classic, diamond, oval, open, block)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "end_arrow",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "End arrow style (none, classic, diamond, oval, open, block)",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "reset_connector",
+                    Description = "Reset a connector to its default path",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to reset",
+                                Required = true
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "reverse_connector",
+                    Description = "Reverse the direction of a connector",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to reverse",
+                                Required = true
+                            }
+                        }
+                    }
                 }
             };
 

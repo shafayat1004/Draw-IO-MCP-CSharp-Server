@@ -84,7 +84,7 @@ namespace DrawIO.MCP.STDIO.Tests
             
             var addResult = await DiagramToolExecutor.ExecuteToolAsync("add_shape", addShapeParams, _testDiagramsDir, _testLogWriter, true);
             var addResultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(addResult);
-            var elementId = addResultDict["ElementId"].ToString();
+            var elementId = addResultDict.ContainsKey("ElementId") ? addResultDict["ElementId"].ToString() : addResultDict["elementId"].ToString();
             
             // Test getting element info
             var infoParams = JsonDocument.Parse(@$"{{ 
@@ -133,8 +133,8 @@ namespace DrawIO.MCP.STDIO.Tests
             var addResultDict1 = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(addResult1);
             var addResultDict2 = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(addResult2);
             
-            var serverId = addResultDict1["ElementId"].ToString();
-            var databaseId = addResultDict2["ElementId"].ToString();
+            var serverId = addResultDict1.ContainsKey("ElementId") ? addResultDict1["ElementId"].ToString() : addResultDict1["elementId"].ToString();
+            var databaseId = addResultDict2.ContainsKey("ElementId") ? addResultDict2["ElementId"].ToString() : addResultDict2["elementId"].ToString();
             
             // Connect the shapes
             var connectParams = JsonDocument.Parse(@$"{{ 

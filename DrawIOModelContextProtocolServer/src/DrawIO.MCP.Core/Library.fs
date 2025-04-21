@@ -64,6 +64,9 @@ module Types =
         Style: string
         Parent: string
         Connections: (string * string) list
+        IsEdge: bool
+        Source: string option
+        Target: string option
     }
     
     /// Bounding box of a diagram
@@ -448,7 +451,7 @@ module DiagramManipulation =
             diagram with
                 Modified = DateTime.Now
                 Pages = updatedPages
-        }
+            }
         
         (updatedDiagram, edgeId)
 
@@ -884,6 +887,9 @@ module DiagramManipulation =
                 Style = element.Style
                 Parent = element.Parent
                 Connections = connections
+                IsEdge = element.IsEdge
+                Source = element.Source
+                Target = element.Target
             }
     
     /// List all neighboring elements connected to the specified element

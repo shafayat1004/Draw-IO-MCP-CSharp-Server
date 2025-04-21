@@ -55,6 +55,12 @@ namespace DrawIO.MCP.STDIO
                     "get_element_info" => await GetElementInfoAsync(arguments, diagramsDirectory),
                     "list_neighbors" => await ListNeighborsAsync(arguments, diagramsDirectory),
                     "get_diagram_bounds" => await GetDiagramBoundsAsync(arguments, diagramsDirectory),
+                    "resize_shape" => await ResizeShapeAsync(arguments, diagramsDirectory),
+                    "set_text_style" => await SetTextStyleAsync(arguments, diagramsDirectory),
+                    "set_line_style" => await SetLineStyleAsync(arguments, diagramsDirectory),
+                    "set_arrow_style" => await SetArrowStyleAsync(arguments, diagramsDirectory),
+                    "reset_connector" => await ResetConnectorAsync(arguments, diagramsDirectory),
+                    "reverse_connector" => await ReverseConnectorAsync(arguments, diagramsDirectory),
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
@@ -96,6 +102,7 @@ namespace DrawIO.MCP.STDIO
                 foreach (var prop in type.GetProperties())
                 {
                     var value = prop.GetValue(obj);
+                    // Preserve original casing of property names
                     dict[prop.Name] = ConvertToDictionary(value);
                 }
                 return dict;
@@ -138,10 +145,17 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new 
             {
-                Status = "success",
+                status = "success",
                 DiagramId = $"diagram://{name}",
                 FileName = name,
-                content = new object[] { } // Add empty content array to satisfy MCP protocol
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Created new diagram: {name}" 
+                    } 
+                }
             });
         }
 
@@ -170,9 +184,10 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new 
             {
-                Status = "success",
-                ElementId = newId,
-                DiagramId = $"diagram://{diagram}",
+                status = "success",
+                elementId = newId,
+                shapeId = newId,
+                diagramId = $"diagram://{diagram}",
                 content = new[] 
                 { 
                     new 
@@ -224,15 +239,16 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new 
             {
-                Status = "success",
-                ElementId = newId,
-                DiagramId = $"diagram://{diagram}",
+                status = "success",
+                elementId = newId,
+                connectorId = newId,
+                diagramId = $"diagram://{diagram}",
                 content = new[] 
                 { 
                     new 
                     { 
                         type = "text", 
-                        text = $"Created connector with ID {newId} between shapes {sourceId} and {targetId}" 
+                        text = $"Connected shapes with ID {newId}" 
                     } 
                 }
             });
@@ -283,7 +299,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                Status = "created",
+                status = "created",
                 DiagramId = $"diagram://{name}",
                 FileName = name,
                 content = new[] 
@@ -325,7 +341,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                Status = "success",
+                status = "success",
                 DiagramId = $"diagram://{diagram}",
                 content = new[] 
                 { 
@@ -399,7 +415,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new 
             {
-                Status = "success",
+                status = "success",
                 DiagramId = $"diagram://{diagram}",
                 content = new[] 
                 { 
@@ -481,7 +497,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new 
             {
-                Status = "success",
+                status = "success",
                 DiagramId = $"diagram://{diagram}",
                 Style = styleString,
                 content = new[] 
@@ -529,7 +545,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                success = true,
+                status = "success",
                 message = $"Diagram arranged using layout: {layout}",
                 content = new[] 
                 { 
@@ -566,7 +582,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new 
             {
-                success = true,
+                status = "success",
                 message = $"Shape {shape_id} moved to position ({x}, {y})",
                 content = new[] 
                 { 
@@ -604,7 +620,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                success = true,
+                status = "success",
                 page_id = pageId,
                 message = $"Created new page '{name}' with ID {pageId}",
                 content = new[] 
@@ -689,7 +705,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                success = true,
+                status = "success",
                 page = new
                 {
                     id = page.Id,
@@ -737,7 +753,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                success = true,
+                status = "success",
                 message = $"Page {pageId} updated",
                 content = new[] 
                 { 
@@ -780,7 +796,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                success = deleted,
+                status = deleted ? "success" : "error",
                 message = message,
                 content = new[] 
                 { 
@@ -819,7 +835,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                success = true,
+                status = "success",
                 message = message,
                 content = new[] 
                 { 
@@ -1245,7 +1261,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new
             {
-                success = true,
+                status = "success",
                 message = $"Style of shape {shape_id} updated",
                 styleProperties = styleProperties,
                 content = new[] 
@@ -1253,7 +1269,7 @@ namespace DrawIO.MCP.STDIO
                     new 
                     { 
                         type = "text", 
-                        text = $"Updated style of shape {shape_id} with properties: {styleString}" 
+                        text = $"Style of shape {shape_id} updated" 
                     } 
                 }
             });
@@ -1491,6 +1507,658 @@ namespace DrawIO.MCP.STDIO
                 ["width"] = boundingBox.Width,
                 ["height"] = boundingBox.Height,
                 ["content"] = boundsMessage
+            });
+        }
+
+        private static Task<object> ResizeShapeAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            
+            // Try both naming conventions for parameters
+            string shapeId;
+            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+            {
+                shapeId = shapeIdElement.GetString();
+            }
+            else
+            {
+                shapeId = GetParameterString(parameters, "shape_id");
+            }
+            
+            float width = parameters.GetProperty("width").GetSingle();
+            float height = parameters.GetProperty("height").GetSingle();
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram, update the shape dimensions, and save it
+            var diagramObj = LoadDiagram(filePath);
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                diagramObj, 
+                0, // page index
+                shapeId,
+                null, // value
+                null, // x
+                null, // y
+                width,
+                height,
+                null // style
+            );
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Resized shape {shapeId} to width: {width}, height: {height}" 
+                    } 
+                }
+            });
+        }
+
+        private static Task<object> SetTextStyleAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            
+            // Try both naming conventions for parameters
+            string shapeId;
+            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+            {
+                shapeId = shapeIdElement.GetString();
+            }
+            else
+            {
+                shapeId = GetParameterString(parameters, "shape_id");
+            }
+            
+            var styleBuilder = new System.Text.StringBuilder();
+            
+            // Handle font color
+            if (parameters.TryGetProperty("font_color", out var fontColorElement))
+            {
+                string fontColor = fontColorElement.GetString();
+                styleBuilder.Append($"fontColor={fontColor};");
+            }
+            
+            // Handle font size
+            if (parameters.TryGetProperty("font_size", out var fontSizeElement))
+            {
+                float fontSize = fontSizeElement.GetSingle();
+                styleBuilder.Append($"fontSize={fontSize};");
+            }
+            
+            // Handle font style
+            if (parameters.TryGetProperty("font_style", out var fontStyleElement))
+            {
+                string fontStyle = fontStyleElement.GetString().ToLower();
+                switch (fontStyle)
+                {
+                    case "bold":
+                        styleBuilder.Append("fontStyle=1;");
+                        break;
+                    case "italic":
+                        styleBuilder.Append("fontStyle=2;");
+                        break;
+                    case "bolditalic":
+                        styleBuilder.Append("fontStyle=3;");
+                        break;
+                    case "normal":
+                        styleBuilder.Append("fontStyle=0;");
+                        break;
+                    default:
+                        throw new ArgumentException($"Invalid font style: {fontStyle}. Valid values are: normal, bold, italic, bolditalic");
+                }
+            }
+            
+            string styleString = styleBuilder.ToString();
+            
+            if (string.IsNullOrEmpty(styleString))
+            {
+                throw new ArgumentException("At least one style property (font_color, font_size, font_style) must be provided");
+            }
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram, update style, and save it
+            var diagramObj = LoadDiagram(filePath);
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                diagramObj, 
+                0, // page index
+                shapeId,
+                null, // value
+                null, // x
+                null, // y
+                null, // width
+                null, // height
+                styleString
+            );
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                DiagramId = $"diagram://{diagram}",
+                Style = styleString,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Applied text style {styleString} to shape {shapeId}" 
+                    } 
+                }
+            });
+        }
+
+        private static Task<object> SetLineStyleAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            try
+            {
+                string diagram = GetParameterString(parameters, "diagram");
+                string connectorId = GetParameterString(parameters, "connector_id");
+                
+                var styleBuilder = new System.Text.StringBuilder();
+                bool hasStyleChanges = false;
+                
+                // Handle line style
+                if (parameters.TryGetProperty("line_style", out var lineStyleElement))
+                {
+                    string lineStyle = lineStyleElement.GetString().ToLower();
+                    switch (lineStyle)
+                    {
+                        case "dashed":
+                            styleBuilder.Append("dashed=1;");
+                            hasStyleChanges = true;
+                            break;
+                        case "dotted":
+                            styleBuilder.Append("dashed=1;dashPattern=1 4;");
+                            hasStyleChanges = true;
+                            break;
+                        case "solid":
+                            styleBuilder.Append("dashed=0;");
+                            hasStyleChanges = true;
+                            break;
+                        default:
+                            throw new ArgumentException($"Invalid line style: {lineStyle}. Valid values are: solid, dashed, dotted");
+                    }
+                }
+                
+                // Handle line width
+                if (parameters.TryGetProperty("line_width", out var lineWidthElement))
+                {
+                    float lineWidth = lineWidthElement.GetSingle();
+                    if (lineWidth <= 0)
+                    {
+                        throw new ArgumentException("Line width must be greater than 0");
+                    }
+                    styleBuilder.Append($"strokeWidth={lineWidth};");
+                    hasStyleChanges = true;
+                }
+
+                // Handle edge style
+                if (parameters.TryGetProperty("edge_style", out var edgeStyleElement))
+                {
+                    string edgeStyle = edgeStyleElement.GetString().ToLower();
+                    switch (edgeStyle)
+                    {
+                        case "sharp":
+                            styleBuilder.Append("edgeStyle=sharp;rounded=0;");
+                            hasStyleChanges = true;
+                            break;
+                        case "rounded":
+                            styleBuilder.Append("edgeStyle=sharp;rounded=1;");
+                            hasStyleChanges = true;
+                            break;
+                        case "curved":
+                            styleBuilder.Append("edgeStyle=curved;rounded=1;");
+                            hasStyleChanges = true;
+                            break;
+                        default:
+                            throw new ArgumentException($"Invalid edge style: {edgeStyle}. Valid values are: sharp, rounded, curved");
+                    }
+                }
+
+                // Handle routing style
+                if (parameters.TryGetProperty("routing_style", out var routingStyleElement))
+                {
+                    string routingStyle = routingStyleElement.GetString().ToLower();
+                    switch (routingStyle)
+                    {
+                        case "straight":
+                            styleBuilder.Append("noJump=0;orthogonalLoop=0;");
+                            hasStyleChanges = true;
+                            break;
+                        case "orthogonal":
+                            styleBuilder.Append("noJump=0;orthogonalLoop=1;");
+                            hasStyleChanges = true;
+                            break;
+                        case "curved":
+                            styleBuilder.Append("noJump=0;curved=1;orthogonalLoop=0;");
+                            hasStyleChanges = true;
+                            break;
+                        default:
+                            throw new ArgumentException($"Invalid routing style: {routingStyle}. Valid values are: straight, orthogonal, curved");
+                    }
+                }
+
+                // Handle jump style
+                if (parameters.TryGetProperty("jump_style", out var jumpStyleElement))
+                {
+                    string jumpStyle = jumpStyleElement.GetString().ToLower();
+                    switch (jumpStyle)
+                    {
+                        case "overlapped":
+                            styleBuilder.Append("noJump=1;");
+                            hasStyleChanges = true;
+                            break;
+                        case "arc":
+                            styleBuilder.Append("noJump=0;jumpStyle=arc;");
+                            hasStyleChanges = true;
+                            break;
+                        case "gap":
+                            styleBuilder.Append("noJump=0;jumpStyle=gap;");
+                            hasStyleChanges = true;
+                            break;
+                        default:
+                            throw new ArgumentException($"Invalid jump style: {jumpStyle}. Valid values are: overlapped, arc, gap");
+                    }
+                }
+                
+                string styleString = styleBuilder.ToString();
+                
+                if (!hasStyleChanges)
+                {
+                    return Task.FromResult<object>(new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = "At least one style property (line_style, line_width, edge_style, routing_style, jump_style) must be provided"
+                            }
+                        }
+                    });
+                }
+                
+                string filePath = Path.Combine(diagramsDirectory, diagram);
+                if (!File.Exists(filePath))
+                {
+                    return Task.FromResult<object>(new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Diagram file not found: {diagram}"
+                            }
+                        }
+                    });
+                }
+                
+                // Load the diagram, update style, and save it
+                var diagramObj = LoadDiagram(filePath);
+                if (diagramObj == null)
+                {
+                    return Task.FromResult<object>(new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Failed to load diagram: {diagram}"
+                            }
+                        }
+                    });
+                }
+                
+                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                    diagramObj, 
+                    0, // page index
+                    connectorId,
+                    null, // value
+                    null, // x
+                    null, // y
+                    null, // width
+                    null, // height
+                    styleString
+                );
+                
+                if (updatedDiagram == null)
+                {
+                    return Task.FromResult<object>(new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Failed to update connector style in diagram: {diagram}"
+                            }
+                        }
+                    });
+                }
+                
+                SaveDiagram(updatedDiagram, filePath);
+                
+                return Task.FromResult<object>(new 
+                {
+                    status = "success",
+                    DiagramId = $"diagram://{diagram}",
+                    Style = styleString,
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Applied line style {styleString} to connector {connectorId}" 
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new
+                {
+                    isError = true,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
+        }
+
+        private static Task<object> SetArrowStyleAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            try
+            {
+                string diagram = GetParameterString(parameters, "diagram");
+                string connectorId = GetParameterString(parameters, "connector_id");
+                
+                var styleBuilder = new System.Text.StringBuilder();
+                bool hasStyleChanges = false;
+                
+                // Handle start arrow
+                if (parameters.TryGetProperty("start_arrow", out var startArrowElement))
+                {
+                    string startArrow = startArrowElement.GetString().ToLower();
+                    string arrowStyle = GetArrowStyle(startArrow);
+                    styleBuilder.Append($"startArrow={arrowStyle};");
+                    hasStyleChanges = true;
+                }
+                
+                // Handle end arrow
+                if (parameters.TryGetProperty("end_arrow", out var endArrowElement))
+                {
+                    string endArrow = endArrowElement.GetString().ToLower();
+                    string arrowStyle = GetArrowStyle(endArrow);
+                    styleBuilder.Append($"endArrow={arrowStyle};");
+                    hasStyleChanges = true;
+                }
+                
+                string styleString = styleBuilder.ToString();
+                
+                if (!hasStyleChanges)
+                {
+                    return Task.FromResult<object>(new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = "At least one arrow style property (start_arrow, end_arrow) must be provided"
+                            }
+                        }
+                    });
+                }
+                
+                string filePath = Path.Combine(diagramsDirectory, diagram);
+                if (!File.Exists(filePath))
+                {
+                    return Task.FromResult<object>(new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Diagram file not found: {diagram}"
+                            }
+                        }
+                    });
+                }
+                
+                // Load the diagram, update style, and save it
+                var diagramObj = LoadDiagram(filePath);
+                if (diagramObj == null)
+                {
+                    return Task.FromResult<object>(new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Failed to load diagram: {diagram}"
+                            }
+                        }
+                    });
+                }
+                
+                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                    diagramObj, 
+                    0, // page index
+                    connectorId,
+                    null, // value
+                    null, // x
+                    null, // y
+                    null, // width
+                    null, // height
+                    styleString
+                );
+                
+                if (updatedDiagram == null)
+                {
+                    return Task.FromResult<object>(new
+                    {
+                        isError = true,
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = $"Failed to update connector style in diagram: {diagram}"
+                            }
+                        }
+                    });
+                }
+                
+                SaveDiagram(updatedDiagram, filePath);
+                
+                return Task.FromResult<object>(new 
+                {
+                    status = "success",
+                    DiagramId = $"diagram://{diagram}",
+                    Style = styleString,
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Applied arrow style {styleString} to connector {connectorId}" 
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new
+                {
+                    isError = true,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
+        }
+
+        private static string GetArrowStyle(string arrowType)
+        {
+            return arrowType.ToLower() switch
+            {
+                "none" => "none",
+                "classic" => "classic",
+                "diamond" => "diamond",
+                "oval" => "oval",
+                "open" => "open",
+                "block" => "block",
+                _ => throw new ArgumentException($"Invalid arrow style: {arrowType}. Valid values are: none, classic, diamond, oval, open, block")
+            };
+        }
+
+        private static Task<object> ResetConnectorAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string connectorId = GetParameterString(parameters, "connector_id");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var diagramObj = LoadDiagram(filePath);
+            
+            // Reset the connector by removing waypoints
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                diagramObj, 
+                0, // page index
+                connectorId,
+                null, // value
+                null, // x
+                null, // y
+                null, // width
+                null, // height
+                "noJump=0;orthogonalLoop=1;jettySize=auto;" // Reset to default routing
+            );
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Reset connector {connectorId} to default path" 
+                    } 
+                }
+            });
+        }
+
+        private static Task<object> ReverseConnectorAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string connectorId = GetParameterString(parameters, "connector_id");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var diagramObj = LoadDiagram(filePath);
+            
+            // Get the connector info
+            var elementInfo = DrawIO.MCP.Core.DiagramManipulation.getElementInfo(diagramObj, 0, connectorId);
+            if (elementInfo.IsNone())
+            {
+                throw new ArgumentException($"Connector with ID {connectorId} not found");
+            }
+            
+            var info = elementInfo.Value;
+            if (!info.IsEdge)
+            {
+                throw new ArgumentException($"Element {connectorId} is not a connector");
+            }
+            
+            // Create a new connector in the reverse direction
+            var (updatedDiagram, newConnectorId) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(
+                diagramObj,
+                0, // page index
+                info.Target.Value, // New source is old target
+                info.Source.Value  // New target is old source
+            );
+            
+            // Copy the style from the original connector
+            updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                updatedDiagram,
+                0,
+                newConnectorId,
+                info.Value, // Keep the same label
+                null,
+                null,
+                null,
+                null,
+                info.Style // Keep the same style
+            );
+            
+            // Delete the original connector
+            updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.deleteShape(updatedDiagram, 0, connectorId);
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            var messageContent = new[] 
+            { 
+                new Dictionary<string, string>
+                { 
+                    ["type"] = "text", 
+                    ["text"] = $"Reversed connector direction" 
+                } 
+            };
+
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["Status"] = "success",
+                ["NewConnectorId"] = newConnectorId,
+                ["content"] = messageContent
             });
         }
     }
