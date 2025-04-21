@@ -24,6 +24,9 @@ namespace DrawIO.MCP.STDIO
         {
             try
             {
+                // Handle the case when --log-file is concatenated with its value
+                args = PreprocessArguments(args);
+
                 // Configure console streams for UTF-8 encoding and disable buffering
                 Console.InputEncoding = Encoding.UTF8;
                 Console.OutputEncoding = Encoding.UTF8;
@@ -159,6 +162,57 @@ namespace DrawIO.MCP.STDIO
                 }
                 return 1;
             }
+        }
+
+        private static string[] PreprocessArguments(string[] args)
+        {
+            List<string> processedArgs = new List<string>();
+            
+            for (int i = 0; i < args.Length; i++)
+            {
+                string arg = args[i];
+                
+                // Check for arguments where option and value are concatenated
+                if (arg.StartsWith("--log-file") && !arg.Equals("--log-file"))
+                {
+                    // Split into option and value
+                    processedArgs.Add("--log-file");
+                    processedArgs.Add(arg.Substring(10)); // Remove "--log-file" prefix
+                    
+                    // Log the transformation for debugging
+                    Console.Error.WriteLine($"Split argument '{arg}' into '--log-file' and '{arg.Substring(10)}'");
+                }
+                // Check for diagrams-dir with concatenated value
+                else if (arg.StartsWith("--diagrams-dir") && !arg.Equals("--diagrams-dir"))
+                {
+                    processedArgs.Add("--diagrams-dir");
+                    processedArgs.Add(arg.Substring(14)); // Remove "--diagrams-dir" prefix
+                    
+                    Console.Error.WriteLine($"Split argument '{arg}' into '--diagrams-dir' and '{arg.Substring(14)}'");
+                }
+                // Check for protocol with concatenated value
+                else if (arg.StartsWith("--protocol") && !arg.Equals("--protocol"))
+                {
+                    processedArgs.Add("--protocol");
+                    processedArgs.Add(arg.Substring(10)); // Remove "--protocol" prefix
+                    
+                    Console.Error.WriteLine($"Split argument '{arg}' into '--protocol' and '{arg.Substring(10)}'");
+                }
+                else
+                {
+                    // Pass through other arguments unchanged
+                    processedArgs.Add(arg);
+                }
+            }
+            
+            // Log the processed arguments for debugging
+            Console.Error.WriteLine("Processed arguments:");
+            for (int i = 0; i < processedArgs.Count; i++)
+            {
+                Console.Error.WriteLine($"  [{i}]: {processedArgs[i]}");
+            }
+            
+            return processedArgs.ToArray();
         }
 
         private static void LogMessage(string message)
