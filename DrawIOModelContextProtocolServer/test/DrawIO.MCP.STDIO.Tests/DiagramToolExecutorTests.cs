@@ -202,5 +202,149 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.True(resultDict.ContainsKey("error"));
             Assert.Contains("not found", resultDict["error"].ToString());
         }
+
+        [Fact]
+        public async Task AddShape_ShouldAddShapeAndReturnUpdatedDiagram()
+        {
+            // Arrange
+            var parameters = JsonDocument.Parse(@"{
+                ""diagram"": ""test.drawio"",
+                ""value"": ""Test Shape"",
+                ""x"": 100,
+                ""y"": 100,
+                ""width"": 120,
+                ""height"": 80
+            }").RootElement;
+
+            // Act
+            var result = await DiagramToolExecutor.ExecuteToolAsync("add_shape", parameters, _testDiagramsDirectory, _testLogWriter, true);
+
+            // Assert
+            Assert.NotNull(result);
+            var resultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(result);
+            Assert.Equal("success", resultDict["status"]);
+            Assert.NotNull(resultDict["elementId"]);
+            Assert.NotEmpty(resultDict["elementId"].ToString());
+            
+            var content = Assert.IsType<object[]>(resultDict["content"]);
+            Assert.Single(content);
+            Assert.Contains("Added shape with ID", content[0].ToString());
+
+            // Verify the diagram was actually updated
+            var updatedDiagram = JsonSerializer.Deserialize<object>(File.ReadAllText(_testDiagramPath));
+            Assert.NotNull(updatedDiagram);
+        }
+
+        [Fact]
+        public async Task ConnectShapes_ShouldConnectShapesAndReturnUpdatedDiagram()
+        {
+            // Arrange - First add two shapes
+            var shape1Params = JsonDocument.Parse(@"{
+                ""diagram"": ""test.drawio"",
+                ""value"": ""Source Shape"",
+                ""x"": 50,
+                ""y"": 50,
+                ""width"": 100,
+                ""height"": 60
+            }").RootElement;
+
+            var shape2Params = JsonDocument.Parse(@"{
+                ""diagram"": ""test.drawio"",
+                ""value"": ""Target Shape"",
+                ""x"": 200,
+                ""y"": 50,
+                ""width"": 100,
+                ""height"": 60
+            }").RootElement;
+
+            var shape1Result = await DiagramToolExecutor.ExecuteToolAsync("add_shape", shape1Params, _testDiagramsDirectory, _testLogWriter, true);
+            var shape2Result = await DiagramToolExecutor.ExecuteToolAsync("add_shape", shape2Params, _testDiagramsDirectory, _testLogWriter, true);
+
+            var shape1Id = ((System.Collections.Generic.Dictionary<string, object>)shape1Result)["elementId"].ToString();
+            var shape2Id = ((System.Collections.Generic.Dictionary<string, object>)shape2Result)["elementId"].ToString();
+
+            var connectParams = JsonDocument.Parse(@$"{{
+                ""diagram"": ""test.drawio"",
+                ""source_id"": ""{shape1Id}"",
+                ""target_id"": ""{shape2Id}""
+            }}").RootElement;
+
+            // Act
+            var result = await DiagramToolExecutor.ExecuteToolAsync("connect_shapes", connectParams, _testDiagramsDirectory, _testLogWriter, true);
+
+            // Assert
+            Assert.NotNull(result);
+            var resultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(result);
+            Assert.Equal("success", resultDict["status"]);
+            Assert.NotNull(resultDict["elementId"]);
+            Assert.NotEmpty(resultDict["elementId"].ToString());
+            
+            var content = Assert.IsType<object[]>(resultDict["content"]);
+            Assert.Single(content);
+            Assert.Contains("Connected shapes with connector ID", content[0].ToString());
+
+            // Verify the diagram was actually updated
+            var updatedDiagram = JsonSerializer.Deserialize<object>(File.ReadAllText(_testDiagramPath));
+            Assert.NotNull(updatedDiagram);
+        }
+
+        [Fact]
+        public async Task AddShape_WithInvalidParameters_ShouldReturnError()
+        {
+            // Arrange
+            var parameters = JsonDocument.Parse(@"{
+                ""diagram"": ""test.drawio"",
+                ""value"": ""Test Shape"",
+                ""x"": ""invalid"",
+                ""y"": 100,
+                ""width"": 120,
+                ""height"": 80
+            }").RootElement;
+
+            // Act
+            var result = await DiagramToolExecutor.ExecuteToolAsync("add_shape", parameters, _testDiagramsDirectory, _testLogWriter, true);
+
+            // Assert
+            Assert.NotNull(result);
+            var resultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(result);
+            Assert.True(resultDict.ContainsKey("isError"));
+            Assert.True(resultDict.ContainsKey("error"));
+            Assert.Contains("Error", ((object[])resultDict["content"])[0].ToString());
+        }
+
+        [Fact]
+        public async Task ConnectShapes_WithInvalidShapeIds_ShouldReturnError()
+        {
+            // Arrange
+            var parameters = JsonDocument.Parse(@"{
+                ""diagram"": ""test.drawio"",
+                ""source_id"": ""invalid_source_id"",
+                ""target_id"": ""invalid_target_id""
+            }").RootElement;
+
+            // Act
+            var result = await DiagramToolExecutor.ExecuteToolAsync("connect_shapes", parameters, _testDiagramsDirectory, _testLogWriter, true);
+
+            // Assert
+            Assert.NotNull(result);
+            var resultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(result);
+            Assert.True(resultDict.ContainsKey("isError"));
+            Assert.True(resultDict.ContainsKey("error"));
+            Assert.Contains("Error", ((object[])resultDict["content"])[0].ToString());
+        }
+
+        [Fact]
+        public async Task GenerateVpc_ShouldCreateVpcDiagramAndReturnUpdatedDiagram()
+        {
+            // Arrange
+            var executor = new DiagramToolExecutor();
+            var diagram = "vpc_test.drawio";
+
+            // Act
+            var result = await executor.GenerateVpcAsync(diagram);
+
+            // Assert
+            Assert.NotNull(result);
+        }
     }
 } 

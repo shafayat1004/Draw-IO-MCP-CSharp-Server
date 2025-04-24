@@ -759,10 +759,17 @@ module DiagramManipulation =
                 diagram.Pages |> List.map (fun page -> 
                     // Only arrange the specified page or all pages if pageId is None
                     if pageId.IsNone || pageId.Value = page.Id then
-                        // Get all vertices
+                        // Extract essential root and layer cells (id=0 and id=1) to preserve them
+                        let criticalCells = 
+                            page.Cells 
+                            |> List.filter (fun cell -> cell.Id = "0" || cell.Id = "1")
+                        
+                        // Get all vertices (except root and default layer)
                         let vertices = 
                             page.Cells 
-                            |> List.filter (fun cell -> cell.IsVertex && cell.Geometry.IsSome)
+                            |> List.filter (fun cell -> 
+                                cell.IsVertex && cell.Geometry.IsSome && 
+                                cell.Id <> "0" && cell.Id <> "1")
                             
                         // Get all edges
                         let edges = 
@@ -820,12 +827,16 @@ module DiagramManipulation =
                                 | _ -> edge
                             )
                         
-                        // Combine the arranged vertices and edges with any other cells
+                        // Combine the critical cells first, then other arranged elements
+                        // This ensures that cells with id "0" and "1" are always present
                         let otherCells = 
                             page.Cells 
-                            |> List.filter (fun cell -> not (cell.IsVertex) && not (cell.IsEdge))
+                            |> List.filter (fun cell -> 
+                                cell.Id <> "0" && cell.Id <> "1" && 
+                                not (cell.IsVertex && cell.Geometry.IsSome) && 
+                                not (cell.IsEdge))
                         
-                        { page with Cells = otherCells @ arrangedVertices @ arrangedEdges }
+                        { page with Cells = criticalCells @ otherCells @ arrangedVertices @ arrangedEdges }
                     else
                         page) }
 
@@ -1046,7 +1057,7 @@ module XmlSerializer =
         let root = XElement(XName.Get("root"))
         
         for cell in page.Cells do
-            root.Add(createCellElement cell)
+            root.Add(createCellElement(cell))
             
         graphModel.Add(root)
         graphModel
@@ -1067,7 +1078,7 @@ module XmlSerializer =
             diagramElem.SetAttributeValue(XName.Get("id"), page.Id)
             diagramElem.SetAttributeValue(XName.Get("name"), page.Name)
             
-            let graphModel = createGraphModelElement page
+            let graphModel = createGraphModelElement(page)
             diagramElem.Add(graphModel)
             
             mxfile.Add(diagramElem)
@@ -1085,11 +1096,11 @@ module FileOperations =
             raise <| FileNotFoundException($"Diagram file not found: {filePath}")
             
         let xmlContent = File.ReadAllText(filePath)
-        XmlParser.parseDiagram xmlContent
+        XmlParser.parseDiagram(xmlContent)
     
     /// Save a diagram to a file
     let saveDiagram (diagram: Diagram) (filePath: string) =
-        let xmlContent = XmlSerializer.serializeDiagram diagram
+        let xmlContent = XmlSerializer.serializeDiagram(diagram)
         File.WriteAllText(filePath, xmlContent)
         
     /// Create a new diagram and save it to a file

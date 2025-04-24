@@ -9,9 +9,12 @@
                 "--",
                 "--diagrams-dir",
                 "/home/shafayat/Documents/repos/Draw-IO-MCP-CSharp-Server/DrawIOModelContextProtocolServer/diagrams",
-                "--verbose",
                 "--log-file",
-                "/home/shafayat/Documents/repos/Draw-IO-MCP-CSharp-Server/mcp-debug.log"
+                "/home/shafayat/Documents/repos/Draw-IO-MCP-CSharp-Server/mcp-debug.log",
+                "--max-log-size",
+                "10",
+                "--max-log-files",
+                "3"
             ]
         }
     }

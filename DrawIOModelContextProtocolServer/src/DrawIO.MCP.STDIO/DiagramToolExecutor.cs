@@ -39,7 +39,7 @@ namespace DrawIO.MCP.STDIO
                     "create_new_diagram" => await CreateNewDiagramAsync(arguments, diagramsDirectory),
                     "add_shape" => await AddShapeAsync(arguments, diagramsDirectory),
                     "connect_shapes" => await ConnectShapesAsync(arguments, diagramsDirectory),
-                    "generate_vpc" => await GenerateVpcDiagramAsync(arguments, diagramsDirectory),
+                    "generate_vpc" => await GenerateVpcAsync(arguments, diagramsDirectory),
                     "get_diagram_image" => await GetDiagramImageAsync(arguments, diagramsDirectory, logWriter, verbose),
                     "delete_shape" => await DeleteShapeAsync(arguments, diagramsDirectory),
                     "update_shape" => await UpdateShapeAsync(arguments, diagramsDirectory),
@@ -161,156 +161,140 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> AddShapeAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string value = GetParameterString(parameters, "value");
-            float x = GetParameterFloat(parameters, "x");
-            float y = GetParameterFloat(parameters, "y");
-            float width = GetParameterFloat(parameters, "width");
-            float height = GetParameterFloat(parameters, "height");
-            string shape = GetParameterString(parameters, "shape", "rectangle");
-            
-            string filePath = Path.Combine(diagramsDirectory, diagram);
-            if (!File.Exists(filePath))
+            try
             {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
-            }
-            
-            // Load the diagram, add a shape, and save it
-            var diagramObj = LoadDiagram(filePath);
-            var result = DrawIO.MCP.Core.DiagramManipulation.addShape(diagramObj, 0, value, x, y, width, height, shape);
-            var updatedDiagram = result.Item1;
-            var newId = result.Item2;
-            SaveDiagram(updatedDiagram, filePath);
-            
-            return Task.FromResult<object>(new 
-            {
-                status = "success",
-                elementId = newId,
-                shapeId = newId,
-                diagramId = $"diagram://{diagram}",
-                content = new[] 
+                // Extract parameters
+                var diagramName = GetParameterString(parameters, "diagram");
+                var value = GetParameterString(parameters, "value");
+                var x = parameters.GetProperty("x").GetDouble();
+                var y = parameters.GetProperty("y").GetDouble();
+                var width = parameters.GetProperty("width").GetDouble();
+                var height = parameters.GetProperty("height").GetDouble();
+                var shape = parameters.TryGetProperty("shape", out var shapeElement) ? shapeElement.GetString() : "rectangle";
+
+                // Load diagram
+                var diagramPath = Path.Combine(diagramsDirectory, diagramName);
+                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+
+                // Add shape
+                var (updatedDiagram, shapeId) = DrawIO.MCP.Core.DiagramManipulation.addShape(diagramObj, 0, value, x, y, width, height, shape);
+
+                // Save updated diagram
+                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+
+                return Task.FromResult<object>(new 
                 { 
-                    new 
+                    status = "success",
+                    elementId = shapeId,
+                    content = new[] 
                     { 
-                        type = "text", 
-                        text = $"Added shape '{value}' with ID {newId}" 
-                    } 
-                }
-            });
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Added shape with ID {shapeId}" 
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new
+                {
+                    isError = true,
+                    error = ex.Message,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
         }
 
         private static Task<object> ConnectShapesAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            
-            // Try both naming conventions for parameters
-            string sourceId;
-            if (parameters.TryGetProperty("sourceId", out var sourceIdElement))
+            try
             {
-                sourceId = sourceIdElement.GetString();
-            }
-            else
-            {
-                sourceId = GetParameterString(parameters, "source_id");
-            }
-            
-            string targetId;
-            if (parameters.TryGetProperty("targetId", out var targetIdElement))
-            {
-                targetId = targetIdElement.GetString();
-            }
-            else
-            {
-                targetId = GetParameterString(parameters, "target_id");
-            }
-            
-            string filePath = Path.Combine(diagramsDirectory, diagram);
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
-            }
-            
-            // Load the diagram, connect shapes, and save it
-            var diagramObj = LoadDiagram(filePath);
-            var result = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramObj, 0, sourceId, targetId);
-            var updatedDiagram = result.Item1;
-            var newId = result.Item2;
-            SaveDiagram(updatedDiagram, filePath);
-            
-            return Task.FromResult<object>(new 
-            {
-                status = "success",
-                elementId = newId,
-                connectorId = newId,
-                diagramId = $"diagram://{diagram}",
-                content = new[] 
+                // Extract parameters
+                var diagramName = GetParameterString(parameters, "diagram");
+                var sourceId = GetParameterString(parameters, "source_id");
+                var targetId = GetParameterString(parameters, "target_id");
+
+                // Load diagram
+                var diagramPath = Path.Combine(diagramsDirectory, diagramName);
+                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+
+                // Connect shapes
+                var (updatedDiagram, connectorId) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramObj, 0, sourceId, targetId);
+
+                // Save updated diagram
+                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+
+                return Task.FromResult<object>(new 
                 { 
-                    new 
+                    status = "success",
+                    elementId = connectorId,
+                    content = new[] 
                     { 
-                        type = "text", 
-                        text = $"Connected shapes with ID {newId}" 
-                    } 
-                }
-            });
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Connected shapes with connector ID {connectorId}" 
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new
+                {
+                    isError = true,
+                    error = ex.Message,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
         }
 
-        private static Task<object> GenerateVpcDiagramAsync(JsonElement parameters, string diagramsDirectory)
+        private static Task<object> GenerateVpcAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string name = GetParameterString(parameters, "diagram_name", null);
-            
-            // If diagram_name is null, try the name parameter for backward compatibility
-            if (name == null)
+            try
             {
-                name = GetParameterString(parameters, "name", "vpc.drawio");
+                var diagramName = parameters.GetProperty("diagram_name").GetString();
+                var diagramPath = Path.Combine(diagramsDirectory, diagramName);
+
+                // Create empty diagram
+                var emptyDiagram = DrawIO.MCP.Core.DiagramManipulation.createEmptyDiagram();
+
+                // Add VPC
+                var (vpcDiagram, vpcId) = DrawIO.MCP.Core.DiagramManipulation.addShape(emptyDiagram, 0, "VPC", 50, 50, 600, 400, "swimlane");
+
+                // Add IGW
+                var (igwDiagram, igwId) = DrawIO.MCP.Core.DiagramManipulation.addShape(vpcDiagram, 0, "IGW", 350, 10, 80, 40, "rectangle");
+
+                // Connect components
+                var (diagramWithConnector1, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(igwDiagram, 0, igwId, vpcId);
+                var (diagramWithConnector2, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramWithConnector1, 0, vpcId, vpcId);
+                var (finalDiagram, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramWithConnector2, 0, vpcId, vpcId);
+
+                // Save the diagram
+                DrawIO.MCP.Core.FileOperations.saveDiagram(finalDiagram, diagramPath);
+
+                return Task.FromResult<object>(new { status = "success" });
             }
-            
-            if (!name.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
+            catch (Exception ex)
             {
-                name += ".drawio";
+                return Task.FromException<object>(ex);
             }
-            
-            string filePath = Path.Combine(diagramsDirectory, name);
-            
-            if (File.Exists(filePath))
-            {
-                throw new InvalidOperationException($"Diagram '{name}' already exists");
-            }
-            
-            // Create empty VPC diagram
-            var emptyDiagram = CreateNewDiagram(filePath);
-            
-            // Add base VPC shape
-            var vpc = DrawIO.MCP.Core.DiagramManipulation.addShape(emptyDiagram, 0, "VPC", 50, 50, 600, 400, "swimlane");
-            var vpcDiagram = vpc.Item1;
-            var vpcId = vpc.Item2;
-            
-            // Add Internet Gateway
-            var igw = DrawIO.MCP.Core.DiagramManipulation.addShape(vpcDiagram, 0, "IGW", 350, 10, 80, 40, "rectangle");
-            var igwDiagram = igw.Item1;
-            var igwId = igw.Item2;
-            
-            // Connect components
-            var (diagramWithConnector1, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(igwDiagram, 0, igwId, vpcId);
-            var (diagramWithConnector2, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramWithConnector1, 0, vpcId, vpcId);
-            var (diagramWithConnector3, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramWithConnector2, 0, vpcId, vpcId);
-            
-            // Save the diagram
-            SaveDiagram(diagramWithConnector3, filePath);
-            
-            return Task.FromResult<object>(new
-            {
-                status = "created",
-                DiagramId = $"diagram://{name}",
-                FileName = name,
-                content = new[] 
-                { 
-                    new 
-                    { 
-                        type = "text", 
-                        text = $"Created VPC diagram '{name}' with VPC and IGW components" 
-                    } 
-                }
-            });
         }
         
         private static Task<object> DeleteShapeAsync(JsonElement parameters, string diagramsDirectory)

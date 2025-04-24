@@ -138,43 +138,17 @@ public class DrawIoService
 
     public (CoreTypes.Diagram, string) AddShape(string fileName, string value, float x, float y, float width, float height, string shape = "rectangle")
     {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".drawio";
-        }
-        
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
-        
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException($"Diagram file not found: {fileName}");
-        }
-        
-        var diagram = CoreFileOps.loadDiagram(filePath);
+        var diagram = GetDiagram(fileName);
         (CoreTypes.Diagram updatedDiagram, string newId) = CoreDiagramOps.addShape(diagram, 0, value, x, y, width, height, shape);
-        CoreFileOps.saveDiagram(updatedDiagram, filePath);
-        
+        SaveDiagram(updatedDiagram, fileName);
         return (updatedDiagram, newId);
     }
 
     public (CoreTypes.Diagram, string) ConnectShapes(string fileName, string sourceId, string targetId)
     {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".drawio";
-        }
-        
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
-        
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException($"Diagram file not found: {fileName}");
-        }
-        
-        var diagram = CoreFileOps.loadDiagram(filePath);
+        var diagram = GetDiagram(fileName);
         (CoreTypes.Diagram updatedDiagram, string newId) = CoreDiagramOps.connectShapes(diagram, 0, sourceId, targetId);
-        CoreFileOps.saveDiagram(updatedDiagram, filePath);
-        
+        SaveDiagram(updatedDiagram, fileName);
         return (updatedDiagram, newId);
     }
 
@@ -243,6 +217,25 @@ public class DrawIoService
 
     public CoreTypes.Diagram GenerateVpcDiagram(string fileName)
     {
+        var diagram = CoreDiagramOps.createEmptyDiagram();
+
+        // Add components
+        (CoreTypes.Diagram diagramWithVpc, string vpcId) = CoreDiagramOps.addShape(diagram, 0, "VPC", 20, 20, 400, 300, "rectangle");
+        (CoreTypes.Diagram diagramWithPublicSubnet, string publicSubnetId) = CoreDiagramOps.addShape(diagramWithVpc, 0, "Public Subnet", 40, 60, 150, 120, "rectangle");
+        (CoreTypes.Diagram diagramWithPrivateSubnet, string privateSubnetId) = CoreDiagramOps.addShape(diagramWithPublicSubnet, 0, "Private Subnet", 240, 60, 150, 120, "rectangle");
+        (CoreTypes.Diagram diagramWithIgw, string igwId) = CoreDiagramOps.addShape(diagramWithPrivateSubnet, 0, "Internet Gateway", 180, 0, 80, 40, "ellipse");
+
+        // Connect components
+        (CoreTypes.Diagram diagramWithConnector1, string _) = CoreDiagramOps.connectShapes(diagramWithIgw, 0, igwId, vpcId);
+        (CoreTypes.Diagram diagramWithConnector2, string _) = CoreDiagramOps.connectShapes(diagramWithConnector1, 0, vpcId, publicSubnetId);
+        (CoreTypes.Diagram finalDiagram, string _) = CoreDiagramOps.connectShapes(diagramWithConnector2, 0, vpcId, privateSubnetId);
+
+        SaveDiagram(finalDiagram, fileName);
+        return finalDiagram;
+    }
+
+    private void SaveDiagram(CoreTypes.Diagram diagram, string fileName)
+    {
         if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
         {
             fileName += ".drawio";
@@ -250,29 +243,7 @@ public class DrawIoService
         
         string filePath = Path.Combine(_diagramsDirectory, fileName);
         
-        if (File.Exists(filePath))
-        {
-            throw new InvalidOperationException($"Diagram '{fileName}' already exists");
-        }
-        
-        // Create a new diagram
-        var diagram = CoreDiagramOps.createEmptyDiagram();
-        
-        // Add VPC components
-        (CoreTypes.Diagram diagramWithVpc, string vpcId) = CoreDiagramOps.addShape(diagram, 0, "VPC", 20, 20, 400, 300, "rectangle");
-        (CoreTypes.Diagram diagramWithPublicSubnet, string publicSubnetId) = CoreDiagramOps.addShape(diagramWithVpc, 0, "Public Subnet", 40, 60, 150, 120, "rectangle");
-        (CoreTypes.Diagram diagramWithPrivateSubnet, string privateSubnetId) = CoreDiagramOps.addShape(diagramWithPublicSubnet, 0, "Private Subnet", 240, 60, 150, 120, "rectangle");
-        (CoreTypes.Diagram diagramWithIgw, string igwId) = CoreDiagramOps.addShape(diagramWithPrivateSubnet, 0, "Internet Gateway", 180, 0, 80, 40, "ellipse");
-        
-        // Connect components
-        (CoreTypes.Diagram diagramWithConnector1, string _) = CoreDiagramOps.connectShapes(diagramWithIgw, 0, igwId, vpcId);
-        (CoreTypes.Diagram diagramWithConnector2, string _) = CoreDiagramOps.connectShapes(diagramWithConnector1, 0, vpcId, publicSubnetId);
-        (CoreTypes.Diagram diagramWithConnector3, string _) = CoreDiagramOps.connectShapes(diagramWithConnector2, 0, vpcId, privateSubnetId);
-        
-        // Save the diagram
-        CoreFileOps.saveDiagram(diagramWithConnector3, filePath);
-        
-        return diagramWithConnector3;
+        CoreFileOps.saveDiagram(diagram, filePath);
     }
 }
 

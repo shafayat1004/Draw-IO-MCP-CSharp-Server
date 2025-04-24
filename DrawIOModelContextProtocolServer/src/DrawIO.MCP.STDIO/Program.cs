@@ -19,6 +19,10 @@ namespace DrawIO.MCP.STDIO
         private static string _diagramsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "diagrams");
         private static TextWriter _logWriter = Console.Error;
         private static ProtocolType _protocolType = ProtocolType.STDIO;
+        private static string _logFilePath = null;
+        private static long _maxLogSizeBytes = 100 * 1024 * 1024; // 100 MB
+        private static int _maxLogFiles = 3;
+        private static long _currentLogSize = 0;
 
         public static async Task<int> Main(string[] args)
         {
@@ -57,6 +61,16 @@ namespace DrawIO.MCP.STDIO
                     "--log-file",
                     description: "File to write logs to (stderr if not specified)");
                 
+                var maxLogSizeOption = new Option<long>(
+                    "--max-log-size",
+                    description: "Maximum size of log file in MB before rotation",
+                    getDefaultValue: () => _maxLogSizeBytes / (1024 * 1024));
+                    
+                var maxLogFilesOption = new Option<int>(
+                    "--max-log-files",
+                    description: "Maximum number of log files to keep",
+                    getDefaultValue: () => _maxLogFiles);
+                
                 var protocolOption = new Option<string>(
                     "--protocol",
                     description: "Protocol to use (stdio, sse)",
@@ -65,11 +79,15 @@ namespace DrawIO.MCP.STDIO
                 rootCommand.AddOption(diagramsDirOption);
                 rootCommand.AddOption(verboseOption);
                 rootCommand.AddOption(logFileOption);
+                rootCommand.AddOption(maxLogSizeOption);
+                rootCommand.AddOption(maxLogFilesOption);
                 rootCommand.AddOption(protocolOption);
 
-                rootCommand.SetHandler(async (string diagramsDir, bool verbose, string logFile, string protocol) =>
+                rootCommand.SetHandler(async (string diagramsDir, bool verbose, string logFile, long maxLogSizeMB, int maxLogFiles, string protocol) =>
                 {
                     _diagramsDirectory = diagramsDir;
+                    _maxLogSizeBytes = maxLogSizeMB * 1024 * 1024;
+                    _maxLogFiles = maxLogFiles;
                     
                     if (!Directory.Exists(_diagramsDirectory))
                     {
@@ -88,8 +106,34 @@ namespace DrawIO.MCP.STDIO
                                 Directory.CreateDirectory(logDir);
                             }
                             
-                            _logWriter = new StreamWriter(logFile, true) { AutoFlush = true };
-                            LogMessage($"Logs being written to: {logFile}");
+                            _logFilePath = logFile;
+                            
+                            // Check the current size of the log file if it exists
+                            if (File.Exists(_logFilePath))
+                            {
+                                var fileInfo = new FileInfo(_logFilePath);
+                                _currentLogSize = fileInfo.Length;
+                                
+                                // If the file is already over the limit, rotate it before starting
+                                if (_currentLogSize > _maxLogSizeBytes)
+                                {
+                                    Console.Error.WriteLine($"Log file already exceeds maximum size ({_maxLogSizeBytes / (1024 * 1024)} MB), rotating...");
+                                    // Create a temporary StreamWriter to use during rotation
+                                    _logWriter = new StreamWriter(_logFilePath, true) { AutoFlush = true };
+                                    RotateLogFile();
+                                }
+                                else
+                                {
+                                    _logWriter = new StreamWriter(_logFilePath, true) { AutoFlush = true };
+                                }
+                            }
+                            else
+                            {
+                                _logWriter = new StreamWriter(_logFilePath, true) { AutoFlush = true };
+                                _currentLogSize = 0;
+                            }
+                            
+                            LogMessage($"Logs being written to: {logFile} (Max size: {_maxLogSizeBytes / (1024 * 1024)} MB, Max files: {_maxLogFiles})");
                         }
                         catch (Exception ex)
                         {
@@ -143,7 +187,7 @@ namespace DrawIO.MCP.STDIO
                     // Add a delay before exiting to ensure logs are written
                     LogMessage("Server execution completed, waiting before exit...");
                     await Task.Delay(1000);
-                }, diagramsDirOption, verboseOption, logFileOption, protocolOption);
+                }, diagramsDirOption, verboseOption, logFileOption, maxLogSizeOption, maxLogFilesOption, protocolOption);
 
                 return await rootCommand.InvokeAsync(args);
             }
@@ -220,13 +264,83 @@ namespace DrawIO.MCP.STDIO
             try
             {
                 var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                _logWriter.WriteLine($"[{timestamp}] {message}");
+                var logLine = $"[{timestamp}] {message}";
+                _logWriter.WriteLine(logLine);
                 _logWriter.Flush(); // Ensure log is written immediately
+                
+                // If we're writing to a file, track the size
+                if (_logWriter != Console.Error && _logFilePath != null)
+                {
+                    // Add the size of the log line plus newline characters to the current log size
+                    _currentLogSize += Encoding.UTF8.GetByteCount(logLine) + Environment.NewLine.Length;
+                    
+                    // Check if we need to rotate
+                    if (_currentLogSize > _maxLogSizeBytes)
+                    {
+                        RotateLogFile();
+                    }
+                }
             }
             catch (Exception ex)
             {
                 // Last-resort attempt to log the failure
                 try { Console.Error.WriteLine($"Logging failed: {ex.Message}"); } catch { }
+            }
+        }
+        
+        private static void RotateLogFile()
+        {
+            try
+            {
+                // Close the current log writer
+                _logWriter.Close();
+                
+                // Perform log rotation - shift files
+                for (int i = _maxLogFiles - 1; i > 0; i--)
+                {
+                    string oldFile = $"{_logFilePath}.{i}";
+                    string newFile = $"{_logFilePath}.{i + 1}";
+                    
+                    if (File.Exists(oldFile))
+                    {
+                        if (i == _maxLogFiles - 1)
+                        {
+                            // Delete the oldest log file
+                            File.Delete(oldFile);
+                        }
+                        else
+                        {
+                            // Rename file to the next index
+                            if (File.Exists(newFile))
+                                File.Delete(newFile);
+                            File.Move(oldFile, newFile);
+                        }
+                    }
+                }
+                
+                // Rename the current log file
+                if (File.Exists(_logFilePath))
+                {
+                    string newFile = $"{_logFilePath}.1";
+                    if (File.Exists(newFile))
+                        File.Delete(newFile);
+                    File.Move(_logFilePath, newFile);
+                }
+                
+                // Create a new log file
+                _logWriter = new StreamWriter(_logFilePath, true) { AutoFlush = true };
+                _currentLogSize = 0;
+                
+                // Log the rotation
+                var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                _logWriter.WriteLine($"[{timestamp}] Log file rotated due to size limit ({_maxLogSizeBytes / (1024 * 1024)} MB) being reached");
+                _logWriter.Flush();
+            }
+            catch (Exception ex)
+            {
+                // If rotation fails, revert to stderr
+                _logWriter = Console.Error;
+                Console.Error.WriteLine($"Log rotation failed: {ex.Message}. Reverting to stderr for logging.");
             }
         }
 
