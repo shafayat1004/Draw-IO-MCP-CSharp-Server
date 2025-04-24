@@ -30,11 +30,14 @@ The DrawIO MCP Server currently implements the following tools:
   - Font size
   - Font style (bold, italic)
 - ✅ Set Line Style (`set_line_style`) with:
-  - Line pattern (solid, dashed)
+  - Line pattern (solid, dashed, dotted)
   - Line width
+  - Edge style (sharp, rounded, curved)
+  - Routing style (straight, orthogonal, curved)
+  - Jump style (overlapped, arc, gap)
 - ✅ Set Arrow Style (`set_arrow_style`) with:
-  - Start arrow type
-  - End arrow type
+  - Start arrow type (none, classic, diamond, oval, open, block)
+  - End arrow type (none, classic, diamond, oval, open, block)
 - ✅ Reset Connector (`reset_connector`)
 - ✅ Reverse Connector (`reverse_connector`)
 - ✅ Resize Shape (`resize_shape`)
@@ -61,7 +64,7 @@ Based on testing and documentation review:
 - 🔴 Copy/paste styles between shapes
 
 #### Connector Features
-- 🔴 Add/remove waypoints on connectors
+- 🔴 Add/remove/modify waypoints on connectors
 - 🔴 Connect to arbitrary points on shapes
 - 🔴 Hide connection arrows
 - 🔴 Hide fixed connection points
@@ -91,6 +94,30 @@ Based on testing and documentation review:
 - 🔴 Export to various formats (PDF, SVG, etc.)
 - 🔴 Import from other formats
 - 🔴 Plugins support
+
+## Connector Styling and Routing Capabilities
+
+Our current implementation supports sophisticated connector styling and routing through the following features:
+
+### Right-Angle (Orthogonal) Routing
+- ✅ Orthogonal edge style via `set_line_style` with `routing_style="orthogonal"`
+- ✅ Control of edge appearance with options for sharp, rounded, or curved corners
+- ✅ Jump style configuration for connector crossings (overlapped, arc, gap)
+
+### Arrow Styling
+- ✅ Customization of both start and end arrow styles
+- ✅ Multiple arrow head types: none, classic, diamond, oval, open, block
+- ✅ Arrow direction reversal via `reverse_connector` tool
+
+### Connector Reset & Management
+- ✅ Reset connectors to default routing paths
+- ✅ Automatic connector routing between shapes
+
+### Limitations
+- 🔴 No manual waypoint control for precise path adjustment
+- 🔴 Cannot connect to arbitrary points on shapes (only predefined connection points)
+- 🔴 No bidirectional arrow support in a single connector
+- 🔴 No waypoint drag-and-drop style editing
 
 ## Implementation Plan by Tier
 
@@ -122,47 +149,56 @@ Based on testing and documentation review:
 
 ### Tier 2: Advanced Editing & Layout Tools (Next Priority)
 
-#### Layout & Positioning
-19. **Align Shapes** 🟨 - *Partially via `arrange_diagram`*
-    - Approach: Add specific alignment options
-    - Complexity: Medium
-    
-20. **Distribute Shapes** 🟨 - *Partially via `arrange_diagram`*
-    - Approach: Add distribution options
-    - Complexity: Medium
-    
-21. **Add/Remove Waypoints** 🔴 - *New tool needed*
-    - Approach: Implement waypoint manipulation
-    - Complexity: Medium
-    - Essential for complex routing
+#### Priority 1: Connector Enhancements
+21. **Add/Remove/Modify Waypoints** 🔴 - *Highest priority*
+    - Approach: Implement waypoint data structure and manipulation functions
+    - Add tools for adding, removing, and moving waypoints on connectors
+    - Complexity: Medium-High
+    - Essential for precise routing control
 
-#### Grouping & Layering
+#### Priority 2: Organizational Features
 22. **Group Shapes** 🔴 - *High priority*
     - Approach: Implement parent-child relationships
+    - Add tools for grouping/ungrouping elements
     - Complexity: High
     - Essential for diagram organization
     
-23. **Layer Management** 🔴 - *High priority*
+26. **Autosize to Text** 🔴 - *Medium priority*
+    - Approach: Calculate text bounds and adjust shape dimensions
+    - Add tool for automatic shape sizing based on content
+    - Complexity: Medium
+    - Improves usability for text-heavy diagrams
+
+#### Priority 3: Layout & Positioning
+19. **Align Shapes** 🟨 - *Medium priority*
+    - Approach: Add specific alignment options (left, right, center, top, bottom)
+    - Extend `arrange_diagram` or create new alignment tool
+    - Complexity: Medium
+    
+20. **Distribute Shapes** 🟨 - *Medium priority*
+    - Approach: Add distribution options (horizontal, vertical spacing)
+    - Extend `arrange_diagram` or create new distribution tool
+    - Complexity: Medium
+
+#### Priority 4: Advanced Organization
+23. **Layer Management** 🔴 - *Medium priority*
     - Approach: Implement layer hierarchy
+    - Add tools for creating/managing layers and moving elements between them
     - Complexity: High
     - Required for complex diagrams
 
 #### Advanced Styling
-24. **Copy/Paste Styles** 🔴 - *Medium priority*
+24. **Copy/Paste Styles** 🔴 - *Lower priority*
     - Approach: Store and apply style templates
     - Complexity: Medium
     
-25. **Global Styles** 🔴 - *Medium priority*
+25. **Global Styles** 🔴 - *Lower priority*
     - Approach: Implement style inheritance
     - Complexity: Medium
 
 ### Tier 3: Enhanced Features (Future Implementation)
 
 #### Text and Labels
-26. **Autosize to Text** 🔴
-    - Approach: Calculate text bounds
-    - Complexity: Medium
-    
 27. **Custom Fonts** 🔴
     - Approach: Font embedding/linking
     - Complexity: High
@@ -208,17 +244,29 @@ Based on testing and documentation review:
 ## Core Architecture Enhancements
 
 ### Immediate Priorities
-1. **Fix Image Export**
+1. **Implement Waypoint Control System**
+   - Design data structures for waypoint representation
+   - Create manipulation functions in core library
+   - Develop user-friendly tools for waypoint editing
+   - Add comprehensive tests for waypoint features
+
+2. **Fix Image Export**
    - Investigate CLI integration
    - Implement reliable export pipeline
    - Support multiple formats
 
-2. **Enhanced Layout Engine**
+3. **Shape Grouping System**
+   - Design group hierarchy implementation
+   - Add group operations to core library
+   - Create tools for group manipulation
+   - Ensure proper visual representation of groups
+
+4. **Enhanced Layout Engine**
    - Implement more layout algorithms
    - Add alignment options
    - Support distribution patterns
 
-3. **Style System Refactor**
+5. **Style System Refactor**
    - Create style templates
    - Implement inheritance
    - Support global styles
@@ -236,22 +284,30 @@ Based on testing and documentation review:
 
 ## Implementation Strategy
 
-1. **Complete Tier 1 Polish**
-   - Fix any remaining issues
-   - Improve error handling
-   - Add comprehensive tests
+1. **Waypoint Implementation (Highest Priority)**
+   - Analyze DrawIO's waypoint data structure
+   - Implement core waypoint functions in F#
+   - Create tools for adding, removing, and editing waypoints
+   - Add comprehensive tests for waypoint manipulation
 
-2. **Tier 2 Implementation**
-   - Focus on grouping and layers
-   - Enhance connector features
-   - Add advanced styling
+2. **Group/Ungroup Implementation**
+   - Design parent-child relationship model
+   - Implement group operations in core library
+   - Create tools for group management
+   - Add tests for grouping functionality
 
-3. **Core Architecture**
-   - Implement state management
-   - Enhance style system
-   - Fix image export
+3. **Autosize to Text**
+   - Research text measurement techniques
+   - Implement autosize functionality in core library
+   - Create tool for automatic shape resizing
+   - Add tests for text measurement and shape resizing
 
-4. **Documentation**
+4. **Tier 2 Implementation**
+   - Focus on remaining tier 2 features
+   - Add alignment and distribution options
+   - Implement layer management
+
+5. **Documentation**
    - Update API documentation
    - Add usage examples
    - Create tutorials 
