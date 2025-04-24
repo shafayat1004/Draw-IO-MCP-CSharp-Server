@@ -1,4 +1,4 @@
-module DrawIO.MCP.Core.Tests.BasicTests
+module DrawIO.MCP.Core.TestSuites.BasicTests
 
 open System
 open Xunit

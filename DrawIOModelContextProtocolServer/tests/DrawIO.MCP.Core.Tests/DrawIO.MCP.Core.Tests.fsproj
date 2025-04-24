@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="BasicTests.fs" />
+    <Compile Include="XmlParserTestSuite.fs" />
+    <Compile Include="ElementQueryTestSuite.fs" />
+    <Compile Include="StyleManipulationTestSuite.fs" />
+    <Compile Include="FileOperationsTestSuite.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
