@@ -664,8 +664,8 @@ module DiagramManipulation =
         // Create the edge without waypoints for simple connection
         let edge = {
             Id = edgeId
-            Value = "endArrow=classic;html=1;rounded=0;"
-            Style = "endArrow=classic;html=1;rounded=0;"
+            Value = "" // Empty value for no label text
+            Style = "endArrow=classic;html=1;rounded=0;" // Style information only in the style attribute
             IsVertex = false
             IsEdge = true
             Parent = "1" // Default layer
@@ -1198,12 +1198,14 @@ module DiagramManipulation =
         ]
         
         // Create the edge with optional waypoints
+        let styleString = 
+            "endArrow=classic;html=1;rounded=0;" + 
+            (if waypoints.Length > 0 then "entryX=0;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0;exitDx=0;exitDy=0;" else "")
+        
         let edge = {
             Id = edgeId
-            Value = "endArrow=classic;html=1;rounded=0;" + 
-                    (if waypoints.Length > 0 then "entryX=0;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0;exitDx=0;exitDy=0;" else "")
-            Style = "endArrow=classic;html=1;rounded=0;" + 
-                    (if waypoints.Length > 0 then "entryX=0;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0;exitDx=0;exitDy=0;" else "")
+            Value = "" // Empty value for no label text
+            Style = styleString // Put the styling info only in the style attribute
             IsVertex = false
             IsEdge = true
             Parent = "1" // Default layer
