@@ -41,6 +41,12 @@ The DrawIO MCP Server currently implements the following tools:
 - ✅ Reset Connector (`reset_connector`)
 - ✅ Reverse Connector (`reverse_connector`)
 - ✅ Resize Shape (`resize_shape`)
+- ✅ Waypoint Management for Connectors:
+  - Add Waypoint (`add_waypoint`)
+  - Remove Waypoint (`remove_waypoint`)
+  - Update Waypoint (`update_waypoint`)
+  - Get Waypoints (`get_waypoints`)
+  - Clear Waypoints (`clear_waypoints`)
 
 ### Needs Investigation
 - 🟨 Get Diagram Image (`get_diagram_image`) - drawio CLI integration issues:
@@ -64,7 +70,7 @@ Based on testing and documentation review:
 - 🔴 Copy/paste styles between shapes
 
 #### Connector Features
-- 🔴 Add/remove/modify waypoints on connectors
+- ✅ Add/remove/modify waypoints on connectors - IMPLEMENTED
 - 🔴 Connect to arbitrary points on shapes
 - 🔴 Hide connection arrows
 - 🔴 Hide fixed connection points
@@ -113,11 +119,17 @@ Our current implementation supports sophisticated connector styling and routing 
 - ✅ Reset connectors to default routing paths
 - ✅ Automatic connector routing between shapes
 
+### Waypoint Control
+- ✅ Manual waypoint addition, removal and modification
+- ✅ Support for multiple waypoints per connector
+- ✅ Clear all waypoints from a connector
+- ✅ Query all waypoints for a connector
+- ✅ Create right-angled paths using strategic waypoint placement
+
 ### Limitations
-- 🔴 No manual waypoint control for precise path adjustment
 - 🔴 Cannot connect to arbitrary points on shapes (only predefined connection points)
 - 🔴 No bidirectional arrow support in a single connector
-- 🔴 No waypoint drag-and-drop style editing
+- 🔴 No waypoint drag-and-drop style editing in the API (would need UI implementation)
 
 ## Implementation Plan by Tier
 
@@ -147,52 +159,52 @@ Our current implementation supports sophisticated connector styling and routing 
 17. **List Neighbors** ✅ - *Implemented and tested*
 18. **Get Diagram Bounds** ✅ - *Implemented and tested*
 
+#### Advanced Connector Control
+19. **Add/Remove/Modify Waypoints** ✅ - *Implemented and tested*
+    - Waypoint data structure and manipulation functions are now in place
+    - Tools for adding, removing, moving and clearing waypoints implemented
+    - Fixed XML structure to use `<Array as="points">` container for waypoints
+    - Backward compatibility for parsing older waypoint formats
+
 ### Tier 2: Advanced Editing & Layout Tools (Next Priority)
 
-#### Priority 1: Connector Enhancements
-21. **Add/Remove/Modify Waypoints** 🔴 - *Highest priority*
-    - Approach: Implement waypoint data structure and manipulation functions
-    - Add tools for adding, removing, and moving waypoints on connectors
-    - Complexity: Medium-High
-    - Essential for precise routing control
-
-#### Priority 2: Organizational Features
-22. **Group Shapes** 🔴 - *High priority*
+#### Priority 1: Organizational Features
+20. **Group Shapes** 🔴 - *Highest priority*
     - Approach: Implement parent-child relationships
     - Add tools for grouping/ungrouping elements
     - Complexity: High
     - Essential for diagram organization
     
-26. **Autosize to Text** 🔴 - *Medium priority*
+21. **Autosize to Text** 🔴 - *Medium priority*
     - Approach: Calculate text bounds and adjust shape dimensions
     - Add tool for automatic shape sizing based on content
     - Complexity: Medium
     - Improves usability for text-heavy diagrams
 
-#### Priority 3: Layout & Positioning
-19. **Align Shapes** 🟨 - *Medium priority*
+#### Priority 2: Layout & Positioning
+22. **Align Shapes** 🟨 - *Medium priority*
     - Approach: Add specific alignment options (left, right, center, top, bottom)
     - Extend `arrange_diagram` or create new alignment tool
     - Complexity: Medium
     
-20. **Distribute Shapes** 🟨 - *Medium priority*
+23. **Distribute Shapes** 🟨 - *Medium priority*
     - Approach: Add distribution options (horizontal, vertical spacing)
     - Extend `arrange_diagram` or create new distribution tool
     - Complexity: Medium
 
-#### Priority 4: Advanced Organization
-23. **Layer Management** 🔴 - *Medium priority*
+#### Priority 3: Advanced Organization
+24. **Layer Management** 🔴 - *Medium priority*
     - Approach: Implement layer hierarchy
     - Add tools for creating/managing layers and moving elements between them
     - Complexity: High
     - Required for complex diagrams
 
 #### Advanced Styling
-24. **Copy/Paste Styles** 🔴 - *Lower priority*
+25. **Copy/Paste Styles** 🔴 - *Lower priority*
     - Approach: Store and apply style templates
     - Complexity: Medium
     
-25. **Global Styles** 🔴 - *Lower priority*
+26. **Global Styles** 🔴 - *Lower priority*
     - Approach: Implement style inheritance
     - Complexity: Medium
 
@@ -244,11 +256,13 @@ Our current implementation supports sophisticated connector styling and routing 
 ## Core Architecture Enhancements
 
 ### Immediate Priorities
-1. **Implement Waypoint Control System**
-   - Design data structures for waypoint representation
-   - Create manipulation functions in core library
-   - Develop user-friendly tools for waypoint editing
-   - Add comprehensive tests for waypoint features
+1. ✅ **Implement Waypoint Control System** - COMPLETED
+   - ✅ Designed data structures for waypoint representation
+   - ✅ Created manipulation functions in core library
+   - ✅ Developed user-friendly tools for waypoint editing
+   - ✅ Added comprehensive tests for waypoint features
+   - ✅ Fixed XML structure to wrap waypoints in `<Array as="points">` elements
+   - ✅ Added backward compatibility for waypoint parsing
 
 2. **Fix Image Export**
    - Investigate CLI integration
@@ -284,13 +298,14 @@ Our current implementation supports sophisticated connector styling and routing 
 
 ## Implementation Strategy
 
-1. **Waypoint Implementation (Highest Priority)**
-   - Analyze DrawIO's waypoint data structure
-   - Implement core waypoint functions in F#
-   - Create tools for adding, removing, and editing waypoints
-   - Add comprehensive tests for waypoint manipulation
+1. ✅ **Waypoint Implementation** - COMPLETED
+   - ✅ Analyzed DrawIO's waypoint data structure
+   - ✅ Implemented core waypoint functions in F#
+   - ✅ Created tools for adding, removing, and editing waypoints
+   - ✅ Added comprehensive tests for waypoint manipulation
+   - ✅ Fixed XML structure to properly wrap waypoints in arrays
 
-2. **Group/Ungroup Implementation**
+2. **Group/Ungroup Implementation** (Next Priority)
    - Design parent-child relationship model
    - Implement group operations in core library
    - Create tools for group management
@@ -302,12 +317,13 @@ Our current implementation supports sophisticated connector styling and routing 
    - Create tool for automatic shape resizing
    - Add tests for text measurement and shape resizing
 
-4. **Tier 2 Implementation**
-   - Focus on remaining tier 2 features
-   - Add alignment and distribution options
+4. **Remaining Tier 2 Implementation**
+   - Focus on alignment and distribution options
    - Implement layer management
+   - Add advanced styling features
 
 5. **Documentation**
    - Update API documentation
    - Add usage examples
-   - Create tutorials 
+   - Create tutorials for new features
+   - Document waypoint handling and connector styling 
