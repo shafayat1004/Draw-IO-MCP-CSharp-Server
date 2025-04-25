@@ -346,5 +346,44 @@ namespace DrawIO.MCP.STDIO.Tests
             // Assert
             Assert.NotNull(result);
         }
+
+        [Fact]
+        public async Task ReverseConnector_ShouldPreserveConnectorId()
+        {
+            // Arrange
+            var testDiagram = "test_reverse_connector.drawio";
+            var sourceId = "source1";
+            var targetId = "target1";
+            
+            // Create test diagram with a connector
+            var diagramObj = DrawIO.MCP.Core.DiagramManipulation.createNewDiagram();
+            diagramObj = DrawIO.MCP.Core.DiagramManipulation.addShape(diagramObj, 0, "rectangle", "Source", 100, 100, 80, 40).Item1;
+            diagramObj = DrawIO.MCP.Core.DiagramManipulation.addShape(diagramObj, 0, "rectangle", "Target", 300, 100, 80, 40).Item1;
+            var (diagram, connectorId) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramObj, 0, sourceId, targetId);
+            
+            var filePath = Path.Combine(_testDiagramsDirectory, testDiagram);
+            DrawIO.MCP.Core.DiagramManipulation.saveDiagram(diagram, filePath);
+            
+            // Create parameters for reverse operation
+            var parameters = JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                ["diagram"] = testDiagram,
+                ["connector_id"] = connectorId
+            });
+            
+            // Act
+            var result = await DiagramToolExecutor.ExecuteToolAsync("reverse_connector", JsonDocument.Parse(parameters).RootElement, _testDiagramsDirectory);
+            var resultDict = (Dictionary<string, object>)result;
+            
+            // Assert
+            Assert.Equal("success", resultDict["status"]);
+            Assert.Equal(connectorId, resultDict["elementId"]); // Verify ID remains the same
+            
+            // Verify the connector direction is actually reversed
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.loadDiagram(filePath);
+            var elementInfo = DrawIO.MCP.Core.DiagramManipulation.getElementInfo(updatedDiagram, 0, connectorId).Value;
+            Assert.Equal(targetId, elementInfo.Source.Value);
+            Assert.Equal(sourceId, elementInfo.Target.Value);
+        }
     }
 } 

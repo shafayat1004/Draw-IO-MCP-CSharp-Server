@@ -14,6 +14,15 @@ using FSharpTypes = DrawIO.MCP.Core.Types;
 namespace DrawIO.MCP.STDIO
 {
     /// <summary>
+    /// Response type for diagram operations that return a connector ID and optional image
+    /// </summary>
+    public class DiagramResponse
+    {
+        public string ConnectorId { get; set; }
+        public object DiagramImage { get; set; }
+    }
+
+    /// <summary>
     /// Handles execution of diagram manipulation tools
     /// </summary>
     public static class DiagramToolExecutor
@@ -2296,75 +2305,27 @@ namespace DrawIO.MCP.STDIO
             });
         }
 
-        private static Task<object> ReverseConnectorAsync(JsonElement parameters, string diagramsDirectory)
+        private static async Task<object> ReverseConnectorAsync(JsonElement parameters, string diagramsDirectory)
         {
             string diagram = GetParameterString(parameters, "diagram");
             string connectorId = GetParameterString(parameters, "connector_id");
-            
-            string filePath = Path.Combine(diagramsDirectory, diagram);
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
-            }
-            
-            // Load the diagram
-            var diagramObj = LoadDiagram(filePath);
-            
-            // Get the connector info
-            var elementInfo = DrawIO.MCP.Core.DiagramManipulation.getElementInfo(diagramObj, 0, connectorId);
-            if (elementInfo.IsNone())
-            {
-                throw new ArgumentException($"Connector with ID {connectorId} not found");
-            }
-            
-            var info = elementInfo.Value;
-            if (!info.IsEdge)
-            {
-                throw new ArgumentException($"Element {connectorId} is not a connector");
-            }
-            
-            // Create a new connector in the reverse direction
-            var (updatedDiagram, newConnectorId) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(
-                diagramObj,
-                0, // page index
-                info.Target.Value, // New source is old target
-                info.Source.Value  // New target is old source
-            );
-            
-            // Copy the style from the original connector
-            updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
-                updatedDiagram,
-                0,
-                newConnectorId,
-                info.Value, // Keep the same label
-                null,
-                null,
-                null,
-                null,
-                info.Style // Keep the same style
-            );
-            
-            // Delete the original connector
-            updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.deleteShape(updatedDiagram, 0, connectorId);
-            
-            // Save the updated diagram
-            SaveDiagram(updatedDiagram, filePath);
-            
-            var messageContent = new[] 
-            { 
-                new Dictionary<string, string>
-                { 
-                    ["type"] = "text", 
-                    ["text"] = $"Reversed connector direction" 
-                } 
-            };
+            bool returnDiagram = parameters.TryGetProperty("return_diagram", out var returnDiagramElement) && returnDiagramElement.GetBoolean();
 
-            return Task.FromResult<object>(new Dictionary<string, object>
+            var response = await ReverseConnectorAsync(diagram, connectorId, returnDiagram);
+
+            return new Dictionary<string, object>
             {
-                ["Status"] = "success",
-                ["NewConnectorId"] = newConnectorId,
-                ["content"] = messageContent
-            });
+                ["status"] = "success",
+                ["elementId"] = connectorId,
+                ["content"] = new[]
+                {
+                    new Dictionary<string, string>
+                    {
+                        ["type"] = "text",
+                        ["text"] = $"Reversed connector direction"
+                    }
+                }
+            };
         }
 
         private static Task<object> AddWaypointAsync(JsonElement parameters, string diagramsDirectory)
@@ -3030,6 +2991,50 @@ namespace DrawIO.MCP.STDIO
         private static void SaveDiagram(DrawIO.MCP.Core.Types.Diagram diagram, string filePath)
         {
             DrawIO.MCP.Core.FileOperations.saveDiagram(diagram, filePath);
+        }
+
+        private static async Task<DiagramResponse> ReverseConnectorAsync(string diagram, string connectorId, bool returnDiagram = false)
+        {
+            var (diagramData, pageIndex) = await GetDiagramAndPageIndexAsync(diagram);
+            var (updatedDiagram, _) = DrawIO.MCP.Core.DiagramManipulation.reverseConnector(diagramData, pageIndex, connectorId);
+            await SaveDiagramAsync(diagram, updatedDiagram);
+
+            return new DiagramResponse
+            {
+                ConnectorId = connectorId,
+                DiagramImage = returnDiagram ? await GetDiagramImageAsync(diagram) : null
+            };
+        }
+
+        private static async Task<(DrawIO.MCP.Core.Types.Diagram, int)> GetDiagramAndPageIndexAsync(string diagram)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), diagram);
+            if (!await Task.Run(() => File.Exists(filePath)))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load diagram in a background thread since it involves file I/O and XML parsing
+            var diagramData = await Task.Run(() => LoadDiagram(filePath));
+            return (diagramData, 0); // Default to first page
+        }
+
+        private static async Task SaveDiagramAsync(string diagram, DrawIO.MCP.Core.Types.Diagram updatedDiagram)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), diagram);
+            // Save diagram in a background thread since it involves file I/O and XML serialization
+            await Task.Run(() => SaveDiagram(updatedDiagram, filePath));
+        }
+
+        private static async Task<object> GetDiagramImageAsync(string diagram)
+        {
+            var parameters = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(new
+            {
+                diagram = diagram,
+                format = "png"
+            }));
+            
+            return await GetDiagramImageAsync(parameters, Directory.GetCurrentDirectory(), null, false);
         }
     }
 } 

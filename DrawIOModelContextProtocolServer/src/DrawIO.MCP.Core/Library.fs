@@ -1839,6 +1839,45 @@ module DiagramManipulation =
             
             updatedDiagram
 
+    /// Reverses a connector's direction by swapping its source and target
+    let reverseConnector (diagram: Diagram) (pageIndex: int) (connectorId: string) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        // Find the connector
+        match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
+        | None -> 
+            raise <| ArgumentException($"Connector with ID {connectorId} not found")
+        | Some cell ->
+            if not cell.IsEdge then
+                raise <| ArgumentException($"Element with ID {connectorId} is not a connector")
+            
+            // Create updated connector with swapped source and target
+            let updatedCell = 
+                { cell with 
+                    Source = cell.Target
+                    Target = cell.Source }
+            
+            // Update the diagram with the new cell
+            let updatedCells = 
+                page.Cells 
+                |> List.map (fun c -> if c.Id = connectorId then updatedCell else c)
+            
+            let updatedPage = { page with Cells = updatedCells }
+            
+            let updatedPages = 
+                diagram.Pages
+                |> List.mapi (fun i p -> if i = pageIndex then updatedPage else p)
+            
+            let updatedDiagram = 
+                { diagram with 
+                    Modified = DateTime.Now
+                    Pages = updatedPages }
+            
+            (updatedDiagram, connectorId)
+
 /// Functions for file operations
 module FileOperations =
     open Types
