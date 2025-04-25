@@ -1242,6 +1242,21 @@ namespace DrawIO.MCP.STDIO
                 },
             };
 
+            // Add the return_diagram parameter to all relevant tools
+            // Define it once to reuse
+            var returnDiagramParam = new McpParameterDefinition
+            {
+                Type = "boolean",
+                Description = "Whether to include the diagram image in the response",
+                Required = false
+            };
+            
+            // Add it to each tool definition except get_diagram_image
+            foreach (var tool in tools.Where(t => t.Name != "get_diagram_image" && t.SchemaInputs.ContainsKey("diagram")))
+            {
+                tool.SchemaInputs["return_diagram"] = returnDiagramParam;
+            }
+
             // Return a result with the array of tools properly structured
             return Task.FromResult<object>(new { tools });
         }

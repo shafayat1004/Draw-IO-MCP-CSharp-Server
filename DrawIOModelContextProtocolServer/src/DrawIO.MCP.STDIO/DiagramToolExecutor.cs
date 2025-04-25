@@ -71,6 +71,51 @@ namespace DrawIO.MCP.STDIO
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
+                // Check if the client has requested the diagram image to be included in the response
+                bool returnDiagram = arguments.TryGetProperty("return_diagram", out var returnDiagramElement) && 
+                                    returnDiagramElement.ValueKind == JsonValueKind.True;
+                
+                // If not the get_diagram_image tool and return_diagram is true, append the diagram image
+                if (returnDiagram && toolName != "get_diagram_image" && arguments.TryGetProperty("diagram", out var diagramElement))
+                {
+                    string diagramName = diagramElement.GetString();
+                    int page = arguments.TryGetProperty("page_index", out var pageElement) ? 
+                              pageElement.GetInt32() : 
+                              (arguments.TryGetProperty("page", out var altPageElement) ? altPageElement.GetInt32() : 0);
+                    
+                    // Get the diagram image
+                    var diagramImage = await GetDiagramImageForResponseAsync(diagramName, page, "png", diagramsDirectory, logWriter, verbose);
+                    
+                    // Convert result to Dictionary if it's not already
+                    var resultDict = ConvertToDictionary(result) as Dictionary<string, object>;
+                    if (resultDict != null)
+                    {
+                        // Append the diagram image to the content
+                        if (resultDict.TryGetValue("content", out var contentObj) && contentObj is IEnumerable<object> contentList)
+                        {
+                            // Convert to list to be able to modify
+                            var content = contentList.ToList();
+                            
+                            // Add the image to the content
+                            if (diagramImage != null)
+                            {
+                                content.Add(diagramImage);
+                                
+                                // Update the content in the result
+                                resultDict["content"] = content;
+                            }
+                        }
+                        else if (diagramImage != null)
+                        {
+                            // Create new content list with the message
+                            resultDict["content"] = new List<object> { diagramImage };
+                        }
+                        
+                        // Return the updated result
+                        return resultDict;
+                    }
+                }
+
                 return ConvertToDictionary(result);
             }
             catch (Exception ex)
@@ -83,6 +128,125 @@ namespace DrawIO.MCP.STDIO
                     ["detail"] = ex.ToString(),
                     ["content"] = new object[] { } // Add empty content array to satisfy MCP protocol
                 };
+            }
+        }
+
+        // Helper method to generate diagram image for responses
+        private static async Task<object> GetDiagramImageForResponseAsync(string diagramName, int page, string format, string diagramsDirectory, TextWriter logWriter, bool verbose)
+        {
+            try
+            {
+                string filePath = Path.Combine(diagramsDirectory, diagramName);
+                if (!File.Exists(filePath))
+                {
+                    LogMessage(logWriter, verbose, $"Diagram file not found for image generation: {diagramName}");
+                    return null;
+                }
+                
+                // Check if drawio CLI is available
+                if (!CheckDrawIoCliAvailable(logWriter, verbose))
+                {
+                    LogMessage(logWriter, verbose, "DrawIO CLI not available for image generation");
+                    return null;
+                }
+                
+                // Create a temporary file to store the output image
+                string tempFileName = $"{Path.GetFileNameWithoutExtension(diagramName)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
+                string outputImagePath = Path.Combine(diagramsDirectory, tempFileName);
+                
+                // Build the drawio CLI command with proper escaping
+                string drawioCommand = $"drawio --export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
+                
+                // Try bash first
+                var bashStartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "bash",
+                    Arguments = $"-c \"{drawioCommand}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                LogMessage(logWriter, verbose, $"Attempting to export with bash for response: {bashStartInfo.FileName} {bashStartInfo.Arguments}");
+                
+                bool exportSuccess = false;
+                
+                try
+                {
+                    using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
+                    if (bashProcess != null)
+                    {
+                        await bashProcess.WaitForExitAsync();
+                        if (bashProcess.ExitCode == 0)
+                        {
+                            exportSuccess = true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogMessage(logWriter, verbose, $"Bash export failed for response: {ex.Message}");
+                }
+
+                // If bash failed, try direct drawio call
+                if (!exportSuccess)
+                {
+                    LogMessage(logWriter, verbose, "Falling back to direct drawio CLI call...");
+                    var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "drawio",
+                        Arguments = $"--export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    LogMessage(logWriter, verbose, $"Executing command for response: {processStartInfo.FileName} {processStartInfo.Arguments}");
+                    
+                    using var process = System.Diagnostics.Process.Start(processStartInfo);
+                    if (process != null)
+                    {
+                        await process.WaitForExitAsync();
+                        if (process.ExitCode == 0)
+                        {
+                            exportSuccess = true;
+                        }
+                    }
+                }
+
+                if (!exportSuccess || !File.Exists(outputImagePath))
+                {
+                    LogMessage(logWriter, verbose, $"Failed to generate diagram image for response");
+                    return null;
+                }
+                
+                // Read the generated image and convert it to base64
+                byte[] imageBytes = await File.ReadAllBytesAsync(outputImagePath);
+                string base64Image = Convert.ToBase64String(imageBytes);
+                
+                // Clean up the temporary file
+                try
+                {
+                    File.Delete(outputImagePath);
+                }
+                catch (Exception ex)
+                {
+                    LogMessage(logWriter, verbose, $"Failed to delete temporary file {outputImagePath}: {ex.Message}");
+                }
+                
+                return new Dictionary<string, object>
+                {
+                    ["type"] = "image",
+                    ["data"] = base64Image,
+                    ["mimeType"] = $"image/{format.ToLower()}"
+                };
+            }
+            catch (Exception ex)
+            {
+                LogMessage(logWriter, true, $"Error generating diagram image for response: {ex.Message}");
+                return null;
             }
         }
 

@@ -33,6 +33,90 @@ namespace DrawIO.MCP.SSE
         public abstract string Description { get; }
         public abstract ToolParameter[] Parameters { get; }
         public abstract Task<object> ExecuteAsync(ToolParameters parameters);
+        
+        // Helper method to add diagram image to response if requested
+        protected async Task<object> AddDiagramImageToResponseAsync(
+            object response, 
+            ToolParameters parameters, 
+            DrawIoService drawIoService)
+        {
+            // If return_diagram is true and diagram parameter exists, add image to response
+            bool returnDiagram = parameters.GetValue<bool>("return_diagram");
+            string? diagramName = parameters.GetValue<string>("diagram");
+            
+            if (returnDiagram && !string.IsNullOrEmpty(diagramName))
+            {
+                // Get page index if specified
+                int pageIndex = parameters.GetValue<int>("page_index", 
+                              parameters.GetValue<int>("page", 0));
+                
+                // Get image data
+                var imageData = await drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex);
+                
+                if (imageData != null)
+                {
+                    // Create a copy of the response object with the image added
+                    // Convert to dictionaries for manipulation
+                    if (response is Dictionary<string, object> respDict)
+                    {
+                        // Check if there's already a content property
+                        if (respDict.TryGetValue("content", out var existingContent))
+                        {
+                            if (existingContent is List<object> contentList)
+                            {
+                                // Add the image to existing content
+                                contentList.Add(imageData);
+                            }
+                            else if (existingContent is object[] contentArray)
+                            {
+                                // Convert array to list, add image, then convert back
+                                var newContent = new List<object>(contentArray) { imageData };
+                                respDict["content"] = newContent;
+                            }
+                            else if (existingContent != null)
+                            {
+                                // Create new content with original and image
+                                respDict["content"] = new List<object> { existingContent, imageData };
+                            }
+                            else
+                            {
+                                // Just set the image as content
+                                respDict["content"] = new List<object> { imageData };
+                            }
+                        }
+                        else
+                        {
+                            // Add new content with just the image
+                            respDict["content"] = new List<object> { imageData };
+                        }
+                        
+                        return respDict;
+                    }
+                    else 
+                    {
+                        // Convert response to dictionary
+                        var responseDict = new Dictionary<string, object>();
+                        
+                        // Add all properties from original response
+                        foreach (var prop in response.GetType().GetProperties())
+                        {
+                            var value = prop.GetValue(response);
+                            if (value != null)
+                            {
+                                responseDict[prop.Name] = value;
+                            }
+                        }
+                        
+                        // Add content with the image
+                        responseDict["content"] = new List<object> { imageData };
+                        
+                        return responseDict;
+                    }
+                }
+            }
+            
+            return response;
+        }
     }
 
     public class ToolParameter

@@ -102,6 +102,160 @@ public class DrawIoService
             .ToList();
     }
 
+    public async Task<Dictionary<string, string>?> GetDiagramImageAsBase64(string fileName, int pageIndex = 0, string format = "png")
+    {
+        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
+        {
+            fileName += ".drawio";
+        }
+        
+        string filePath = Path.Combine(_diagramsDirectory, fileName);
+        
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException($"Diagram file not found: {fileName}");
+        }
+        
+        _logger.LogInformation($"Generating diagram image for {fileName}, page {pageIndex}, format {format}");
+        
+        try
+        {
+            // Check if drawio CLI is available
+            if (!await IsDrawIoCliAvailableAsync())
+            {
+                _logger.LogWarning("drawio CLI is not available for image export");
+                return null;
+            }
+            
+            // Create a temporary file to store the output image
+            string tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{pageIndex}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
+            string outputImagePath = Path.Combine(_diagramsDirectory, tempFileName);
+            
+            // Build the drawio CLI command with proper escaping
+            string drawioCommand = $"drawio --export --format {format} --page-index {pageIndex} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
+            
+            // Try bash first
+            var bashStartInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "bash",
+                Arguments = $"-c \"{drawioCommand}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            _logger.LogDebug($"Attempting to export with bash: {bashStartInfo.FileName} {bashStartInfo.Arguments}");
+            
+            bool exportSuccess = false;
+            
+            try
+            {
+                using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
+                if (bashProcess != null)
+                {
+                    await bashProcess.WaitForExitAsync();
+                    if (bashProcess.ExitCode == 0)
+                    {
+                        exportSuccess = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"bash export failed: {ex.Message}");
+            }
+
+            // If bash failed, try direct drawio call
+            if (!exportSuccess)
+            {
+                _logger.LogDebug("Falling back to direct drawio CLI call...");
+                var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "drawio",
+                    Arguments = $"--export --format {format} --page-index {pageIndex} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                _logger.LogDebug($"Executing command: {processStartInfo.FileName} {processStartInfo.Arguments}");
+                
+                using var process = System.Diagnostics.Process.Start(processStartInfo);
+                if (process != null)
+                {
+                    await process.WaitForExitAsync();
+                    if (process.ExitCode == 0)
+                    {
+                        exportSuccess = true;
+                    }
+                }
+            }
+
+            if (!exportSuccess || !File.Exists(outputImagePath))
+            {
+                _logger.LogWarning($"Failed to generate diagram image");
+                return null;
+            }
+            
+            // Read the generated image and convert it to base64
+            byte[] imageBytes = await File.ReadAllBytesAsync(outputImagePath);
+            string base64Image = Convert.ToBase64String(imageBytes);
+            
+            // Clean up the temporary file
+            try
+            {
+                File.Delete(outputImagePath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"Failed to delete temporary file {outputImagePath}: {ex.Message}");
+            }
+            
+            return new Dictionary<string, string>
+            {
+                ["type"] = "image",
+                ["data"] = base64Image,
+                ["mimeType"] = $"image/{format.ToLower()}"
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error generating diagram image: {ex.Message}");
+            return null;
+        }
+    }
+
+    private async Task<bool> IsDrawIoCliAvailableAsync()
+    {
+        try
+        {
+            var processStartInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "drawio",
+                Arguments = "--version",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            
+            using var process = System.Diagnostics.Process.Start(processStartInfo);
+            if (process != null)
+            {
+                await process.WaitForExitAsync();
+                return process.ExitCode == 0;
+            }
+        }
+        catch
+        {
+            // Command not found or other error
+        }
+        
+        return false;
+    }
+
     public CoreTypes.Diagram GetDiagram(string fileName)
     {
         if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
@@ -116,7 +270,7 @@ public class DrawIoService
             throw new FileNotFoundException($"Diagram file not found: {fileName}");
         }
         
-        return CoreFileOps.loadDiagram(filePath);
+        return CoreFileOps.loadDiagram(filePath) ?? throw new InvalidOperationException($"Failed to load diagram: {fileName}");
     }
 
     public CoreTypes.Diagram CreateDiagram(string fileName)
@@ -133,10 +287,10 @@ public class DrawIoService
             throw new InvalidOperationException($"Diagram '{fileName}' already exists");
         }
         
-        return CoreFileOps.createNewDiagram(filePath);
+        return CoreFileOps.createNewDiagram(filePath) ?? throw new InvalidOperationException($"Failed to create new diagram: {fileName}");
     }
 
-    public (CoreTypes.Diagram, string) AddShape(string fileName, string value, float x, float y, float width, float height, string shape = "rectangle")
+    public (CoreTypes.Diagram?, string) AddShape(string fileName, string value, float x, float y, float width, float height, string shape = "rectangle")
     {
         var diagram = GetDiagram(fileName);
         (CoreTypes.Diagram updatedDiagram, string newId) = CoreDiagramOps.addShape(diagram, 0, value, x, y, width, height, shape);
@@ -147,70 +301,55 @@ public class DrawIoService
     public (CoreTypes.Diagram, string) ConnectShapes(string fileName, string sourceId, string targetId)
     {
         var diagram = GetDiagram(fileName);
-        (CoreTypes.Diagram updatedDiagram, string newId) = CoreDiagramOps.connectShapes(diagram, 0, sourceId, targetId);
+        
+        var (updatedDiagram, connectorId) = CoreDiagramOps.connectShapes(diagram, 0, sourceId, targetId);
         SaveDiagram(updatedDiagram, fileName);
-        return (updatedDiagram, newId);
+        
+        return (updatedDiagram, connectorId);
     }
 
     public CoreTypes.Diagram DeleteShape(string fileName, string shapeId)
     {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".drawio";
-        }
+        var diagram = GetDiagram(fileName);
         
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
-        
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException($"Diagram file not found: {fileName}");
-        }
-        
-        var diagram = CoreFileOps.loadDiagram(filePath);
         var updatedDiagram = CoreDiagramOps.deleteShape(diagram, 0, shapeId);
-        CoreFileOps.saveDiagram(updatedDiagram, filePath);
+        SaveDiagram(updatedDiagram, fileName);
         
         return updatedDiagram;
     }
 
     public CoreTypes.Diagram UpdateShape(string fileName, string shapeId, string value, float? x = null, float? y = null, float? width = null, float? height = null, string? style = null)
     {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".drawio";
-        }
+        var diagram = GetDiagram(fileName);
         
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
+        // Convert nullable parameters to F# options with correct types (double instead of float)
+        var xOpt = x.HasValue ? FSharpOption<double>.Some((double)x.Value) : FSharpOption<double>.None;
+        var yOpt = y.HasValue ? FSharpOption<double>.Some((double)y.Value) : FSharpOption<double>.None;
+        var widthOpt = width.HasValue ? FSharpOption<double>.Some((double)width.Value) : FSharpOption<double>.None;
+        var heightOpt = height.HasValue ? FSharpOption<double>.Some((double)height.Value) : FSharpOption<double>.None;
+        var styleOpt = !string.IsNullOrEmpty(style) ? FSharpOption<string>.Some(style) : FSharpOption<string>.None;
         
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException($"Diagram file not found: {fileName}");
-        }
-        
-        var diagram = CoreFileOps.loadDiagram(filePath);
-        var updatedDiagram = CoreDiagramOps.updateShape(diagram, 0, shapeId, value, x, y, width, height, style);
-        CoreFileOps.saveDiagram(updatedDiagram, filePath);
+        var updatedDiagram = CoreDiagramOps.updateShape(diagram, 0, shapeId, value, xOpt, yOpt, widthOpt, heightOpt, styleOpt);
+        SaveDiagram(updatedDiagram, fileName);
         
         return updatedDiagram;
     }
 
-    public CoreTypes.Diagram ArrangeDiagram(string fileName, string layout = "horizontal")
+    public CoreTypes.Diagram ArrangeDiagram(string fileName, string layoutType)
     {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
+        var diagram = GetDiagram(fileName);
+        
+        // Convert the layout type to a valid value if needed
+        string layout = layoutType.ToLowerInvariant() switch
         {
-            fileName += ".drawio";
-        }
-        
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
-        
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException($"Diagram file not found: {fileName}");
-        }
-        
-        var diagram = CoreFileOps.loadDiagram(filePath);
+            "horizontal" => "horizontal",
+            "vertical" => "vertical",
+            "radial" => "radial",
+            _ => "horizontal"
+        };
+
         var updatedDiagram = CoreDiagramOps.arrangeLayout(diagram, 0, layout);
-        CoreFileOps.saveDiagram(updatedDiagram, filePath);
+        SaveDiagram(updatedDiagram, fileName);
         
         return updatedDiagram;
     }
@@ -260,17 +399,7 @@ public class DiagramResourceProvider(DrawIoService drawIoService, ILogger<Diagra
 
     public override Task<Resource> GetResourceAsync(string resourceId, ResourceQuery? query = null)
     {
-        if (resourceId == "diagram-list://all")
-        {
-            var diagrams = drawIoService.GetAllDiagrams();
-            return Task.FromResult(new Resource
-            {
-                Id = resourceId,
-                Type = "diagram-list",
-                Content = diagrams
-            });
-        }
-        else if (resourceId.StartsWith("diagram://"))
+        if (resourceId.StartsWith("diagram://"))
         {
             string filename = resourceId.Substring("diagram://".Length);
             var diagram = drawIoService.GetDiagram(filename);
@@ -278,65 +407,80 @@ public class DiagramResourceProvider(DrawIoService drawIoService, ILogger<Diagra
             // Convert the diagram to a format suitable for the MCP protocol
             var pages = new List<object>();
             
-            foreach (var page in diagram.Pages)
+            if (diagram != null)
             {
-                var cells = new List<object>();
-                
-                foreach (var cell in page.Cells)
+                foreach (var page in diagram.Pages)
                 {
-                    var cellObj = new Dictionary<string, object>
-                    {
-                        { "id", cell.Id },
-                        { "value", cell.Value },
-                        { "style", cell.Style },
-                        { "isVertex", cell.IsVertex },
-                        { "isEdge", cell.IsEdge },
-                        { "parent", cell.Parent }
-                    };
+                    var cells = new List<object>();
                     
-                    if (FSharpOption<string>.get_IsSome(cell.Source))
+                    foreach (var cell in page.Cells)
                     {
-                        cellObj.Add("source", cell.Source.Value);
-                    }
-                    
-                    if (FSharpOption<string>.get_IsSome(cell.Target))
-                    {
-                        cellObj.Add("target", cell.Target.Value);
-                    }
-                    
-                    if (FSharpOption<CoreTypes.Geometry>.get_IsSome(cell.Geometry))
-                    {
-                        var geo = cell.Geometry.Value;
-                        cellObj.Add("geometry", new
+                        var cellObj = new Dictionary<string, object>
                         {
-                            x = geo.Position.X,
-                            y = geo.Position.Y,
-                            width = geo.Size.Width,
-                            height = geo.Size.Height,
-                            relative = geo.Relative
-                        });
+                            ["id"] = cell.Id,
+                            ["value"] = cell.Value,
+                            ["style"] = cell.Style,
+                            ["isVertex"] = cell.IsVertex,
+                            ["isEdge"] = cell.IsEdge,
+                            ["parent"] = cell.Parent
+                        };
+                        
+                        if (Microsoft.FSharp.Core.FSharpOption<string>.get_IsSome(cell.Source))
+                        {
+                            cellObj["source"] = cell.Source.Value;
+                        }
+                        
+                        if (Microsoft.FSharp.Core.FSharpOption<string>.get_IsSome(cell.Target))
+                        {
+                            cellObj["target"] = cell.Target.Value;
+                        }
+                        
+                        if (Microsoft.FSharp.Core.FSharpOption<CoreTypes.Geometry>.get_IsSome(cell.Geometry))
+                        {
+                            var geo = cell.Geometry.Value;
+                            cellObj["geometry"] = new Dictionary<string, object>
+                            {
+                                ["x"] = geo.Position.X,
+                                ["y"] = geo.Position.Y,
+                                ["width"] = geo.Size.Width,
+                                ["height"] = geo.Size.Height,
+                                ["relative"] = geo.Relative
+                            };
+                        }
+                        
+                        cells.Add(cellObj);
                     }
                     
-                    cells.Add(cellObj);
+                    pages.Add(new Dictionary<string, object>
+                    {
+                        ["id"] = page.Id,
+                        ["name"] = page.Name, 
+                        ["cells"] = cells
+                    });
                 }
-                
-                pages.Add(new
-                {
-                    id = page.Id,
-                    name = page.Name,
-                    cells = cells
-                });
             }
             
             return Task.FromResult(new Resource
             {
                 Id = resourceId,
                 Type = "diagram",
-                Content = new
+                Content = new Dictionary<string, object>
                 {
-                    modified = diagram.Modified,
-                    pages = pages
+                    ["modified"] = diagram?.Modified.ToString("o") ?? DateTime.Now.ToString("o"),
+                    ["pages"] = pages
                 }
+            });
+        }
+        else if (resourceId == "diagram-list://all")
+        {
+            // Return a list of all diagrams
+            var diagrams = drawIoService.GetAllDiagrams();
+            
+            return Task.FromResult(new Resource
+            {
+                Id = resourceId,
+                Type = "diagram-list",
+                Content = diagrams
             });
         }
         
@@ -456,9 +600,9 @@ public class AddShapeTool(DrawIoService drawIoService, ILogger<AddShapeTool> log
             Description = "Shape type (rectangle, ellipse, etc.)",
             Required = false
         }
-    };
+    }.AddCommonParameters();
 
-    public override Task<object> ExecuteAsync(ToolParameters parameters)
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
         string value = parameters.GetValue<string>("value") ?? ""; 
@@ -472,12 +616,15 @@ public class AddShapeTool(DrawIoService drawIoService, ILogger<AddShapeTool> log
         {
             var (_, newId) = drawIoService.AddShape(diagram, value, x, y, width, height, shape);
             
-            return Task.FromResult<object>(new
+            var response = new
             {
                 Status = "success", 
                 ShapeId = newId,
                 DiagramId = $"diagram://{diagram}"
-            });
+            };
+            
+            // Add diagram image to response if requested
+            return await AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {

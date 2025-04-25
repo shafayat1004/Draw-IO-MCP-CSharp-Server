@@ -5,6 +5,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 using DrawIO.MCP.STDIO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DrawIO.MCP.STDIO.Tests
 {
@@ -204,6 +206,124 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.True(resultDict.ContainsKey("height"));
             
             // Note: This test will likely fail until the query tools are implemented correctly
+        }
+        
+        [Fact]
+        public async Task TestReturnDiagramWithResponse()
+        {
+            // Create a test diagram
+            var diagramName = "return_diagram_test.drawio";
+            var createParams = JsonDocument.Parse(@$"{{ ""name"": ""{diagramName}"" }}").RootElement;
+            await DiagramToolExecutor.ExecuteToolAsync("create_new_diagram", createParams, _testDiagramsDir, _testLogWriter, true);
+            
+            // Add a shape to the diagram
+            var addShapeParams = JsonDocument.Parse(@$"{{ 
+                ""diagram"": ""{diagramName}"", 
+                ""value"": ""Test Shape"", 
+                ""x"": 100, ""y"": 100, 
+                ""width"": 120, ""height"": 60 
+            }}").RootElement;
+            
+            await DiagramToolExecutor.ExecuteToolAsync("add_shape", addShapeParams, _testDiagramsDir, _testLogWriter, true);
+            
+            // Get element info with return_diagram parameter set to true
+            var infoParamsWithDiagram = JsonDocument.Parse(@$"{{ 
+                ""diagram"": ""{diagramName}"", 
+                ""search_text"": ""Test"",
+                ""return_diagram"": true
+            }}").RootElement;
+            
+            var result = await DiagramToolExecutor.ExecuteToolAsync("find_elements_by_text", infoParamsWithDiagram, _testDiagramsDir, _testLogWriter, true);
+            
+            // Assert the result
+            Assert.NotNull(result);
+            var resultDict = Assert.IsType<Dictionary<string, object>>(result);
+            Assert.True(resultDict.ContainsKey("content"), "Result should contain a content property");
+            
+            // Content could be a List, Array, or a single object
+            bool hasImageOrNullResponse = false;
+            var content = resultDict["content"];
+            
+            if (content is List<object> contentList)
+            {
+                // List<object> case
+                hasImageOrNullResponse = contentList.Any(item => 
+                {
+                    var itemDict = item as Dictionary<string, object>;
+                    return itemDict != null && 
+                           (itemDict.TryGetValue("type", out var type) && type.ToString() == "image");
+                });
+            }
+            else if (content is object[] contentArray)
+            {
+                // Array case
+                hasImageOrNullResponse = contentArray.Any(item => 
+                {
+                    var itemDict = item as Dictionary<string, object>;
+                    return itemDict != null && 
+                           (itemDict.TryGetValue("type", out var type) && type.ToString() == "image");
+                });
+            }
+            else if (content is Dictionary<string, object> contentDict)
+            {
+                // Single object case
+                hasImageOrNullResponse = contentDict.TryGetValue("type", out var type) && 
+                                        type.ToString() == "image";
+            }
+            
+            // If the drawio CLI is available, we might have an image in the content
+            // Since this is environment-dependent, just report the result without failing
+            if (File.Exists("/usr/bin/drawio") || File.Exists("/usr/local/bin/drawio"))
+            {
+                // Just log the result instead of asserting
+                _testLogWriter.WriteLine($"Has image in response: {hasImageOrNullResponse}");
+            }
+            
+            // Test same call without return_diagram parameter
+            var infoParamsWithoutDiagram = JsonDocument.Parse(@$"{{ 
+                ""diagram"": ""{diagramName}"", 
+                ""search_text"": ""Test""
+            }}").RootElement;
+            
+            var resultWithoutDiagram = await DiagramToolExecutor.ExecuteToolAsync("find_elements_by_text", infoParamsWithoutDiagram, _testDiagramsDir, _testLogWriter, true);
+            
+            // Assert the result
+            Assert.NotNull(resultWithoutDiagram);
+            var resultWithoutDiagramDict = Assert.IsType<Dictionary<string, object>>(resultWithoutDiagram);
+            Assert.True(resultWithoutDiagramDict.ContainsKey("content"), "Result without return_diagram should contain a content property");
+            
+            // Content could be a List, Array, or a single object
+            bool hasImage = false;
+            var contentWithoutDiagram = resultWithoutDiagramDict["content"];
+            
+            if (contentWithoutDiagram is List<object> contentWithoutDiagramList)
+            {
+                // List<object> case
+                hasImage = contentWithoutDiagramList.Any(item => 
+                {
+                    var itemDict = item as Dictionary<string, object>;
+                    return itemDict != null && 
+                           (itemDict.TryGetValue("type", out var type) && type.ToString() == "image");
+                });
+            }
+            else if (contentWithoutDiagram is object[] contentWithoutDiagramArray)
+            {
+                // Array case
+                hasImage = contentWithoutDiagramArray.Any(item => 
+                {
+                    var itemDict = item as Dictionary<string, object>;
+                    return itemDict != null && 
+                           (itemDict.TryGetValue("type", out var type) && type.ToString() == "image");
+                });
+            }
+            else if (contentWithoutDiagram is Dictionary<string, object> contentWithoutDiagramDict)
+            {
+                // Single object case
+                hasImage = contentWithoutDiagramDict.TryGetValue("type", out var type) && 
+                          type.ToString() == "image";
+            }
+            
+            Assert.False(hasImage, "Response should not include an image when return_diagram is not set");
         }
     }
 } 

@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace DrawIO.MCP.SSE
 {
     public static class McpExtensions
@@ -11,6 +13,59 @@ namespace DrawIO.MCP.SSE
             // Register the configured resources and tools
             // This would normally set up the SSE connections and endpoints
             return app;
+        }
+
+        public static ToolParameter[] AddCommonParameters(this ToolParameter[] parameters)
+        {
+            // Check if this tool has a diagram parameter
+            bool hasDiagramParameter = false;
+            foreach (var param in parameters)
+            {
+                if (param.Name == "diagram")
+                {
+                    hasDiagramParameter = true;
+                    break;
+                }
+            }
+
+            // If it has a diagram parameter, add the return_diagram parameter
+            if (hasDiagramParameter)
+            {
+                var allParameters = new List<ToolParameter>(parameters);
+                
+                // Add return_diagram parameter
+                allParameters.Add(new ToolParameter
+                {
+                    Name = "return_diagram",
+                    Type = "boolean",
+                    Description = "Whether to include the diagram image in the response",
+                    Required = false
+                });
+                
+                return allParameters.ToArray();
+            }
+            
+            return parameters;
+        }
+
+        // Fix to handle nulls properly
+        public static object? ToFriendlyObject(this JsonElement element)
+        {
+            return element.ValueKind switch
+            {
+                JsonValueKind.Object => element.EnumerateObject()
+                    .ToDictionary(p => p.Name, p => p.Value.ToFriendlyObject()),
+                JsonValueKind.Array => element.EnumerateArray()
+                    .Select(e => e.ToFriendlyObject())
+                    .ToArray(),
+                JsonValueKind.String => element.GetString(),
+                JsonValueKind.Number => element.TryGetInt64(out var longVal) ? 
+                    longVal : element.GetDouble(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.Null => null,
+                _ => null
+            };
         }
     }
     
