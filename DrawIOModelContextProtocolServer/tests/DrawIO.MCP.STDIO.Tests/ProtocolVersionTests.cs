@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
+using System.Linq;
 
 namespace DrawIO.MCP.STDIO.Tests
 {
@@ -94,7 +95,7 @@ namespace DrawIO.MCP.STDIO.Tests
         }
 
         [Fact]
-        public async Task Initialize_WithNoProtocolVersion_ShouldDefaultTo_2024_11_05()
+        public async Task Initialize_WithNoProtocolVersion_ShouldDefaultTo_2025_03_26()
         {
             // Arrange
             string paramsJson = @"{}";
@@ -124,14 +125,15 @@ namespace DrawIO.MCP.STDIO.Tests
             var resultObj = JsonSerializer.Deserialize<JsonElement>(resultJson);
             
             Assert.True(resultObj.TryGetProperty("protocolVersion", out var versionElement));
-            Assert.Equal("2024-11-05", versionElement.GetString());
+            Assert.Equal("2025-03-26", versionElement.GetString());
         }
 
         [Fact]
-        public async Task Initialize_WithUnsupportedProtocolVersion_ShouldFallbackTo_2024_11_05()
+        public async Task Initialize_WithUnsupportedProtocolVersion_ShouldReturnError()
         {
             // Arrange
-            string paramsJson = @"{""protocolVersion"": ""2023-01-01""}";
+            string requestedVersion = "2023-01-01";
+            string paramsJson = $"{{\"protocolVersion\": \"{requestedVersion}\"}}";
             JsonElement paramsElement;
             using (JsonDocument doc = JsonDocument.Parse(paramsJson))
             {
@@ -151,18 +153,27 @@ namespace DrawIO.MCP.STDIO.Tests
 
             // Assert
             Assert.NotNull(response);
-            Assert.NotNull(response.Result);
-            Assert.Null(response.Error);
-            
-            var resultJson = JsonSerializer.Serialize(response.Result);
-            var resultObj = JsonSerializer.Deserialize<JsonElement>(resultJson);
-            
-            Assert.True(resultObj.TryGetProperty("protocolVersion", out var versionElement));
-            Assert.Equal("2024-11-05", versionElement.GetString());
-            
-            // Check logs to verify fallback message was logged
+            Assert.Null(response.Result);
+            Assert.NotNull(response.Error);
+
+            Assert.Equal(-32602, response.Error.Code);
+            Assert.Equal("Unsupported protocol version", response.Error.Message);
+            Assert.NotNull(response.Error.Details);
+
+            var errorDetailsJson = JsonSerializer.Serialize(response.Error.Details);
+            var errorDetailsObj = JsonSerializer.Deserialize<JsonElement>(errorDetailsJson);
+
+            Assert.True(errorDetailsObj.TryGetProperty("requested", out var reqVerElement));
+            Assert.Equal(requestedVersion, reqVerElement.GetString());
+
+            Assert.True(errorDetailsObj.TryGetProperty("supported", out var supVerElement));
+            Assert.Equal(JsonValueKind.Array, supVerElement.ValueKind);
+            var supportedVersions = supVerElement.EnumerateArray().Select(e => e.GetString()).ToList();
+            Assert.Contains("2025-03-26", supportedVersions);
+            Assert.Contains("2024-11-05", supportedVersions);
+
             string logs = _testLogWriter.ToString();
-            Assert.Contains("Client requested unsupported version 2023-01-01", logs);
+            Assert.Contains($"Client requested unsupported version {requestedVersion}", logs);
         }
     }
 } 

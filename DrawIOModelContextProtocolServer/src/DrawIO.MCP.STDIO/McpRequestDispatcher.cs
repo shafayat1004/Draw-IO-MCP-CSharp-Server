@@ -69,15 +69,26 @@ namespace DrawIO.MCP.STDIO
             catch (Exception ex)
             {
                 LogInfo($"Error handling request {request.Method}: {ex.Message}");
-                
-                // Check if there are additional details to include in the error response
+
+                // Default error code
+                int errorCode = -32603; // Internal error
+                string errorMessage = ex.Message;
                 object errorDetails = null;
-                if (ex.Data.Contains("details"))
+
+                // Check for specific MCP version mismatch error
+                if (ex.Message == "Unsupported protocol version" && ex.Data.Contains("details"))
+                {
+                    errorCode = -32602; // Invalid params - specific code for version mismatch
+                    errorMessage = "Unsupported protocol version"; // Use the standard message
+                    errorDetails = ex.Data["details"];
+                }
+                // Extract details if present for other errors too
+                else if (ex.Data.Contains("details"))
                 {
                     errorDetails = ex.Data["details"];
                 }
-                
-                return McpResponse.CreateError(request.Id, -32603, ex.Message, errorDetails);
+
+                return McpResponse.CreateError(request.Id, errorCode, errorMessage, errorDetails);
             }
         }
 
@@ -107,17 +118,17 @@ namespace DrawIO.MCP.STDIO
         {
             this.LogInfo("Initializing MCP server");
 
-            // Default to the most widely compatible version
-            string protocolVersion = "2024-11-05";
-            
-            // List of protocol versions we support
-            var supportedVersions = new[] { "2024-11-05", "2025-03-26" };
-            
+            // Default to the most recent supported version if client doesn't specify
+            string protocolVersion = "2025-03-26";
+
+            // List of protocol versions we support (most recent first)
+            var supportedVersions = new[] { "2025-03-26", "2024-11-05" };
+
             if (parameters.TryGetProperty("protocolVersion", out var versionElement))
             {
                 string requestedVersion = versionElement.GetString();
                 this.LogInfo($"Client requested protocol version: {requestedVersion}");
-                
+
                 // If the requested version is one we support, use it
                 if (Array.IndexOf(supportedVersions, requestedVersion) >= 0)
                 {
@@ -126,8 +137,21 @@ namespace DrawIO.MCP.STDIO
                 }
                 else
                 {
-                    this.LogInfo($"Client requested unsupported version {requestedVersion}, using {protocolVersion} instead");
+                    // Client requested an unsupported version - return specific error
+                    this.LogInfo($"Client requested unsupported version {requestedVersion}. Server supports: [{string.Join(", ", supportedVersions)}]");
+                    var errorDetails = new Dictionary<string, object>
+                    {
+                        { "supported", supportedVersions },
+                        { "requested", requestedVersion }
+                    };
+                    var errorException = new Exception("Unsupported protocol version");
+                    errorException.Data["details"] = errorDetails;
+                    throw errorException; // This will be caught by DispatchRequestAsync
                 }
+            }
+            else
+            {
+                 this.LogInfo($"Client did not specify protocolVersion. Defaulting to {protocolVersion}");
             }
 
             // Return the exact format expected by VS Code

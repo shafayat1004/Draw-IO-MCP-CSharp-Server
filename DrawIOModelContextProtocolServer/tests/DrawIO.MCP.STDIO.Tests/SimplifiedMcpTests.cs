@@ -341,7 +341,7 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.Equal("success", statusProp.GetString());
             
             // Save the group ID for the next test
-            string groupId = groupIdProp.GetString();
+            string groupId = groupIdProp.GetString()!;
             Assert.False(string.IsNullOrEmpty(groupId));
         }
         

@@ -86,35 +86,45 @@ namespace DrawIO.MCP.STDIO.Tests
         }
         
         [Fact]
-        public async Task ProtocolVersion_NegotiationConflict_ShouldFallbackToDefault()
+        public async Task ProtocolVersion_NegotiationConflict_ShouldReturnError()
         {
             // Arrange - Request an unsupported protocol version
+            string requestedVersion = "1.0.0";
             var request = new McpRequest
             {
                 Id = "protocol-1",
                 JsonRpc = "2.0",
                 Method = "mcp/initialize",
-                Params = JsonDocument.Parse("{\"protocolVersion\":\"1.0.0\"}").RootElement
+                Params = JsonDocument.Parse($"{{\"protocolVersion\":\"{requestedVersion}\"}}").RootElement
             };
 
             // Act
             var response = await _dispatcher.DispatchRequestAsync(request);
 
-            // Assert
-            ValidateJsonRpcResponse(response, "protocol-1");
+            // Assert - Expect a specific error response now
+            ValidateJsonRpcResponse(response, "protocol-1", expectError: true);
             
-            // Check that we got a supported protocol version back (not the unsupported one we requested)
-            var resultJson = JsonSerializer.Serialize(response.Result);
-            var resultObj = JsonDocument.Parse(resultJson).RootElement;
-            Assert.True(resultObj.TryGetProperty("protocolVersion", out var protocolVersion));
-            string? version = protocolVersion.GetString();
-            Assert.NotNull(version);
+            // Verify the specific error details
+            Assert.NotNull(response.Error);
+            Assert.Equal(-32602, response.Error.Code);
+            Assert.Equal("Unsupported protocol version", response.Error.Message);
+            Assert.NotNull(response.Error.Details);
+
+            // Verify the details in the error data
+            var errorDetailsJson = JsonSerializer.Serialize(response.Error.Details);
+            var errorDetailsObj = JsonSerializer.Deserialize<JsonElement>(errorDetailsJson);
+
+            Assert.True(errorDetailsObj.TryGetProperty("requested", out var reqVerElement));
+            Assert.Equal(requestedVersion, reqVerElement.GetString());
+
+            Assert.True(errorDetailsObj.TryGetProperty("supported", out var supVerElement));
+            Assert.Equal(JsonValueKind.Array, supVerElement.ValueKind);
+            var supportedVersions = supVerElement.EnumerateArray().Select(e => e.GetString()).ToList();
+            Assert.Contains("2025-03-26", supportedVersions);
+            Assert.Contains("2024-11-05", supportedVersions);
             
-            _output.WriteLine($"Negotiated protocol version: {version}");
-            Assert.NotEqual("1.0.0", version);
-            
-            // Should be one of our supported versions
-            Assert.Contains(version, new[] { "2024-11-05", "2025-03-26" });
+            // No longer check for a fallback version in the Result
+            // Assert.Null(response.Result); // This is checked by ValidateJsonRpcResponse
         }
         
         [Fact]

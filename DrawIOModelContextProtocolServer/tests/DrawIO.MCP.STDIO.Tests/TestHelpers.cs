@@ -11,7 +11,7 @@ namespace DrawIO.MCP.STDIO.Tests
         /// </summary>
         public static string ExtractShapeId(object result)
         {
-            var jsonStr = result.ToString();
+            var jsonStr = result?.ToString() ?? "";
             var jsonDoc = JsonDocument.Parse(jsonStr);
             
             // Try to extract from message text
@@ -21,7 +21,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 {
                     if (item.TryGetProperty("text", out var text))
                     {
-                        var match = Regex.Match(text.GetString(), @"Added shape with ID ([a-zA-Z0-9_-]+)");
+                        var match = Regex.Match(text.GetString() ?? "", @"Added shape with ID ([a-zA-Z0-9_-]+)");
                         if (match.Success)
                         {
                             return match.Groups[1].Value;
@@ -33,7 +33,7 @@ namespace DrawIO.MCP.STDIO.Tests
             // Try to extract from shape_id property
             if (jsonDoc.RootElement.TryGetProperty("shape_id", out var shapeId))
             {
-                return shapeId.GetString();
+                return shapeId.GetString()!;
             }
             
             throw new InvalidOperationException("Could not extract shape ID from result");
@@ -44,7 +44,7 @@ namespace DrawIO.MCP.STDIO.Tests
         /// </summary>
         public static string ExtractConnectorId(object result)
         {
-            var jsonStr = result.ToString();
+            var jsonStr = result?.ToString() ?? "";
             var jsonDoc = JsonDocument.Parse(jsonStr);
             
             // Try to extract from message text
@@ -54,7 +54,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 {
                     if (item.TryGetProperty("text", out var text))
                     {
-                        var match = Regex.Match(text.GetString(), @"Connected shapes with connector ID ([a-zA-Z0-9_-]+)");
+                        var match = Regex.Match(text.GetString() ?? "", @"Connected shapes with connector ID ([a-zA-Z0-9_-]+)");
                         if (match.Success)
                         {
                             return match.Groups[1].Value;
@@ -66,7 +66,7 @@ namespace DrawIO.MCP.STDIO.Tests
             // Try to extract from edge_id property
             if (jsonDoc.RootElement.TryGetProperty("edge_id", out var edgeId))
             {
-                return edgeId.GetString();
+                return edgeId.GetString()!;
             }
             
             throw new InvalidOperationException("Could not extract connector ID from result");
