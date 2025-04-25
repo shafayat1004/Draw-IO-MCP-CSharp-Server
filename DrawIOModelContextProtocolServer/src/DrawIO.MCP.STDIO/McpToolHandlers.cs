@@ -492,7 +492,7 @@ namespace DrawIO.MCP.STDIO
                             {
                                 Type = "string",
                                 Description = "New name for the page",
-                                Required = true
+                                Required = false
                             }
                         }
                     }
@@ -539,7 +539,7 @@ namespace DrawIO.MCP.STDIO
                             }
                         },
                         {
-                            "shape_id",
+                            "cell_id",
                             new McpParameterDefinition
                             {
                                 Type = "string",

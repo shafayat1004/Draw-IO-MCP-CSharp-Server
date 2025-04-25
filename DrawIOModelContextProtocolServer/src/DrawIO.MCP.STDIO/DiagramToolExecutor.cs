@@ -922,7 +922,7 @@ namespace DrawIO.MCP.STDIO
         private static Task<object> UpdateDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
         {
             string diagram = GetParameterString(parameters, "diagram");
-            string pageId = GetParameterString(parameters, "page_id");
+            int pageIndex = GetParameterInt(parameters, "page_index");
             
             string filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
@@ -932,6 +932,15 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram
             var loadedDiagram = LoadDiagram(filePath);
+            
+            // Validate page index
+            if (pageIndex < 0 || pageIndex >= loadedDiagram.Pages.Length)
+            {
+                throw new ArgumentException($"Page index {pageIndex} is out of range");
+            }
+            
+            // Get the page ID from the index
+            string pageId = loadedDiagram.Pages[pageIndex].Id;
             
             // Get the optional name parameter
             string name = null;
