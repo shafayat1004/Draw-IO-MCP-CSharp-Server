@@ -13,6 +13,7 @@
     <Compile Include="XmlParserTestSuite.fs" />
     <Compile Include="ElementQueryTestSuite.fs" />
     <Compile Include="StyleManipulationTestSuite.fs" />
+    <Compile Include="GroupOperationsTestSuite.fs" />
     <Compile Include="FileOperationsTestSuite.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />

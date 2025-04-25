@@ -533,13 +533,38 @@ module DiagramManipulation =
         match page.Cells |> List.tryFind (fun cell -> cell.Id = shapeId) with
         | None -> 
             raise <| ArgumentException($"Shape with ID {shapeId} not found")
-        | Some _ ->
-            // Remove the shape and any connected edges
+        | Some shape ->
+            // Find all child shapes (for groups) - this is recursive to handle nested groups
+            let rec getAllDescendants (parentId: string) =
+                let directChildren = 
+                    page.Cells 
+                    |> List.filter (fun cell -> cell.Parent = parentId)
+                
+                let childrenIds = directChildren |> List.map (fun cell -> cell.Id)
+                
+                // Recursively get descendants of each child
+                let descendantIds = 
+                    childrenIds 
+                    |> List.collect getAllDescendants
+                
+                // Combine direct children with all descendants
+                childrenIds @ descendantIds
+            
+            // Get all shapes that need to be deleted (the shape itself and all its descendants)
+            let allShapesToDelete = 
+                if shape.Style.Contains("group;") then
+                    // For groups, include the group itself and all descendants
+                    [shapeId] @ (getAllDescendants shapeId)
+                else
+                    // For normal shapes, just the shape itself
+                    [shapeId]
+            
+            // Remove all these shapes and any connectors attached to them
             let updatedCells = page.Cells 
                               |> List.filter (fun cell -> 
-                                 cell.Id <> shapeId && 
-                                 cell.Source <> Some shapeId && 
-                                 cell.Target <> Some shapeId)
+                                 not (List.contains cell.Id allShapesToDelete) && 
+                                 not (cell.Source.IsSome && List.contains cell.Source.Value allShapesToDelete) && 
+                                 not (cell.Target.IsSome && List.contains cell.Target.Value allShapesToDelete))
             
             let updatedPage = {
                 page with

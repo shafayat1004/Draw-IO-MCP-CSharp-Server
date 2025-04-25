@@ -575,5 +575,38 @@ namespace DrawIO.MCP.Core.Tests
             // Act & Assert
             Assert.Throws<ArgumentException>(() => DiagramManipulation.ungroupShapes(diagramWithShape, 0, shapeId));
         }
+
+        [Fact]
+        public void DeleteShape_WhenDeletingGroup_ShouldDeleteAllChildShapes()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape1, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithShape2, shape2Id) = DiagramManipulation.addShape(diagramWithShape1, 0, "Shape 2", 250, 100, 120, 60, "rectangle");
+            var (diagramWithShape3, shape3Id) = DiagramManipulation.addShape(diagramWithShape2, 0, "Shape 3", 175, 200, 120, 60, "rectangle");
+            
+            // Create a group with the three shapes
+            var shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Empty;
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shape3Id, shapeIds);
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shape2Id, shapeIds);
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shape1Id, shapeIds);
+            
+            var (diagramWithGroup, groupId) = DiagramManipulation.groupShapes(diagramWithShape3, 0, shapeIds);
+            
+            // Verify initial state
+            Assert.NotNull(Array.Find(diagramWithGroup.Pages[0].Cells, cell => cell.Id == groupId));
+            Assert.NotNull(Array.Find(diagramWithGroup.Pages[0].Cells, cell => cell.Id == shape1Id));
+            Assert.NotNull(Array.Find(diagramWithGroup.Pages[0].Cells, cell => cell.Id == shape2Id));
+            Assert.NotNull(Array.Find(diagramWithGroup.Pages[0].Cells, cell => cell.Id == shape3Id));
+            
+            // Act - Delete the group
+            var updatedDiagram = DiagramManipulation.deleteShape(diagramWithGroup, 0, groupId);
+            
+            // Assert - The group and all its child shapes should be deleted
+            Assert.Null(Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == groupId));
+            Assert.Null(Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape1Id));
+            Assert.Null(Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape2Id));
+            Assert.Null(Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape3Id));
+        }
     }
 } 
