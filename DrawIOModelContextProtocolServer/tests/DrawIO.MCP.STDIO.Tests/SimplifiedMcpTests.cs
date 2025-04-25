@@ -227,33 +227,208 @@ namespace DrawIO.MCP.STDIO.Tests
         [Fact]
         public async Task ValidateMcpResponseStructure()
         {
-            // Arrange - create a valid request
+            // This test ensures that our MCP responses have the right structure for the protocol.
+            
+            // Arrange
             var request = new McpRequest
             {
-                Id = "validation-test",
+                Id = "test-validate",
                 JsonRpc = "2.0",
-                Method = "tools/list",
-                Params = JsonDocument.Parse("{}").RootElement
+                Method = "mcp/initialize",
+                Params = JsonDocument.Parse("{\"clientIdentifier\":\"test-client\"}").RootElement
             };
 
             // Act
             var response = await _dispatcher.DispatchRequestAsync(request);
-            string jsonResponse = JsonSerializer.Serialize(response);
 
-            // Assert - validate JSON-RPC structure
-            _output.WriteLine($"Full JSON response: {jsonResponse}");
-            var responseDoc = JsonDocument.Parse(jsonResponse);
-            var root = responseDoc.RootElement;
+            // Assert
+            Assert.Equal("test-validate", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
 
-            // Check JSON-RPC 2.0 format compliance
-            Assert.True(root.TryGetProperty("jsonrpc", out var jsonrpc));
-            Assert.Equal("2.0", jsonrpc.GetString());
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            // Basic validation of response structure
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
             
-            Assert.True(root.TryGetProperty("id", out var id));
-            Assert.Equal("validation-test", id.GetString());
+            // MCP responses should have these top-level properties
+            Assert.True(resultObj.TryGetProperty("protocolVersion", out var versionProp));
+            Assert.Equal(JsonValueKind.String, versionProp.ValueKind);
             
-            Assert.True(root.TryGetProperty("result", out _));
-            Assert.False(root.TryGetProperty("error", out _), "Response should not contain error property for successful requests");
+            Assert.True(resultObj.TryGetProperty("capabilities", out var capabilitiesProp));
+            Assert.Equal(JsonValueKind.Object, capabilitiesProp.ValueKind);
+            
+            Assert.True(resultObj.TryGetProperty("serverInfo", out var serverInfoProp));
+            Assert.Equal(JsonValueKind.Object, serverInfoProp.ValueKind);
+            
+            // Capabilities should include tools
+            Assert.True(capabilitiesProp.TryGetProperty("tools", out var toolsProp));
+            Assert.Equal(JsonValueKind.Object, toolsProp.ValueKind);
+        }
+        
+        [Fact]
+        public async Task GroupShapes_ShouldCreateGroupAndReturnGroupId()
+        {
+            // Arrange - Create a diagram and two shapes to group
+            string diagramName = $"group-test-{Guid.NewGuid()}.drawio";
+            
+            // Create diagram
+            var createRequest = new McpRequest
+            {
+                Id = "create-diagram",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"create_new_diagram\",\"parameters\":{{\"name\":\"{diagramName}\"}}}}").RootElement
+            };
+            
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            
+            // Add first shape
+            var addShape1Request = new McpRequest
+            {
+                Id = "add-shape-1",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"add_shape\",\"parameters\":{{\"diagram\":\"{diagramName}\",\"value\":\"Shape 1\",\"x\":100,\"y\":100,\"width\":120,\"height\":60,\"shape\":\"rectangle\"}}}}").RootElement
+            };
+            
+            var shape1Response = await _dispatcher.DispatchRequestAsync(addShape1Request);
+            var shape1Json = JsonSerializer.Serialize(shape1Response.Result);
+            var shape1Id = JsonDocument.Parse(shape1Json).RootElement.GetProperty("elementId").GetString();
+            
+            // Add second shape
+            var addShape2Request = new McpRequest
+            {
+                Id = "add-shape-2",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"add_shape\",\"parameters\":{{\"diagram\":\"{diagramName}\",\"value\":\"Shape 2\",\"x\":250,\"y\":100,\"width\":120,\"height\":60,\"shape\":\"rectangle\"}}}}").RootElement
+            };
+            
+            var shape2Response = await _dispatcher.DispatchRequestAsync(addShape2Request);
+            var shape2Json = JsonSerializer.Serialize(shape2Response.Result);
+            var shape2Id = JsonDocument.Parse(shape2Json).RootElement.GetProperty("elementId").GetString();
+            
+            // Act - Group the shapes
+            var groupRequest = new McpRequest
+            {
+                Id = "group-shapes",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"group_shapes\",\"parameters\":{{\"diagram\":\"{diagramName}\",\"shape_ids\":[\"{shape1Id}\",\"{shape2Id}\"]}}}}").RootElement
+            };
+            
+            var groupResponse = await _dispatcher.DispatchRequestAsync(groupRequest);
+            
+            // Assert
+            Assert.Equal("group-shapes", groupResponse.Id);
+            Assert.Equal("2.0", groupResponse.JsonRpc);
+            Assert.NotNull(groupResponse.Result);
+            Assert.Null(groupResponse.Error);
+            
+            var resultJson = JsonSerializer.Serialize(groupResponse.Result);
+            _output.WriteLine($"Group Response: {resultJson}");
+            
+            // Verify the response contains a groupId
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("groupId", out var groupIdProp));
+            Assert.Equal(JsonValueKind.String, groupIdProp.ValueKind);
+            
+            // Verify the status
+            Assert.True(resultObj.TryGetProperty("status", out var statusProp));
+            Assert.Equal("success", statusProp.GetString());
+            
+            // Save the group ID for the next test
+            string groupId = groupIdProp.GetString();
+            Assert.False(string.IsNullOrEmpty(groupId));
+        }
+        
+        [Fact]
+        public async Task UngroupShapes_ShouldSuccessfullyUngroupElements()
+        {
+            // Arrange - Create a diagram, add shapes, and group them
+            string diagramName = $"ungroup-test-{Guid.NewGuid()}.drawio";
+            
+            // Create diagram
+            var createRequest = new McpRequest
+            {
+                Id = "create-diagram",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"create_new_diagram\",\"parameters\":{{\"name\":\"{diagramName}\"}}}}").RootElement
+            };
+            
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            
+            // Add first shape
+            var addShape1Request = new McpRequest
+            {
+                Id = "add-shape-1",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"add_shape\",\"parameters\":{{\"diagram\":\"{diagramName}\",\"value\":\"Shape 1\",\"x\":100,\"y\":100,\"width\":120,\"height\":60,\"shape\":\"rectangle\"}}}}").RootElement
+            };
+            
+            var shape1Response = await _dispatcher.DispatchRequestAsync(addShape1Request);
+            var shape1Json = JsonSerializer.Serialize(shape1Response.Result);
+            var shape1Id = JsonDocument.Parse(shape1Json).RootElement.GetProperty("elementId").GetString();
+            
+            // Add second shape
+            var addShape2Request = new McpRequest
+            {
+                Id = "add-shape-2",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"add_shape\",\"parameters\":{{\"diagram\":\"{diagramName}\",\"value\":\"Shape 2\",\"x\":250,\"y\":100,\"width\":120,\"height\":60,\"shape\":\"rectangle\"}}}}").RootElement
+            };
+            
+            var shape2Response = await _dispatcher.DispatchRequestAsync(addShape2Request);
+            var shape2Json = JsonSerializer.Serialize(shape2Response.Result);
+            var shape2Id = JsonDocument.Parse(shape2Json).RootElement.GetProperty("elementId").GetString();
+            
+            // Group the shapes
+            var groupRequest = new McpRequest
+            {
+                Id = "group-shapes",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"group_shapes\",\"parameters\":{{\"diagram\":\"{diagramName}\",\"shape_ids\":[\"{shape1Id}\",\"{shape2Id}\"]}}}}").RootElement
+            };
+            
+            var groupResponse = await _dispatcher.DispatchRequestAsync(groupRequest);
+            var groupJson = JsonSerializer.Serialize(groupResponse.Result);
+            var groupId = JsonDocument.Parse(groupJson).RootElement.GetProperty("groupId").GetString();
+            
+            // Act - Ungroup the shapes
+            var ungroupRequest = new McpRequest
+            {
+                Id = "ungroup-shapes",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($"{{\"tool\":\"ungroup_shapes\",\"parameters\":{{\"diagram\":\"{diagramName}\",\"group_id\":\"{groupId}\"}}}}").RootElement
+            };
+            
+            var ungroupResponse = await _dispatcher.DispatchRequestAsync(ungroupRequest);
+            
+            // Assert
+            Assert.Equal("ungroup-shapes", ungroupResponse.Id);
+            Assert.Equal("2.0", ungroupResponse.JsonRpc);
+            Assert.NotNull(ungroupResponse.Result);
+            Assert.Null(ungroupResponse.Error);
+            
+            var resultJson = JsonSerializer.Serialize(ungroupResponse.Result);
+            _output.WriteLine($"Ungroup Response: {resultJson}");
+            
+            // Verify the status
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("status", out var statusProp));
+            Assert.Equal("success", statusProp.GetString());
+            
+            // Verify content array is present
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp));
+            Assert.Equal(JsonValueKind.Array, contentProp.ValueKind);
         }
     }
 } 

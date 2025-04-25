@@ -1012,7 +1012,7 @@ module DiagramManipulation =
                     Some (neighborId, neighborLabel, direction)
                 | _ -> None)
     
-    /// Calculate the bounding box of all elements in the diagram
+    /// Gets the boundaries of all elements in a diagram
     let getDiagramBounds (diagram: Diagram) (pageIndex: int) : BoundingBox option =
         if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
             raise <| IndexOutOfRangeException("Page index out of range")
@@ -1043,6 +1043,147 @@ module DiagramManipulation =
                 Width = maxX - minX
                 Height = maxY - minY
             }
+
+    /// Groups multiple shapes into a single group
+    let groupShapes (diagram: Diagram) (pageIndex: int) (shapeIds: string list) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        if shapeIds.IsEmpty then
+            raise <| ArgumentException("No shapes provided for grouping")
+            
+        let page = diagram.Pages.[pageIndex]
+        
+        // Check if all shapes exist
+        let shapesExist = shapeIds |> List.forall (fun id -> 
+            page.Cells |> List.exists (fun cell -> cell.Id = id))
+        
+        if not shapesExist then
+            raise <| ArgumentException("One or more shapes not found in diagram")
+            
+        // Get the shapes to group
+        let shapesToGroup = 
+            page.Cells 
+            |> List.filter (fun cell -> List.contains cell.Id shapeIds)
+            
+        // Calculate the bounding box that contains all shapes
+        let shapesWithGeometry = 
+            shapesToGroup 
+            |> List.filter (fun cell -> cell.Geometry.IsSome)
+            |> List.map (fun cell -> cell.Geometry.Value)
+            
+        if shapesWithGeometry.IsEmpty then
+            raise <| ArgumentException("No shapes with geometry provided for grouping")
+            
+        // Calculate the bounds of the group
+        let minX = shapesWithGeometry |> List.map (fun geo -> geo.Position.X) |> List.min
+        let minY = shapesWithGeometry |> List.map (fun geo -> geo.Position.Y) |> List.min
+        let maxX = shapesWithGeometry |> List.map (fun geo -> geo.Position.X + geo.Size.Width) |> List.max
+        let maxY = shapesWithGeometry |> List.map (fun geo -> geo.Position.Y + geo.Size.Height) |> List.max
+        
+        let width = maxX - minX
+        let height = maxY - minY
+        
+        // Create a group ID
+        let groupId = generateId()
+        
+        // Create the group cell
+        let groupCell = {
+            Id = groupId
+            Value = "" // No label on the group by default
+            Style = "group;" // This is the important style for a group
+            IsVertex = true
+            IsEdge = false
+            Parent = "1" // Default layer
+            Source = None
+            Target = None
+            Geometry = Some {
+                Position = { X = minX; Y = minY }
+                Size = { Width = width; Height = height }
+                Relative = false
+                Waypoints = []
+            }
+        }
+        
+        // Update the parent of the grouped shapes to point to the group
+        let updatedCells = 
+            page.Cells 
+            |> List.map (fun cell -> 
+                if List.contains cell.Id shapeIds then
+                    { cell with Parent = groupId }
+                else 
+                    cell)
+            
+        // Add the group cell
+        let finalCells = updatedCells @ [groupCell]
+        
+        let updatedPage = {
+            page with
+                Cells = finalCells
+        }
+        
+        let updatedPages = 
+            diagram.Pages
+            |> List.mapi (fun i p -> if i = pageIndex then updatedPage else p)
+        
+        let updatedDiagram = {
+            diagram with
+                Modified = DateTime.Now
+                Pages = updatedPages
+        }
+        
+        (updatedDiagram, groupId)
+    
+    /// Ungroups shapes from a group
+    let ungroupShapes (diagram: Diagram) (pageIndex: int) (groupId: string) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+            
+        let page = diagram.Pages.[pageIndex]
+        
+        // Check if the group exists
+        let groupExists = page.Cells |> List.exists (fun cell -> cell.Id = groupId)
+        
+        if not groupExists then
+            raise <| ArgumentException($"Group with ID {groupId} not found")
+            
+        // Get the group
+        let group = page.Cells |> List.find (fun cell -> cell.Id = groupId)
+        
+        // Check if it's actually a group
+        if not (group.Style.Contains("group;")) then
+            raise <| ArgumentException($"Element with ID {groupId} is not a group")
+            
+        // Find the parent of the group to reassign children
+        let groupParent = group.Parent
+        
+        // Update all cells that have this group as a parent
+        let updatedCells = 
+            page.Cells 
+            |> List.map (fun cell -> 
+                if cell.Parent = groupId then
+                    { cell with Parent = groupParent }
+                else 
+                    cell)
+            // Remove the group itself
+            |> List.filter (fun cell -> cell.Id <> groupId)
+        
+        let updatedPage = {
+            page with
+                Cells = updatedCells
+        }
+        
+        let updatedPages = 
+            diagram.Pages
+            |> List.mapi (fun i p -> if i = pageIndex then updatedPage else p)
+        
+        let updatedDiagram = {
+            diagram with
+                Modified = DateTime.Now
+                Pages = updatedPages
+        }
+        
+        updatedDiagram
 
     /// Gets waypoints from a connector
     let getWaypoints (diagram: Diagram) (pageIndex: int) (connectorId: string) =

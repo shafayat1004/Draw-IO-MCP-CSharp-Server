@@ -1165,6 +1165,76 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
+                new McpToolDefinition
+                {
+                    Name = "group_shapes",
+                    Description = "Group multiple shapes into a single group",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "shape_ids",
+                            new McpParameterDefinition
+                            {
+                                Type = "array",
+                                Description = "Array of shape IDs to group together",
+                                Required = true
+                            }
+                        },
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page containing the shapes (defaults to 0)",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "ungroup_shapes",
+                    Description = "Ungroup shapes from a group",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "group_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the group to ungroup",
+                                Required = true
+                            }
+                        },
+                        {
+                            "page_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the page containing the group (defaults to 0)",
+                                Required = false
+                            }
+                        }
+                    }
+                },
             };
 
             // Return a result with the array of tools properly structured

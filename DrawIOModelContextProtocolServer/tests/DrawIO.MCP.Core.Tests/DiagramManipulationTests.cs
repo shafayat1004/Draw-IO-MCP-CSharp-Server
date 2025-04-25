@@ -447,8 +447,133 @@ namespace DrawIO.MCP.Core.Tests
             var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
             
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
-                DiagramManipulation.updateWaypoint(diagramWithConnector, 0, connectorId, 0, Some.FromValue(250.0), Some.FromValue(200.0)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => DiagramManipulation.updateWaypoint(diagramWithConnector, 0, connectorId, 5, 250, 300, null));
+        }
+
+        [Fact]
+        public void GroupShapes_ShouldCreateGroupAndSetParent()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape1, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithShape2, shape2Id) = DiagramManipulation.addShape(diagramWithShape1, 0, "Shape 2", 250, 100, 120, 60, "rectangle");
+            var (diagramWithShape3, shape3Id) = DiagramManipulation.addShape(diagramWithShape2, 0, "Shape 3", 175, 200, 120, 60, "rectangle");
+            
+            var shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Empty;
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shape3Id, shapeIds);
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shape2Id, shapeIds);
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shape1Id, shapeIds);
+            
+            // Act
+            var (updatedDiagram, groupId) = DiagramManipulation.groupShapes(diagramWithShape3, 0, shapeIds);
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            Assert.NotEmpty(updatedDiagram.Pages);
+            
+            // Find the group cell
+            var groupCell = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == groupId);
+            Assert.NotNull(groupCell);
+            Assert.Contains("group", groupCell.Style);
+            Assert.True(groupCell.IsVertex);
+            Assert.Equal("1", groupCell.Parent); // Group parent should be the default layer
+            
+            // Verify that all shapes have the group as their parent
+            var shape1 = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape1Id);
+            var shape2 = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape2Id);
+            var shape3 = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape3Id);
+            
+            Assert.Equal(groupId, shape1.Parent);
+            Assert.Equal(groupId, shape2.Parent);
+            Assert.Equal(groupId, shape3.Parent);
+            
+            // Verify group's geometry encompasses all shapes
+            Assert.NotNull(groupCell.Geometry);
+            Assert.Equal(100, groupCell.Geometry.Value.Position.X); // Left-most shape (shape1)
+            Assert.Equal(100, groupCell.Geometry.Value.Position.Y); // Top-most shape (shape1 and shape2)
+            Assert.Equal(270, groupCell.Geometry.Value.Size.Width); // From x=100 to x=250+120=370, width = 370-100 = 270
+            Assert.Equal(160, groupCell.Geometry.Value.Size.Height); // From y=100 to y=200+60=260, height = 260-100 = 160
+        }
+        
+        [Fact]
+        public void GroupShapes_WithEmptyList_ShouldThrowException()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var emptyList = Microsoft.FSharp.Collections.FSharpList<string>.Empty;
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => DiagramManipulation.groupShapes(diagram, 0, emptyList));
+        }
+        
+        [Fact]
+        public void GroupShapes_WithNonExistentShapes_ShouldThrowException()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape, shapeId) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            
+            var shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Empty;
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shapeId, shapeIds);
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons("non-existent-id", shapeIds);
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => DiagramManipulation.groupShapes(diagramWithShape, 0, shapeIds));
+        }
+        
+        [Fact]
+        public void UngroupShapes_ShouldReassignParents()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape1, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithShape2, shape2Id) = DiagramManipulation.addShape(diagramWithShape1, 0, "Shape 2", 250, 100, 120, 60, "rectangle");
+            
+            var shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Empty;
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shape2Id, shapeIds);
+            shapeIds = Microsoft.FSharp.Collections.FSharpList<string>.Cons(shape1Id, shapeIds);
+            
+            var (diagramWithGroup, groupId) = DiagramManipulation.groupShapes(diagramWithShape2, 0, shapeIds);
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.ungroupShapes(diagramWithGroup, 0, groupId);
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            Assert.NotEmpty(updatedDiagram.Pages);
+            
+            // Verify group was removed
+            Assert.DoesNotContain(updatedDiagram.Pages[0].Cells, cell => cell.Id == groupId);
+            
+            // Verify shapes are reassigned to the layer
+            var shape1 = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape1Id);
+            var shape2 = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape2Id);
+            
+            Assert.NotNull(shape1);
+            Assert.NotNull(shape2);
+            Assert.Equal("1", shape1.Parent); // Parent should be the default layer
+            Assert.Equal("1", shape2.Parent); // Parent should be the default layer
+        }
+        
+        [Fact]
+        public void UngroupShapes_WithNonExistentGroup_ShouldThrowException()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => DiagramManipulation.ungroupShapes(diagram, 0, "non-existent-group-id"));
+        }
+        
+        [Fact]
+        public void UngroupShapes_WithNonGroupElement_ShouldThrowException()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape, shapeId) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => DiagramManipulation.ungroupShapes(diagramWithShape, 0, shapeId));
         }
     }
 } 

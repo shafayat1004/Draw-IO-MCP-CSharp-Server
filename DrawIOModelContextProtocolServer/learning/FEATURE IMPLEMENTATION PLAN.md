@@ -47,6 +47,9 @@ The DrawIO MCP Server currently implements the following tools:
   - Update Waypoint (`update_waypoint`)
   - Get Waypoints (`get_waypoints`)
   - Clear Waypoints (`clear_waypoints`)
+- ✅ Group/Ungroup Shapes:
+  - Group Shapes (`group_shapes`)
+  - Ungroup Shapes (`ungroup_shapes`)
 
 ### Needs Investigation
 - 🟨 Get Diagram Image (`get_diagram_image`) - drawio CLI integration issues:
@@ -59,7 +62,7 @@ The DrawIO MCP Server currently implements the following tools:
 Based on testing and documentation review:
 
 #### Shape and Text Manipulation
-- 🔴 Group/Ungroup shapes
+- ✅ Group/Ungroup shapes - IMPLEMENTED
 - 🔴 Rotate shapes
 - 🔴 Flip shapes horizontally/vertically
 - 🔴 Lock/unlock elements
@@ -166,16 +169,17 @@ Our current implementation supports sophisticated connector styling and routing 
     - Fixed XML structure to use `<Array as="points">` container for waypoints
     - Backward compatibility for parsing older waypoint formats
 
+#### Advanced Organization
+20. **Group/Ungroup Shapes** ✅ - *Implemented and tested*
+    - Parent-child relationships implemented
+    - Proper XML structure for groups created
+    - Tools for grouping and ungrouping shapes implemented
+    - Comprehensive tests for grouping functionality added
+
 ### Tier 2: Advanced Editing & Layout Tools (Next Priority)
 
 #### Priority 1: Organizational Features
-20. **Group Shapes** 🔴 - *Highest priority*
-    - Approach: Implement parent-child relationships
-    - Add tools for grouping/ungrouping elements
-    - Complexity: High
-    - Essential for diagram organization
-    
-21. **Autosize to Text** 🔴 - *Medium priority*
+21. **Autosize to Text** 🔴 - *High priority*
     - Approach: Calculate text bounds and adjust shape dimensions
     - Add tool for automatic shape sizing based on content
     - Complexity: Medium
@@ -264,16 +268,16 @@ Our current implementation supports sophisticated connector styling and routing 
    - ✅ Fixed XML structure to wrap waypoints in `<Array as="points">` elements
    - ✅ Added backward compatibility for waypoint parsing
 
-2. **Fix Image Export**
+2. ✅ **Implement Shape Grouping System** - COMPLETED
+   - ✅ Designed parent-child relationship model
+   - ✅ Implemented group operations in core library
+   - ✅ Created tools for group manipulation
+   - ✅ Added tests for grouping functionality
+
+3. **Fix Image Export**
    - Investigate CLI integration
    - Implement reliable export pipeline
    - Support multiple formats
-
-3. **Shape Grouping System**
-   - Design group hierarchy implementation
-   - Add group operations to core library
-   - Create tools for group manipulation
-   - Ensure proper visual representation of groups
 
 4. **Enhanced Layout Engine**
    - Implement more layout algorithms
@@ -305,13 +309,13 @@ Our current implementation supports sophisticated connector styling and routing 
    - ✅ Added comprehensive tests for waypoint manipulation
    - ✅ Fixed XML structure to properly wrap waypoints in arrays
 
-2. **Group/Ungroup Implementation** (Next Priority)
-   - Design parent-child relationship model
-   - Implement group operations in core library
-   - Create tools for group management
-   - Add tests for grouping functionality
+2. ✅ **Group/Ungroup Implementation** - COMPLETED
+   - ✅ Designed parent-child relationship model
+   - ✅ Implemented group operations in core library
+   - ✅ Created tools for group management
+   - ✅ Added tests for grouping functionality
 
-3. **Autosize to Text**
+3. **Autosize to Text** (Next Priority)
    - Research text measurement techniques
    - Implement autosize functionality in core library
    - Create tool for automatic shape resizing
@@ -326,4 +330,5 @@ Our current implementation supports sophisticated connector styling and routing 
    - Update API documentation
    - Add usage examples
    - Create tutorials for new features
-   - Document waypoint handling and connector styling 
+   - Document waypoint handling and connector styling
+   - Document grouping functionality 

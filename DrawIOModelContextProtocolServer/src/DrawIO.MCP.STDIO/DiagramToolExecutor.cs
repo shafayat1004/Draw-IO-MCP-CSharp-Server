@@ -66,6 +66,8 @@ namespace DrawIO.MCP.STDIO
                     "update_waypoint" => await UpdateWaypointAsync(arguments, diagramsDirectory),
                     "get_waypoints" => await GetWaypointsAsync(arguments, diagramsDirectory),
                     "clear_waypoints" => await ClearWaypointsAsync(arguments, diagramsDirectory),
+                    "group_shapes" => await GroupShapesAsync(arguments, diagramsDirectory),
+                    "ungroup_shapes" => await UngroupShapesAsync(arguments, diagramsDirectory),
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
@@ -2379,6 +2381,128 @@ namespace DrawIO.MCP.STDIO
                     } 
                 }
             });
+        }
+
+        private static Task<object> GroupShapesAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            try
+            {
+                // Extract parameters
+                var diagramName = GetParameterString(parameters, "diagram");
+                var pageIndex = GetParameterInt(parameters, "page_index", 0);
+                var shapeIds = new List<string>();
+                
+                // Extract shape IDs from the JSON array
+                if (parameters.TryGetProperty("shape_ids", out var shapeIdsElement) && shapeIdsElement.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var element in shapeIdsElement.EnumerateArray())
+                    {
+                        shapeIds.Add(element.GetString());
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("Missing or invalid shape_ids array parameter");
+                }
+                
+                if (shapeIds.Count < 2)
+                {
+                    throw new ArgumentException("At least two shapes must be provided for grouping");
+                }
+
+                // Load diagram
+                var diagramPath = Path.Combine(diagramsDirectory, diagramName);
+                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+
+                // Create F# list from C# list
+                var fsharpList = Microsoft.FSharp.Collections.ListModule.OfSeq(shapeIds);
+                
+                // Group shapes
+                var (updatedDiagram, groupId) = DrawIO.MCP.Core.DiagramManipulation.groupShapes(diagramObj, pageIndex, fsharpList);
+
+                // Save updated diagram
+                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+
+                return Task.FromResult<object>(new 
+                { 
+                    status = "success",
+                    groupId = groupId,
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Grouped {shapeIds.Count} shapes into group with ID {groupId}" 
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new
+                {
+                    isError = true,
+                    error = ex.Message,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
+        }
+
+        private static Task<object> UngroupShapesAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            try
+            {
+                // Extract parameters
+                var diagramName = GetParameterString(parameters, "diagram");
+                var groupId = GetParameterString(parameters, "group_id");
+                var pageIndex = GetParameterInt(parameters, "page_index", 0);
+
+                // Load diagram
+                var diagramPath = Path.Combine(diagramsDirectory, diagramName);
+                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+
+                // Ungroup shapes
+                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.ungroupShapes(diagramObj, pageIndex, groupId);
+
+                // Save updated diagram
+                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+
+                return Task.FromResult<object>(new 
+                { 
+                    status = "success",
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Ungrouped shapes from group with ID {groupId}" 
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new
+                {
+                    isError = true,
+                    error = ex.Message,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
         }
     }
 } 
