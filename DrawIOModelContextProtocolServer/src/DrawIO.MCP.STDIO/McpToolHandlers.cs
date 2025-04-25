@@ -1186,7 +1186,12 @@ namespace DrawIO.MCP.STDIO
                             {
                                 Type = "array",
                                 Description = "Array of shape IDs to group together",
-                                Required = true
+                                Required = true,
+                                Items = new McpParameterDefinition
+                                {
+                                    Type = "string",
+                                    Description = "ID of a shape to include in the group"
+                                }
                             }
                         },
                         {

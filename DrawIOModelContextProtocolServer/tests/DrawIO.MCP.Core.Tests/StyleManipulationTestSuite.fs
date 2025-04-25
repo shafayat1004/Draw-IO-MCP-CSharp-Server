@@ -1,5 +1,7 @@
 module DrawIO.MCP.Core.TestSuites.StyleManipulation
 
+// #nowarn "20" // Suppress spurious FS0020 float warnings in this file
+
 open System
 open Xunit
 open DrawIO.MCP.Core
@@ -96,17 +98,19 @@ let ``ArrangeLayout with horizontal layout should align shapes horizontally`` ()
     
     // Check all shapes have the same Y value
     let yValues = vertices |> List.map (fun v -> v.Geometry.Value.Position.Y) |> Set.ofList
-    Assert.Single(yValues) // Should only be one unique Y value
+    Assert.Single(yValues) |> ignore // Should only be one unique Y value
     
     // Check X values are evenly spaced
     let xValues = vertices |> List.map (fun v -> v.Geometry.Value.Position.X) |> List.sort
     let spacings = List.pairwise xValues |> List.map (fun (a, b) -> b - a)
     
     // All spacings should be equal (within a small tolerance for floating point)
-    let firstSpacing = spacings.[0]
-    for spacing in spacings do
-        let _ = Assert.True(Math.Abs(spacing - firstSpacing) < 0.001)
-        ()
+    let firstSpacing: float = spacings.[0]
+    spacings
+    |> List.iter (fun spacing ->
+        let diff = Math.Abs(spacing - firstSpacing)
+        Assert.True(diff < 0.001)
+    )
 
 [<Fact>]
 let ``ArrangeLayout with vertical layout should align shapes vertically`` () =
@@ -125,32 +129,34 @@ let ``ArrangeLayout with vertical layout should align shapes vertically`` () =
     
     // Check all shapes have the same X value
     let xValues = vertices |> List.map (fun v -> v.Geometry.Value.Position.X) |> Set.ofList
-    Assert.Single(xValues) // Should only be one unique X value
+    Assert.Single(xValues) |> ignore // Should only be one unique X value
     
     // Check Y values are evenly spaced
     let yValues = vertices |> List.map (fun v -> v.Geometry.Value.Position.Y) |> List.sort
     let spacings = List.pairwise yValues |> List.map (fun (a, b) -> b - a)
     
     // All spacings should be equal (within a small tolerance for floating point)
-    let firstSpacing = spacings.[0]
-    for spacing in spacings do
-        let _ = Assert.True(Math.Abs(spacing - firstSpacing) < 0.001)
-        ()
+    let firstSpacing: float = spacings.[0]
+    spacings
+    |> List.iter (fun spacing ->
+        let diff = Math.Abs(spacing - firstSpacing)
+        Assert.True(diff < 0.001)
+    )
 
 [<Fact>]
 let ``MoveShape should update shape position`` () =
     // Arrange
     let diagram = createEmptyDiagram()
     let (diagramWithShape, shapeId) = addShape diagram 0 "Test Shape" 100.0 100.0 120.0 60.0 "rectangle"
-    
+
     // Act
     let updatedDiagram = moveShape diagramWithShape shapeId 300.0 200.0
-    
+
     // Assert
     let movedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
     Assert.Equal(300.0, movedShape.Geometry.Value.Position.X)
     Assert.Equal(200.0, movedShape.Geometry.Value.Position.Y)
-    
+
     // Size should remain unchanged
     Assert.Equal(120.0, movedShape.Geometry.Value.Size.Width)
     Assert.Equal(60.0, movedShape.Geometry.Value.Size.Height)
@@ -159,18 +165,18 @@ let ``MoveShape should update shape position`` () =
 let ``Different shape types should have correct styles`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    
+
     // Create shapes with different types
     let (diagramWithRect, rectId) = addShape diagram 0 "Rectangle" 100.0 100.0 120.0 60.0 "rectangle"
     let (diagramWithEllipse, ellipseId) = addShape diagramWithRect 0 "Ellipse" 300.0 100.0 120.0 60.0 "ellipse"
     let (diagramWithDiamond, diamondId) = addShape diagramWithEllipse 0 "Diamond" 500.0 100.0 120.0 60.0 "diamond"
-    
+
     // Assert
     let rectShape = diagramWithDiamond.Pages.[0].Cells |> List.find (fun c -> c.Id = rectId)
     let ellipseShape = diagramWithDiamond.Pages.[0].Cells |> List.find (fun c -> c.Id = ellipseId)
     let diamondShape = diagramWithDiamond.Pages.[0].Cells |> List.find (fun c -> c.Id = diamondId)
-    
+
     // Each shape type should have an appropriate style
     Assert.Contains("rounded=0", rectShape.Style)
     Assert.Contains("ellipse", ellipseShape.Style)
-    Assert.Contains("shape=diamond", diamondShape.Style) 
+    Assert.Contains("shape=diamond", diamondShape.Style)

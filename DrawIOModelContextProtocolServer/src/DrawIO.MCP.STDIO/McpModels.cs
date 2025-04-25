@@ -139,6 +139,10 @@ namespace DrawIO.MCP.STDIO
         
         [JsonIgnore] // We handle required at the parent level in the InputSchema property
         public bool Required { get; set; }
+
+        [JsonPropertyName("items")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] // Only include 'items' for array types
+        public McpParameterDefinition Items { get; set; }
     }
     
     // Custom JSON converter to handle both string and integer IDs
