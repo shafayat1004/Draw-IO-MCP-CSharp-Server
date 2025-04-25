@@ -162,13 +162,32 @@ namespace DrawIO.MCP.STDIO.Tests
             // The result should contain error information inside the result
             var resultObj = JsonDocument.Parse(resultJson).RootElement;
             
-            // For an invalid tool, the response should contain either an "error" property
-            bool hasErrorProperty = resultObj.TryGetProperty("error", out var errorEl);
-            Assert.True(hasErrorProperty, "Response should contain an 'error' property");
+            // For an invalid tool, the response should contain isError=true
+            bool hasIsErrorProperty = resultObj.TryGetProperty("isError", out var isErrorEl);
+            Assert.True(hasIsErrorProperty, "Response should contain an 'isError' property");
+            Assert.True(isErrorEl.GetBoolean(), "isError should be true");
             
-            // Check if the error message contains information about the invalid tool
-            string errorMessage = errorEl.GetString() ?? string.Empty;
-            Assert.Contains("Unknown tool", errorMessage, StringComparison.OrdinalIgnoreCase);
+            // Check if the content array contains information about the invalid tool
+            Assert.True(resultObj.TryGetProperty("content", out var contentEl), 
+                "Response should have a content array");
+            Assert.True(contentEl.GetArrayLength() > 0, "Content array shouldn't be empty");
+            
+            // At least one content item should contain text with the error message
+            bool foundErrorMessage = false;
+            foreach (var item in contentEl.EnumerateArray())
+            {
+                if (item.TryGetProperty("text", out var textEl))
+                {
+                    string text = textEl.GetString();
+                    if (text != null && text.Contains("Unknown tool", StringComparison.OrdinalIgnoreCase))
+                    {
+                        foundErrorMessage = true;
+                        break;
+                    }
+                }
+            }
+            
+            Assert.True(foundErrorMessage, "Content should mention 'Unknown tool'");
         }
 
         [Fact]

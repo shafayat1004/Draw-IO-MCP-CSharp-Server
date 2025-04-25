@@ -46,7 +46,8 @@ namespace DrawIO.MCP.STDIO.Tests
         /// </summary>
         private void ValidateJsonRpcResponse(McpResponse response, string expectedId, bool expectError = false)
         {
-            // Check required JSON-RPC 2.0 fields
+            // All responses should have required JSON-RPC 2.0 fields
+            Assert.NotNull(response);
             Assert.Equal("2.0", response.JsonRpc);
             Assert.Equal(expectedId, response.Id);
             
@@ -54,7 +55,7 @@ namespace DrawIO.MCP.STDIO.Tests
             {
                 // Error responses can be in two forms in our implementation:
                 // 1. Standard JSON-RPC error: Error property set, Result is null
-                // 2. Tool execution error: Result contains a dictionary with error info
+                // 2. Tool execution error: Result contains a dictionary with isError=true flag
                 
                 if (response.Error != null)
                 {
@@ -73,8 +74,28 @@ namespace DrawIO.MCP.STDIO.Tests
                     _output.WriteLine($"Testing result for error dictionary: {resultJson}");
                     
                     var resultObj = JsonDocument.Parse(resultJson).RootElement;
-                    Assert.True(resultObj.TryGetProperty("error", out _), 
-                        "Error response should contain 'error' property in result");
+                    
+                    // Check for new error format with isError=true
+                    if (resultObj.TryGetProperty("isError", out var isErrorEl) && isErrorEl.GetBoolean())
+                    {
+                        // This is the new format using isError flag
+                        Assert.True(resultObj.TryGetProperty("content", out var contentEl),
+                            "Error with isError=true should contain a content array");
+                        
+                        // Verify content is an array with at least one entry
+                        Assert.Equal(JsonValueKind.Array, contentEl.ValueKind);
+                        Assert.True(contentEl.GetArrayLength() > 0, "Content array should not be empty");
+                    }
+                    // For backward compatibility, also check for legacy error field
+                    else if (resultObj.TryGetProperty("error", out _))
+                    {
+                        // Old format - accepts but doesn't enforce this going forward
+                        _output.WriteLine("Warning: Found legacy error format with 'error' property instead of 'isError'");
+                    }
+                    else
+                    {
+                        Assert.Fail("Error response should contain either 'isError' or 'error' property in result");
+                    }
                 }
             }
             else
@@ -82,6 +103,14 @@ namespace DrawIO.MCP.STDIO.Tests
                 // For success responses, Result should not be null and Error should be null
                 Assert.NotNull(response.Result);
                 Assert.Null(response.Error);
+                
+                // For success responses, make sure isError isn't set to true
+                var resultJson = JsonSerializer.Serialize(response.Result);
+                var resultObj = JsonDocument.Parse(resultJson).RootElement;
+                if (resultObj.TryGetProperty("isError", out var isErrorEl))
+                {
+                    Assert.False(isErrorEl.GetBoolean(), "Success response should not have isError=true");
+                }
             }
         }
         
@@ -219,13 +248,32 @@ namespace DrawIO.MCP.STDIO.Tests
             _output.WriteLine($"Result: {resultJson}");
             
             var resultObj = JsonDocument.Parse(resultJson).RootElement;
-            Assert.True(resultObj.TryGetProperty("error", out var errorEl), 
-                "Response should contain an 'error' property in result");
             
-            // Error should mention the missing parameter
-            string? errorMsg = errorEl.GetString();
-            Assert.NotNull(errorMsg);
-            Assert.Contains("name", errorMsg, StringComparison.OrdinalIgnoreCase);
+            // Check for isError=true flag (new format)
+            Assert.True(resultObj.TryGetProperty("isError", out var isErrorEl), 
+                "Response should contain an 'isError' property");
+            Assert.True(isErrorEl.GetBoolean(), "isError should be true");
+            
+            // Check for content array with error message
+            Assert.True(resultObj.TryGetProperty("content", out var contentEl),
+                "Error response should contain a 'content' array");
+            Assert.Equal(JsonValueKind.Array, contentEl.ValueKind);
+            
+            // At least one content item should exist with error message
+            bool foundErrorMessage = false;
+            foreach (var item in contentEl.EnumerateArray())
+            {
+                if (item.TryGetProperty("text", out var textEl))
+                {
+                    string text = textEl.GetString();
+                    if (text != null && text.Contains("name", StringComparison.OrdinalIgnoreCase))
+                    {
+                        foundErrorMessage = true;
+                        break;
+                    }
+                }
+            }
+            Assert.True(foundErrorMessage, "Content should contain an error message mentioning 'name' parameter");
         }
         
         [Fact]

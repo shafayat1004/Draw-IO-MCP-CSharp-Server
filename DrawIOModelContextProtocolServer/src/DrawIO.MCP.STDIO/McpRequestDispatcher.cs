@@ -433,8 +433,29 @@ namespace DrawIO.MCP.STDIO
             try
             {
                 // Use the tool executor to execute the tool
-                // DiagramToolExecutor now handles all tools, including query tools
                 object result = await DiagramToolExecutor.ExecuteToolAsync(toolName, arguments, _diagramsDirectory, _logWriter, _verbose);
+                
+                // Check if the result contains an error object (legacy format, shouldn't happen with new code)
+                if (result is Dictionary<string, object> resultDict && resultDict.ContainsKey("error") && !resultDict.ContainsKey("isError"))
+                {
+                    // Legacy format with error field but no isError flag
+                    if (resultDict["error"] is McpErrorDetail error)
+                    {
+                        throw new Exception(error.Message)
+                        {
+                            Data = { ["details"] = error.Details }
+                        };
+                    }
+                    else
+                    {
+                        // Handle other legacy format with error string
+                        throw new Exception(resultDict["error"]?.ToString() ?? "Unknown error occurred");
+                    }
+                }
+                
+                // If it's a proper tool error (isError=true), pass it through as a successful result
+                // This allows LLMs to handle the error appropriately
+                
                 return result;
             }
             catch (ArgumentException ex) when (ex.Message.Contains("parameter"))

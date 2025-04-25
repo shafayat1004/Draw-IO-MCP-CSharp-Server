@@ -32,11 +32,9 @@ namespace DrawIO.MCP.STDIO
         /// </summary>
         public static async Task<object> ExecuteToolAsync(string toolName, JsonElement arguments, string diagramsDirectory, TextWriter logWriter, bool verbose)
         {
-            LogMessage(logWriter, verbose, $"Executing tool: {toolName}");
-            
             try
             {
-                // Handle update_shape_style separately since it has issues
+                // If updating shape with style, use custom method
                 if (toolName == "update_shape_style")
                 {
                     return await UpdateShapeWithStyleAsync(arguments, diagramsDirectory);
@@ -135,12 +133,21 @@ namespace DrawIO.MCP.STDIO
             catch (Exception ex)
             {
                 LogMessage(logWriter, true, $"Error executing tool {toolName}: {ex.Message}");
-                // Return an error object as Dictionary<string, object>
+                
+                // Create proper tool error response according to MCP protocol
+                // Tool errors should be reported within the result with isError=true
                 return new Dictionary<string, object>
                 {
-                    ["error"] = ex.Message,
-                    ["detail"] = ex.ToString(),
-                    ["content"] = new object[] { } // Add empty content array to satisfy MCP protocol
+                    ["isError"] = true,
+                    ["content"] = new object[] 
+                    { 
+                        new Dictionary<string, object>
+                        {
+                            ["type"] = "text",
+                            ["text"] = $"Error: {ex.Message}"
+                        }
+                    },
+                    ["detail"] = ex.ToString() // Additional context for debugging
                 };
             }
         }

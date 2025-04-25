@@ -94,6 +94,12 @@ namespace DrawIO.MCP.STDIO
                 // Ensure response has an ID (use request ID)
                 response.Id = request.Id;
                 
+                // Log response for debugging
+                if (response.Error != null)
+                {
+                    LogMessage($"WARNING: Returning error response: Code={response.Error.Code}, Message={response.Error.Message}");
+                }
+                
                 return response;
             }
             catch (JsonException ex)
@@ -106,8 +112,24 @@ namespace DrawIO.MCP.STDIO
             {
                 LogMessage($"ERROR: Error processing request: {ex.Message}");
                 LogMessage($"ERROR: Stack trace: {ex.StackTrace}");
-                LogMessage($"ERROR: Inner exception: {ex.InnerException?.Message ?? "none"}");
-                return McpResponse.CreateError("null", -32603, $"Internal error: {ex.Message}");
+                
+                // Get error details if available
+                object errorDetails = null;
+                if (ex.Data.Contains("details"))
+                {
+                    errorDetails = ex.Data["details"];
+                }
+                
+                // Default error code
+                int errorCode = -32603; // Internal error
+                
+                // Create properly formatted error response
+                return McpResponse.CreateError(
+                    "null", 
+                    errorCode, 
+                    $"Internal error: {ex.Message}",
+                    errorDetails
+                );
             }
         }
 
