@@ -255,5 +255,200 @@ namespace DrawIO.MCP.Core.Tests
             Assert.Contains("startArrow=diamond", connector.Style);
             Assert.Contains("endArrow=classic", connector.Style);
         }
+
+        [Fact]
+        public void AddWaypoint_ShouldAddWaypointToConnector()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 200, 150, false, null);
+            
+            // Assert
+            var waypoints = DiagramManipulation.getWaypoints(updatedDiagram, 0, connectorId);
+            Assert.Single(waypoints);
+            Assert.Equal(200, waypoints[0].X);
+            Assert.Equal(150, waypoints[0].Y);
+            Assert.False(waypoints[0].IsRelative);
+        }
+        
+        [Fact]
+        public void AddWaypoint_WithPosition_ShouldInsertAtSpecifiedIndex()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Add first waypoint
+            var diagramWithOneWaypoint = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 200, 150, false, null);
+            
+            // Act - Add another waypoint at beginning
+            var updatedDiagram = DiagramManipulation.addWaypoint(diagramWithOneWaypoint, 0, connectorId, 150, 125, false, Some.FromValue(0));
+            
+            // Assert
+            var waypoints = DiagramManipulation.getWaypoints(updatedDiagram, 0, connectorId);
+            Assert.Equal(2, waypoints.Count);
+            Assert.Equal(150, waypoints[0].X);
+            Assert.Equal(125, waypoints[0].Y);
+            Assert.Equal(200, waypoints[1].X);
+            Assert.Equal(150, waypoints[1].Y);
+        }
+        
+        [Fact]
+        public void RemoveWaypoint_ShouldRemoveSpecifiedWaypoint()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Add two waypoints
+            var diagramWithOneWaypoint = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 150, 125, false, null);
+            var diagramWithTwoWaypoints = DiagramManipulation.addWaypoint(diagramWithOneWaypoint, 0, connectorId, 200, 150, false, null);
+            
+            // Verify we have two waypoints
+            var initialWaypoints = DiagramManipulation.getWaypoints(diagramWithTwoWaypoints, 0, connectorId);
+            Assert.Equal(2, initialWaypoints.Count);
+            
+            // Act - Remove the first waypoint
+            var updatedDiagram = DiagramManipulation.removeWaypoint(diagramWithTwoWaypoints, 0, connectorId, 0);
+            
+            // Assert
+            var remainingWaypoints = DiagramManipulation.getWaypoints(updatedDiagram, 0, connectorId);
+            Assert.Single(remainingWaypoints);
+            Assert.Equal(200, remainingWaypoints[0].X);
+            Assert.Equal(150, remainingWaypoints[0].Y);
+        }
+        
+        [Fact]
+        public void UpdateWaypoint_ShouldModifyWaypointPosition()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Add a waypoint
+            var diagramWithWaypoint = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 200, 150, false, null);
+            
+            // Act - Update the waypoint
+            var updatedDiagram = DiagramManipulation.updateWaypoint(diagramWithWaypoint, 0, connectorId, 0, Some.FromValue(250.0), Some.FromValue(200.0));
+            
+            // Assert
+            var waypoints = DiagramManipulation.getWaypoints(updatedDiagram, 0, connectorId);
+            Assert.Single(waypoints);
+            Assert.Equal(250, waypoints[0].X);
+            Assert.Equal(200, waypoints[0].Y);
+        }
+        
+        [Fact]
+        public void UpdateWaypoint_WithPartialValues_ShouldOnlyUpdateSpecifiedProperties()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Add a waypoint
+            var diagramWithWaypoint = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 200, 150, false, null);
+            
+            // Act - Update only the Y coordinate
+            var updatedDiagram = DiagramManipulation.updateWaypoint(diagramWithWaypoint, 0, connectorId, 0, None.Value, Some.FromValue(200.0));
+            
+            // Assert
+            var waypoints = DiagramManipulation.getWaypoints(updatedDiagram, 0, connectorId);
+            Assert.Single(waypoints);
+            Assert.Equal(200, waypoints[0].X); // X should remain unchanged
+            Assert.Equal(200, waypoints[0].Y); // Y should be updated
+        }
+        
+        [Fact]
+        public void ClearWaypoints_ShouldRemoveAllWaypoints()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Add multiple waypoints
+            var diagramWithOneWaypoint = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 150, 125, false, null);
+            var diagramWithTwoWaypoints = DiagramManipulation.addWaypoint(diagramWithOneWaypoint, 0, connectorId, 200, 150, false, null);
+            var diagramWithThreeWaypoints = DiagramManipulation.addWaypoint(diagramWithTwoWaypoints, 0, connectorId, 250, 125, false, null);
+            
+            // Verify we have three waypoints
+            var initialWaypoints = DiagramManipulation.getWaypoints(diagramWithThreeWaypoints, 0, connectorId);
+            Assert.Equal(3, initialWaypoints.Count);
+            
+            // Act - Clear all waypoints
+            var updatedDiagram = DiagramManipulation.clearWaypoints(diagramWithThreeWaypoints, 0, connectorId);
+            
+            // Assert
+            var remainingWaypoints = DiagramManipulation.getWaypoints(updatedDiagram, 0, connectorId);
+            Assert.Empty(remainingWaypoints);
+        }
+        
+        [Fact]
+        public void GetWaypoints_NonExistentConnector_ShouldThrowException()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => 
+                DiagramManipulation.getWaypoints(diagram, 0, "non-existent-id"));
+        }
+        
+        [Fact]
+        public void AddWaypoint_ToVertexNotEdge_ShouldThrowException()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape, shapeId) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => 
+                DiagramManipulation.addWaypoint(diagramWithShape, 0, shapeId, 200, 150, false, null));
+        }
+        
+        [Fact]
+        public void RemoveWaypoint_InvalidIndex_ShouldThrowException()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Add a waypoint
+            var diagramWithWaypoint = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 200, 150, false, null);
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => 
+                DiagramManipulation.removeWaypoint(diagramWithWaypoint, 0, connectorId, 1)); // Index 1 is out of range
+        }
+        
+        [Fact]
+        public void UpdateWaypoint_InvalidIndex_ShouldThrowException()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShapes, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithTwoShapes, shape2Id) = DiagramManipulation.addShape(diagramWithShapes, 0, "Shape 2", 300, 100, 120, 60, "rectangle");
+            var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
+            
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => 
+                DiagramManipulation.updateWaypoint(diagramWithConnector, 0, connectorId, 0, Some.FromValue(250.0), Some.FromValue(200.0)));
+        }
     }
 } 

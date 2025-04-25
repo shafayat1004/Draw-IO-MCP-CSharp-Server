@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -7,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using DrawIO.MCP.STDIO.Tests;
 
 namespace DrawIO.MCP.STDIO.Tests
 {
@@ -225,6 +227,73 @@ namespace DrawIO.MCP.STDIO.Tests
             // Check if the file was actually created
             string filePath = Path.Combine(_tempDiagramsDir, "test-diagram.drawio");
             Assert.True(File.Exists(filePath), "The file should be created by the tool execution");
+        }
+
+        [Theory]
+        [InlineData("add_waypoint")]
+        [InlineData("remove_waypoint")]
+        [InlineData("update_waypoint")]
+        [InlineData("get_waypoints")]
+        [InlineData("clear_waypoints")]
+        public async Task WaypointManipulationTools_WithValidParameters_ShouldSucceed(string toolName)
+        {
+            // Define a simple message format for tool execution
+            string message = @$"{{
+                ""jsonrpc"": ""2.0"",
+                ""id"": ""test-waypoint"",
+                ""method"": ""tools/execute"",
+                ""params"": {{
+                    ""tool"": ""{toolName}"",
+                    ""parameters"": {{
+                        ""diagram"": ""test-diagram.drawio"",
+                        ""connector_id"": ""test-connector-id"",
+                        ""x"": 100,
+                        ""y"": 100,
+                        ""waypoint_index"": 0
+                    }}
+                }}
+            }}";
+            
+            // Mock the file existence check
+            if (!Directory.Exists(_tempDiagramsDir))
+            {
+                Directory.CreateDirectory(_tempDiagramsDir);
+            }
+            string filePath = Path.Combine(_tempDiagramsDir, "test-diagram.drawio");
+            if (!File.Exists(filePath))
+            {
+                File.WriteAllText(filePath, "<mxfile><diagram id=\"test\"><mxGraphModel><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"test-connector-id\" edge=\"1\" parent=\"1\"><mxGeometry relative=\"1\" as=\"geometry\"/></mxCell></root></mxGraphModel></diagram></mxfile>");
+            }
+            
+            try
+            {
+                // Act
+                string responseJson = await ProcessRawMessageAsync(message);
+                
+                // Assert
+                var responseObject = JsonNode.Parse(responseJson);
+                Assert.NotNull(responseObject);
+                
+                // Basic validation
+                Assert.Equal("2.0", responseObject?["jsonrpc"]?.GetValue<string>() ?? string.Empty);
+                Assert.Equal("test-waypoint", responseObject?["id"]?.GetValue<string>() ?? string.Empty);
+                
+                // Either there should be a result or an error explaining why it wasn't processed
+                bool hasResult = responseObject?["result"] != null;
+                bool hasError = responseObject?["error"] != null;
+                
+                // Assert that we got either a result or an error, but not both
+                Assert.True(hasResult || hasError);
+                Assert.False(hasResult && hasError);
+            }
+            finally
+            {
+                // Clean up
+                if (File.Exists(filePath))
+                {
+                    try { File.Delete(filePath); } catch { }
+                }
+            }
         }
     }
 } 

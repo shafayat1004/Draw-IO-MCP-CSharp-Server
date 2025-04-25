@@ -61,6 +61,11 @@ namespace DrawIO.MCP.STDIO
                     "set_arrow_style" => await SetArrowStyleAsync(arguments, diagramsDirectory),
                     "reset_connector" => await ResetConnectorAsync(arguments, diagramsDirectory),
                     "reverse_connector" => await ReverseConnectorAsync(arguments, diagramsDirectory),
+                    "add_waypoint" => await AddWaypointAsync(arguments, diagramsDirectory),
+                    "remove_waypoint" => await RemoveWaypointAsync(arguments, diagramsDirectory),
+                    "update_waypoint" => await UpdateWaypointAsync(arguments, diagramsDirectory),
+                    "get_waypoints" => await GetWaypointsAsync(arguments, diagramsDirectory),
+                    "clear_waypoints" => await ClearWaypointsAsync(arguments, diagramsDirectory),
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
@@ -2143,6 +2148,236 @@ namespace DrawIO.MCP.STDIO
                 ["Status"] = "success",
                 ["NewConnectorId"] = newConnectorId,
                 ["content"] = messageContent
+            });
+        }
+
+        private static Task<object> AddWaypointAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string connectorId = GetParameterString(parameters, "connector_id");
+            float x = GetParameterFloat(parameters, "x");
+            float y = GetParameterFloat(parameters, "y");
+            
+            // Optional parameters
+            bool isRelative = parameters.TryGetProperty("is_relative", out var relativeParam) && relativeParam.GetBoolean();
+            int? position = parameters.TryGetProperty("position", out var positionParam) ? (int?)positionParam.GetInt32() : null;
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var diagramObj = LoadDiagram(filePath);
+            
+            // Create some value to pass to F# Option
+            Microsoft.FSharp.Core.FSharpOption<int> positionOption = 
+                position.HasValue ? Microsoft.FSharp.Core.FSharpOption<int>.Some(position.Value) : null;
+            
+            // Add waypoint to the connector
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.addWaypoint(
+                diagramObj, 
+                0, // page index
+                connectorId,
+                x,
+                y,
+                isRelative,
+                positionOption
+            );
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Added waypoint at ({x}, {y}) to connector {connectorId}" 
+                    } 
+                }
+            });
+        }
+        
+        private static Task<object> RemoveWaypointAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string connectorId = GetParameterString(parameters, "connector_id");
+            int waypointIndex = GetParameterInt(parameters, "waypoint_index");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var diagramObj = LoadDiagram(filePath);
+            
+            // Remove waypoint from connector
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.removeWaypoint(
+                diagramObj, 
+                0, // page index
+                connectorId,
+                waypointIndex
+            );
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Removed waypoint at index {waypointIndex} from connector {connectorId}" 
+                    } 
+                }
+            });
+        }
+        
+        private static Task<object> UpdateWaypointAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string connectorId = GetParameterString(parameters, "connector_id");
+            int waypointIndex = GetParameterInt(parameters, "waypoint_index");
+            
+            // Optional parameters - allow updating just x, just y, or both
+            float? x = parameters.TryGetProperty("x", out var xParam) ? (float?)xParam.GetSingle() : null;
+            float? y = parameters.TryGetProperty("y", out var yParam) ? (float?)yParam.GetSingle() : null;
+            
+            if (x == null && y == null)
+            {
+                throw new ArgumentException("At least one of 'x' or 'y' must be provided");
+            }
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var diagramObj = LoadDiagram(filePath);
+            
+            // Create F# options for x and y values
+            Microsoft.FSharp.Core.FSharpOption<double> xOption = 
+                x.HasValue ? Microsoft.FSharp.Core.FSharpOption<double>.Some(x.Value) : null;
+            Microsoft.FSharp.Core.FSharpOption<double> yOption = 
+                y.HasValue ? Microsoft.FSharp.Core.FSharpOption<double>.Some(y.Value) : null;
+            
+            // Update waypoint position
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateWaypoint(
+                diagramObj, 
+                0, // page index
+                connectorId,
+                waypointIndex,
+                xOption,
+                yOption
+            );
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Updated waypoint at index {waypointIndex} for connector {connectorId}" 
+                    } 
+                }
+            });
+        }
+        
+        private static Task<object> GetWaypointsAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string connectorId = GetParameterString(parameters, "connector_id");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var diagramObj = LoadDiagram(filePath);
+            
+            // Get waypoints
+            var waypoints = DrawIO.MCP.Core.DiagramManipulation.getWaypoints(
+                diagramObj, 
+                0, // page index
+                connectorId
+            );
+            
+            // Convert waypoints to simplified objects for JSON response
+            var waypointList = waypoints.Select((wp, index) => new 
+            {
+                index,
+                x = wp.X,
+                y = wp.Y,
+                is_relative = wp.IsRelative
+            }).ToArray();
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                DiagramId = $"diagram://{diagram}",
+                waypoints = waypointList,
+                count = waypointList.Length,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Retrieved {waypointList.Length} waypoints from connector {connectorId}" 
+                    } 
+                }
+            });
+        }
+        
+        private static Task<object> ClearWaypointsAsync(JsonElement parameters, string diagramsDirectory)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string connectorId = GetParameterString(parameters, "connector_id");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var diagramObj = LoadDiagram(filePath);
+            
+            // Clear waypoints
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.clearWaypoints(
+                diagramObj, 
+                0, // page index
+                connectorId
+            );
+            SaveDiagram(updatedDiagram, filePath);
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                DiagramId = $"diagram://{diagram}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Cleared all waypoints from connector {connectorId}" 
+                    } 
+                }
             });
         }
     }

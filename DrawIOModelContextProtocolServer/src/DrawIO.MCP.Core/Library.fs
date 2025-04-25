@@ -21,11 +21,19 @@ module Types =
         Height: float
     }
 
+    /// A waypoint for a connector
+    type Waypoint = {
+        X: float
+        Y: float
+        IsRelative: bool
+    }
+
     /// Geometry of an element
     type Geometry = {
         Position: Position
         Size: Size
         Relative: bool
+        Waypoints: Waypoint list
     }
 
     /// An element in the diagram
@@ -67,6 +75,7 @@ module Types =
         IsEdge: bool
         Source: string option
         Target: string option
+        Waypoints: Waypoint list option
     }
     
     /// Bounding box of a diagram
@@ -94,6 +103,34 @@ module XmlParser =
             XDocument.Parse(xml)
         with ex ->
             raise <| Exception($"Failed to decode diagram content: {ex.Message}", ex)
+    
+    /// Parse a waypoint from an mxPoint element
+    let parseWaypoint (pointElement: XElement) =
+        if pointElement = null then None
+        else
+            try
+                let x = 
+                    match pointElement.Attribute(XName.Get("x")) with 
+                    | null -> 0.0 
+                    | attr -> Double.Parse(attr.Value)
+                
+                let y = 
+                    match pointElement.Attribute(XName.Get("y")) with 
+                    | null -> 0.0 
+                    | attr -> Double.Parse(attr.Value)
+                
+                let isRelative = 
+                    match pointElement.Attribute(XName.Get("relative")) with 
+                    | null -> false 
+                    | attr -> attr.Value = "1" || attr.Value = "true"
+                
+                Some {
+                    X = x
+                    Y = y
+                    IsRelative = isRelative
+                }
+            with ex ->
+                None
     
     /// Parse geometry attributes from an mxCell element
     let parseGeometry (geometryElement: XElement) =
@@ -125,10 +162,36 @@ module XmlParser =
                     | null -> false 
                     | attr -> attr.Value = "1"
                 
+                // Parse waypoints from mxPoint elements
+                let waypoints =
+                    // First check for Array element with as="points" attribute
+                    let arrayElement = 
+                        geometryElement.Elements(XName.Get("Array"))
+                        |> Seq.tryFind (fun elem -> 
+                            match elem.Attribute(XName.Get("as")) with
+                            | null -> false
+                            | attr -> attr.Value = "points")
+                    
+                    match arrayElement with
+                    | Some array -> 
+                        // Parse waypoints from inside the Array element
+                        array.Elements(XName.Get("mxPoint"))
+                        |> Seq.choose parseWaypoint
+                        |> Seq.toList
+                    | None ->
+                        // Fallback to direct mxPoint elements for backward compatibility
+                        if Seq.isEmpty (geometryElement.Elements(XName.Get("mxPoint"))) then
+                            []
+                        else
+                            geometryElement.Elements(XName.Get("mxPoint"))
+                            |> Seq.choose parseWaypoint
+                            |> Seq.toList
+                
                 Some {
                     Position = { X = x; Y = y }
                     Size = { Width = width; Height = height }
                     Relative = relative
+                    Waypoints = waypoints
                 }
             with ex ->
                 None
@@ -286,6 +349,7 @@ module DiagramManipulation =
                 Position = { X = x; Y = y }
                 Size = { Width = width; Height = height }
                 Relative = false
+                Waypoints = []
             }
         }
     
@@ -304,6 +368,7 @@ module DiagramManipulation =
                 Position = { X = 0.0; Y = 0.0 }
                 Size = { Width = 0.0; Height = 0.0 }
                 Relative = true
+                Waypoints = []
             }
         }
     
@@ -383,6 +448,7 @@ module DiagramManipulation =
                 Position = { X = x; Y = y }
                 Size = { Width = width; Height = height }
                 Relative = false
+                Waypoints = []
             }
         }
         
@@ -435,6 +501,7 @@ module DiagramManipulation =
                 Position = { X = 0.0; Y = 0.0 }
                 Size = { Width = 0.0; Height = 0.0 }
                 Relative = true
+                Waypoints = []
             }
         }
         
@@ -524,6 +591,7 @@ module DiagramManipulation =
                         Position = updatedPosition
                         Size = updatedSize
                         Relative = geo.Relative
+                        Waypoints = geo.Waypoints
                     }
             
             // Update the style if provided
@@ -889,6 +957,11 @@ module DiagramManipulation =
                 | Some geo -> Some geo.Position, Some geo.Size
                 | None -> None, None
             
+            let waypoints = 
+                match element.Geometry with
+                | Some geo -> Some geo.Waypoints
+                | None -> None
+            
             Some {
                 Id = element.Id
                 Type = elementType
@@ -901,6 +974,7 @@ module DiagramManipulation =
                 IsEdge = element.IsEdge
                 Source = element.Source
                 Target = element.Target
+                Waypoints = waypoints
             }
     
     /// List all neighboring elements connected to the specified element
@@ -970,6 +1044,247 @@ module DiagramManipulation =
                 Height = maxY - minY
             }
 
+    /// Gets waypoints from a connector
+    let getWaypoints (diagram: Diagram) (pageIndex: int) (connectorId: string) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        // Find the connector
+        match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
+        | None -> 
+            raise <| ArgumentException($"Connector with ID {connectorId} not found")
+        | Some cell ->
+            if not cell.IsEdge then
+                raise <| ArgumentException($"Element with ID {connectorId} is not a connector")
+            
+            // Return waypoints or empty list if no geometry or waypoints
+            match cell.Geometry with
+            | Some geo -> geo.Waypoints
+            | None -> []
+    
+    /// Adds a waypoint to a connector
+    let addWaypoint (diagram: Diagram) (pageIndex: int) (connectorId: string) (x: float) (y: float) (isRelative: bool) (position: int option) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        // Find the connector
+        match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
+        | None -> 
+            raise <| ArgumentException($"Connector with ID {connectorId} not found")
+        | Some cell ->
+            if not cell.IsEdge then
+                raise <| ArgumentException($"Element with ID {connectorId} is not a connector")
+            
+            // Create the new waypoint
+            let newWaypoint = {
+                X = x
+                Y = y
+                IsRelative = isRelative
+            }
+            
+            // Update the connector's geometry with the new waypoint
+            let updatedGeometry = 
+                match cell.Geometry with
+                | None -> 
+                    // If no geometry exists, create one with just this waypoint
+                    Some {
+                        Position = { X = 0.0; Y = 0.0 }
+                        Size = { Width = 0.0; Height = 0.0 }
+                        Relative = true
+                        Waypoints = [newWaypoint]
+                    }
+                | Some geo ->
+                    // Insert the waypoint at the specified position or append to the end
+                    let updatedWaypoints =
+                        match position with
+                        | Some pos when pos >= 0 && pos <= geo.Waypoints.Length ->
+                            let (before, after) = List.splitAt pos geo.Waypoints
+                            before @ [newWaypoint] @ after
+                        | _ ->
+                            // Default to adding at the end
+                            geo.Waypoints @ [newWaypoint]
+                    
+                    Some { geo with Waypoints = updatedWaypoints }
+            
+            // Create an updated connector cell
+            let updatedCell = { cell with Geometry = updatedGeometry }
+            
+            // Update the diagram with the new cell
+            let updatedCells = 
+                page.Cells 
+                |> List.map (fun c -> if c.Id = connectorId then updatedCell else c)
+            
+            let updatedPage = { page with Cells = updatedCells }
+            
+            let updatedPages = 
+                diagram.Pages
+                |> List.mapi (fun i p -> if i = pageIndex then updatedPage else p)
+            
+            let updatedDiagram = { 
+                diagram with 
+                    Modified = DateTime.Now
+                    Pages = updatedPages 
+            }
+            
+            updatedDiagram
+    
+    /// Removes a waypoint from a connector by index
+    let removeWaypoint (diagram: Diagram) (pageIndex: int) (connectorId: string) (waypointIndex: int) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        // Find the connector
+        match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
+        | None -> 
+            raise <| ArgumentException($"Connector with ID {connectorId} not found")
+        | Some cell ->
+            if not cell.IsEdge then
+                raise <| ArgumentException($"Element with ID {connectorId} is not a connector")
+            
+            // Update the connector's geometry by removing the waypoint
+            let updatedGeometry = 
+                match cell.Geometry with
+                | None -> None
+                | Some geo ->
+                    if waypointIndex < 0 || waypointIndex >= geo.Waypoints.Length then
+                        raise <| ArgumentException($"Waypoint index {waypointIndex} is out of range")
+                    
+                    let updatedWaypoints = 
+                        geo.Waypoints 
+                        |> List.mapi (fun i wp -> (i, wp))
+                        |> List.filter (fun (i, _) -> i <> waypointIndex)
+                        |> List.map snd
+                    
+                    Some { geo with Waypoints = updatedWaypoints }
+            
+            // Create an updated connector cell
+            let updatedCell = { cell with Geometry = updatedGeometry }
+            
+            // Update the diagram with the new cell
+            let updatedCells = 
+                page.Cells 
+                |> List.map (fun c -> if c.Id = connectorId then updatedCell else c)
+            
+            let updatedPage = { page with Cells = updatedCells }
+            
+            let updatedPages = 
+                diagram.Pages
+                |> List.mapi (fun i p -> if i = pageIndex then updatedPage else p)
+            
+            let updatedDiagram = { 
+                diagram with 
+                    Modified = DateTime.Now
+                    Pages = updatedPages 
+            }
+            
+            updatedDiagram
+    
+    /// Updates a waypoint's position
+    let updateWaypoint (diagram: Diagram) (pageIndex: int) (connectorId: string) (waypointIndex: int) (x: float option) (y: float option) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        // Find the connector
+        match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
+        | None -> 
+            raise <| ArgumentException($"Connector with ID {connectorId} not found")
+        | Some cell ->
+            if not cell.IsEdge then
+                raise <| ArgumentException($"Element with ID {connectorId} is not a connector")
+            
+            // Update the connector's geometry by modifying the waypoint
+            let updatedGeometry = 
+                match cell.Geometry with
+                | None -> None
+                | Some geo ->
+                    if waypointIndex < 0 || waypointIndex >= geo.Waypoints.Length then
+                        raise <| ArgumentException($"Waypoint index {waypointIndex} is out of range")
+                    
+                    let updatedWaypoints = 
+                        geo.Waypoints 
+                        |> List.mapi (fun i wp -> 
+                            if i = waypointIndex then
+                                let newX = match x with Some value -> value | None -> wp.X
+                                let newY = match y with Some value -> value | None -> wp.Y
+                                { wp with X = newX; Y = newY }
+                            else
+                                wp)
+                    
+                    Some { geo with Waypoints = updatedWaypoints }
+            
+            // Create an updated connector cell
+            let updatedCell = { cell with Geometry = updatedGeometry }
+            
+            // Update the diagram with the new cell
+            let updatedCells = 
+                page.Cells 
+                |> List.map (fun c -> if c.Id = connectorId then updatedCell else c)
+            
+            let updatedPage = { page with Cells = updatedCells }
+            
+            let updatedPages = 
+                diagram.Pages
+                |> List.mapi (fun i p -> if i = pageIndex then updatedPage else p)
+            
+            let updatedDiagram = { 
+                diagram with 
+                    Modified = DateTime.Now
+                    Pages = updatedPages 
+            }
+            
+            updatedDiagram
+    
+    /// Clears all waypoints from a connector
+    let clearWaypoints (diagram: Diagram) (pageIndex: int) (connectorId: string) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        
+        // Find the connector
+        match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
+        | None -> 
+            raise <| ArgumentException($"Connector with ID {connectorId} not found")
+        | Some cell ->
+            if not cell.IsEdge then
+                raise <| ArgumentException($"Element with ID {connectorId} is not a connector")
+            
+            // Update the connector's geometry by clearing waypoints
+            let updatedGeometry = 
+                match cell.Geometry with
+                | None -> None
+                | Some geo -> Some { geo with Waypoints = [] }
+            
+            // Create an updated connector cell
+            let updatedCell = { cell with Geometry = updatedGeometry }
+            
+            // Update the diagram with the new cell
+            let updatedCells = 
+                page.Cells 
+                |> List.map (fun c -> if c.Id = connectorId then updatedCell else c)
+            
+            let updatedPage = { page with Cells = updatedCells }
+            
+            let updatedPages = 
+                diagram.Pages
+                |> List.mapi (fun i p -> if i = pageIndex then updatedPage else p)
+            
+            let updatedDiagram = { 
+                diagram with 
+                    Modified = DateTime.Now
+                    Pages = updatedPages 
+            }
+            
+            updatedDiagram
+
 /// Functions for serializing DrawIO diagrams to XML
 module XmlSerializer =
     open Types
@@ -995,6 +1310,24 @@ module XmlSerializer =
                 
             if geo.Relative then
                 element.SetAttributeValue(XName.Get("relative"), "1")
+            
+            // Add waypoints if any exist
+            if not (List.isEmpty geo.Waypoints) then
+                // Create an Array element to hold the waypoints
+                let arrayElement = XElement(XName.Get("Array"))
+                arrayElement.SetAttributeValue(XName.Get("as"), "points")
+                
+                // Add each waypoint to the array
+                for waypoint in geo.Waypoints do
+                    let pointElement = XElement(XName.Get("mxPoint"))
+                    pointElement.SetAttributeValue(XName.Get("x"), waypoint.X)
+                    pointElement.SetAttributeValue(XName.Get("y"), waypoint.Y)
+                    if waypoint.IsRelative then
+                        pointElement.SetAttributeValue(XName.Get("relative"), "1")
+                    arrayElement.Add(pointElement)
+                
+                // Add the array to the geometry element
+                element.Add(arrayElement)
                 
             element.SetAttributeValue(XName.Get("as"), "geometry")
             element

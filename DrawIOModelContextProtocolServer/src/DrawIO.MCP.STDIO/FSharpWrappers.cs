@@ -38,8 +38,9 @@ namespace DrawIO.MCP.STDIO
             {
                 var position = new FSharpTypes.Position(x, y);
                 var size = new FSharpTypes.Size(width, height);
+                var emptyWaypoints = ListModule.Empty<FSharpTypes.Waypoint>();
                 
-                return new FSharpTypes.Geometry(position, size, relative);
+                return new FSharpTypes.Geometry(position, size, relative, emptyWaypoints);
             }
         }
         

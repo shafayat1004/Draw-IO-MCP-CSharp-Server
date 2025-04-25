@@ -961,7 +961,210 @@ namespace DrawIO.MCP.STDIO
                             }
                         }
                     }
-                }
+                },
+                // Waypoint manipulation tools
+                new McpToolDefinition
+                {
+                    Name = "add_waypoint",
+                    Description = "Add a waypoint to a connector for precise path control",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to add waypoint to",
+                                Required = true
+                            }
+                        },
+                        {
+                            "x",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "X position of the waypoint",
+                                Required = true
+                            }
+                        },
+                        {
+                            "y",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Y position of the waypoint",
+                                Required = true
+                            }
+                        },
+                        {
+                            "is_relative",
+                            new McpParameterDefinition
+                            {
+                                Type = "boolean",
+                                Description = "Whether the waypoint position is relative (defaults to false)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "position",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index position to insert waypoint (defaults to end of waypoint list)",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "remove_waypoint",
+                    Description = "Remove a waypoint from a connector",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to remove waypoint from",
+                                Required = true
+                            }
+                        },
+                        {
+                            "waypoint_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the waypoint to remove",
+                                Required = true
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "update_waypoint",
+                    Description = "Update a waypoint's position on a connector",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to update waypoint on",
+                                Required = true
+                            }
+                        },
+                        {
+                            "waypoint_index",
+                            new McpParameterDefinition
+                            {
+                                Type = "integer",
+                                Description = "Index of the waypoint to update",
+                                Required = true
+                            }
+                        },
+                        {
+                            "x",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "New X position for the waypoint",
+                                Required = false
+                            }
+                        },
+                        {
+                            "y",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "New Y position for the waypoint",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "get_waypoints",
+                    Description = "Get all waypoints on a connector",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to get waypoints from",
+                                Required = true
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "clear_waypoints",
+                    Description = "Remove all waypoints from a connector, resetting to default path",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "connector_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the connector to clear waypoints from",
+                                Required = true
+                            }
+                        }
+                    }
+                },
             };
 
             // Return a result with the array of tools properly structured
