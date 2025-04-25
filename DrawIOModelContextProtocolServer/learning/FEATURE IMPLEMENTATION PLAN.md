@@ -300,6 +300,10 @@ Our current implementation supports sophisticated connector styling and routing 
    - Support custom shapes
    - Enable extensions
 
+3. **Protocol Compliance Enhancements**
+   - Implement `$/cancelRequest` handler (for 2025-03-26 compliance)
+   - Investigate `CancellationToken` integration for cancellable tool execution
+
 ## Implementation Strategy
 
 1. ✅ **Waypoint Implementation** - COMPLETED
