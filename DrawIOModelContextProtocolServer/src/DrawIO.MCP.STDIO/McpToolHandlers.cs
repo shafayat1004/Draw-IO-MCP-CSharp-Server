@@ -1240,6 +1240,219 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
+                // Add new tool definitions after the existing tools
+                new McpToolDefinition
+                {
+                    Name = "rotate_shape",
+                    Description = "Rotate a shape by a specified angle",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to rotate",
+                                Required = true
+                            }
+                        },
+                        {
+                            "angle",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Rotation angle in degrees",
+                                Required = true
+                            }
+                        },
+                        {
+                            "return_diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "boolean",
+                                Description = "Whether to include the diagram image in the response",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "flip_shape",
+                    Description = "Flip a shape horizontally or vertically",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "shape_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the shape to flip",
+                                Required = true
+                            }
+                        },
+                        {
+                            "direction",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Direction to flip (horizontal or vertical)",
+                                Required = true
+                            }
+                        },
+                        {
+                            "return_diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "boolean",
+                                Description = "Whether to include the diagram image in the response",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "set_diagram_background",
+                    Description = "Set the background color or image for a diagram",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "background_color",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Background color in hex format (e.g., #f5f5f5)",
+                                Required = false
+                            }
+                        },
+                        {
+                            "background_image",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "URL or path to background image",
+                                Required = false
+                            }
+                        },
+                        {
+                            "return_diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "boolean",
+                                Description = "Whether to include the diagram image in the response",
+                                Required = false
+                            }
+                        }
+                    }
+                },
+                new McpToolDefinition
+                {
+                    Name = "connect_shapes_at_points",
+                    Description = "Connect two shapes with an arrow at specific points",
+                    SchemaInputs = new Dictionary<string, McpParameterDefinition>
+                    {
+                        {
+                            "diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "Diagram filename",
+                                Required = true
+                            }
+                        },
+                        {
+                            "source_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the source shape",
+                                Required = true
+                            }
+                        },
+                        {
+                            "target_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the target shape",
+                                Required = true
+                            }
+                        },
+                        {
+                            "source_x",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "X coordinate on the source shape",
+                                Required = false
+                            }
+                        },
+                        {
+                            "source_y",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Y coordinate on the source shape",
+                                Required = false
+                            }
+                        },
+                        {
+                            "target_x",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "X coordinate on the target shape",
+                                Required = false
+                            }
+                        },
+                        {
+                            "target_y",
+                            new McpParameterDefinition
+                            {
+                                Type = "number",
+                                Description = "Y coordinate on the target shape",
+                                Required = false
+                            }
+                        },
+                        {
+                            "return_diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "boolean",
+                                Description = "Whether to include the diagram image in the response",
+                                Required = false
+                            }
+                        }
+                    }
+                },
             };
 
             // Add the return_diagram parameter to all relevant tools

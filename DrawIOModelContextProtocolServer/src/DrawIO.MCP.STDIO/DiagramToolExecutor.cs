@@ -68,6 +68,10 @@ namespace DrawIO.MCP.STDIO
                     "clear_waypoints" => await ClearWaypointsAsync(arguments, diagramsDirectory),
                     "group_shapes" => await GroupShapesAsync(arguments, diagramsDirectory),
                     "ungroup_shapes" => await UngroupShapesAsync(arguments, diagramsDirectory),
+                    "rotate_shape" => await RotateShapeAsync(arguments, diagramsDirectory, verbose, logWriter),
+                    "flip_shape" => await FlipShapeAsync(arguments, diagramsDirectory, verbose, logWriter),
+                    "set_diagram_background" => await SetDiagramBackgroundAsync(arguments, diagramsDirectory, logWriter, verbose),
+                    "connect_shapes_at_points" => await ConnectShapesAtPointsAsync(arguments, diagramsDirectory, logWriter, verbose),
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
@@ -2667,6 +2671,322 @@ namespace DrawIO.MCP.STDIO
                     }
                 });
             }
+        }
+
+        // Add right before the last closing brace of the class
+        private static Task<object> RotateShapeAsync(JsonElement parameters, string diagramsDirectory, bool verbose = false, TextWriter logWriter = null)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string shapeId = GetParameterString(parameters, "shape_id");
+            float angle = GetParameterFloat(parameters, "angle");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Convert FlipDirection from string to enum
+            Microsoft.FSharp.Core.FSharpOption<string> direction = null;
+            
+            // Rotate the shape
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.rotateShape(loadedDiagram, shapeId, angle);
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            bool returnDiagram = false;
+            if (parameters.TryGetProperty("return_diagram", out var returnDiagramProp))
+            {
+                returnDiagram = returnDiagramProp.GetBoolean();
+            }
+            
+            if (returnDiagram)
+            {
+                return GetDiagramImageAsync(parameters, diagramsDirectory, logWriter, verbose);
+            }
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                message = $"Shape {shapeId} rotated by {angle} degrees",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Shape {shapeId} rotated by {angle} degrees" 
+                    } 
+                }
+            });
+        }
+
+        private static Task<object> FlipShapeAsync(JsonElement parameters, string diagramsDirectory, bool verbose = false, TextWriter logWriter = null)
+        {
+            string diagram = GetParameterString(parameters, "diagram");
+            string shapeId = GetParameterString(parameters, "shape_id");
+            string directionStr = GetParameterString(parameters, "direction");
+            
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+            }
+            
+            // Load the diagram
+            var loadedDiagram = LoadDiagram(filePath);
+            
+            // Convert direction from string to enum
+            DrawIO.MCP.Core.DiagramManipulation.FlipDirection flipDirection;
+            if (string.Equals(directionStr, "horizontal", StringComparison.OrdinalIgnoreCase))
+            {
+                flipDirection = DrawIO.MCP.Core.DiagramManipulation.FlipDirection.Horizontal;
+            }
+            else if (string.Equals(directionStr, "vertical", StringComparison.OrdinalIgnoreCase))
+            {
+                flipDirection = DrawIO.MCP.Core.DiagramManipulation.FlipDirection.Vertical;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid flip direction '{directionStr}'. Must be 'horizontal' or 'vertical'.");
+            }
+            
+            // Flip the shape
+            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.flipShape(loadedDiagram, shapeId, flipDirection);
+            
+            // Save the updated diagram
+            SaveDiagram(updatedDiagram, filePath);
+            
+            bool returnDiagram = false;
+            if (parameters.TryGetProperty("return_diagram", out var returnDiagramProp))
+            {
+                returnDiagram = returnDiagramProp.GetBoolean();
+            }
+            
+            if (returnDiagram)
+            {
+                return GetDiagramImageAsync(parameters, diagramsDirectory, logWriter, verbose);
+            }
+            
+            return Task.FromResult<object>(new 
+            {
+                status = "success",
+                message = $"Shape {shapeId} flipped {directionStr}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Shape {shapeId} flipped {directionStr}" 
+                    } 
+                }
+            });
+        }
+
+        private static Task<object> SetDiagramBackgroundAsync(JsonElement parameters, string diagramsDirectory, TextWriter logWriter = null, bool verbose = false)
+        {
+            try
+            {
+                // Extract parameters
+                var diagramName = GetParameterString(parameters, "diagram");
+                
+                // Try to get background color and image
+                string backgroundColor = null;
+                string backgroundImage = null;
+                
+                if (parameters.TryGetProperty("background_color", out var bgColorElement))
+                {
+                    backgroundColor = bgColorElement.GetString();
+                }
+                
+                if (parameters.TryGetProperty("background_image", out var bgImageElement))
+                {
+                    backgroundImage = bgImageElement.GetString();
+                }
+                
+                // Check that at least one parameter is provided
+                if (string.IsNullOrEmpty(backgroundColor) && string.IsNullOrEmpty(backgroundImage))
+                {
+                    throw new ArgumentException("At least one of background_color or background_image must be provided");
+                }
+                
+                // Load diagram
+                var diagramPath = Path.Combine(diagramsDirectory, diagramName);
+                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+                
+                // Create FSharpOption types for the parameters
+                FSharpOption<string> backgroundImageOption = 
+                    string.IsNullOrEmpty(backgroundImage) 
+                        ? FSharpOption<string>.None 
+                        : FSharpOption<string>.Some(backgroundImage);
+                        
+                FSharpOption<string> backgroundColorOption = 
+                    string.IsNullOrEmpty(backgroundColor) 
+                        ? FSharpOption<string>.None 
+                        : FSharpOption<string>.Some(backgroundColor);
+                
+                // Set the diagram background
+                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.setDiagramBackground(
+                    diagramObj, backgroundImageOption, backgroundColorOption);
+                
+                // Save updated diagram
+                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+                
+                // Generate response message
+                string message = "Diagram background updated";
+                if (!string.IsNullOrEmpty(backgroundColor))
+                {
+                    message += $" with color {backgroundColor}";
+                }
+                if (!string.IsNullOrEmpty(backgroundImage))
+                {
+                    message += $"{(!string.IsNullOrEmpty(backgroundColor) ? " and" : " with")} image {backgroundImage}";
+                }
+                
+                return Task.FromResult<object>(new 
+                { 
+                    status = "success",
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = message
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new
+                {
+                    isError = true,
+                    error = ex.Message,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
+        }
+
+        private static Task<object> ConnectShapesAtPointsAsync(JsonElement parameters, string diagramsDirectory, TextWriter logWriter = null, bool verbose = false)
+        {
+            try
+            {
+                // Extract parameters
+                var diagramName = GetParameterString(parameters, "diagram");
+                var sourceId = GetParameterString(parameters, "source_id");
+                var targetId = GetParameterString(parameters, "target_id");
+                var pageIndex = GetParameterInt(parameters, "page_index", 0);
+                
+                // Optional parameters
+                double? sourceX = null;
+                double? sourceY = null;
+                double? targetX = null;
+                double? targetY = null;
+                
+                if (parameters.TryGetProperty("source_x", out var sourceXElement) && sourceXElement.ValueKind == JsonValueKind.Number)
+                {
+                    sourceX = sourceXElement.GetDouble();
+                }
+                
+                if (parameters.TryGetProperty("source_y", out var sourceYElement) && sourceYElement.ValueKind == JsonValueKind.Number)
+                {
+                    sourceY = sourceYElement.GetDouble();
+                }
+                
+                if (parameters.TryGetProperty("target_x", out var targetXElement) && targetXElement.ValueKind == JsonValueKind.Number)
+                {
+                    targetX = targetXElement.GetDouble();
+                }
+                
+                if (parameters.TryGetProperty("target_y", out var targetYElement) && targetYElement.ValueKind == JsonValueKind.Number)
+                {
+                    targetY = targetYElement.GetDouble();
+                }
+                
+                // Load diagram
+                var diagramPath = Path.Combine(diagramsDirectory, diagramName);
+                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+                
+                // Create FSharpOption types for the parameters
+                FSharpOption<double> sourceXOption = 
+                    sourceX.HasValue 
+                        ? FSharpOption<double>.Some(sourceX.Value) 
+                        : FSharpOption<double>.None;
+                        
+                FSharpOption<double> sourceYOption = 
+                    sourceY.HasValue 
+                        ? FSharpOption<double>.Some(sourceY.Value) 
+                        : FSharpOption<double>.None;
+                        
+                FSharpOption<double> targetXOption = 
+                    targetX.HasValue 
+                        ? FSharpOption<double>.Some(targetX.Value) 
+                        : FSharpOption<double>.None;
+                        
+                FSharpOption<double> targetYOption = 
+                    targetY.HasValue 
+                        ? FSharpOption<double>.Some(targetY.Value) 
+                        : FSharpOption<double>.None;
+                
+                // Connect shapes at specified points
+                var (updatedDiagram, edgeId) = DrawIO.MCP.Core.DiagramManipulation.connectShapesAtPoints(
+                    diagramObj, pageIndex, sourceId, targetId, sourceXOption, sourceYOption, targetXOption, targetYOption);
+                
+                // Save updated diagram
+                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+                
+                return Task.FromResult<object>(new 
+                { 
+                    status = "success",
+                    connectorId = edgeId,
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Connected shapes {sourceId} and {targetId} with connector {edgeId}"
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new
+                {
+                    isError = true,
+                    error = ex.Message,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
+        }
+
+        // Helper method to load a diagram from a file path
+        private static DrawIO.MCP.Core.Types.Diagram LoadDiagram(string filePath)
+        {
+            return DrawIO.MCP.Core.FileOperations.loadDiagram(filePath);
+        }
+
+        // Helper method to save a diagram to a file path
+        private static void SaveDiagram(DrawIO.MCP.Core.Types.Diagram diagram, string filePath)
+        {
+            DrawIO.MCP.Core.FileOperations.saveDiagram(diagram, filePath);
         }
     }
 } 

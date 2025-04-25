@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -10,12 +11,14 @@
 
   <ItemGroup>
     <Compile Include="BasicTests.fs" />
-    <Compile Include="XmlParserTestSuite.fs" />
-    <Compile Include="ElementQueryTestSuite.fs" />
-    <Compile Include="StyleManipulationTestSuite.fs" />
-    <Compile Include="GroupOperationsTestSuite.fs" />
-    <Compile Include="FileOperationsTestSuite.fs" />
     <Compile Include="Tests.fs" />
+    <Compile Include="FileOperationsTestSuite.fs" />
+    <Compile Include="XmlParserTestSuite.fs" />
+    <Compile Include="StyleManipulationTestSuite.fs" />
+    <Compile Include="ElementQueryTestSuite.fs" />
+    <Compile Include="GroupOperationsTestSuite.fs" />
+    <Compile Include="TransformationTestSuite.fs" />
+    <Compile Include="ShapeLibraryTestSuite.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

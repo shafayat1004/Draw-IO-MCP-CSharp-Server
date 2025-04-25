@@ -25,8 +25,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddMcpServer();
 
 // Add custom services
-builder.Services.AddSingleton<DrawIoService>();
-
 var diagramsDir = Environment.GetEnvironmentVariable("DIAGRAMS_DIR") ?? 
                   Path.Combine(Directory.GetCurrentDirectory(), "diagrams");
 
@@ -34,6 +32,9 @@ if (!Directory.Exists(diagramsDir))
 {
     Directory.CreateDirectory(diagramsDir);
 }
+
+builder.Services.AddSingleton<DrawIO.MCP.SSE.DrawIoService>(sp => 
+    new DrawIO.MCP.SSE.DrawIoService(diagramsDir));
 
 var app = builder.Build();
 
@@ -63,6 +64,10 @@ app.UseMcp(mcpBuilder =>
     mcpBuilder.RegisterTool<UpdateShapeTool>();
     mcpBuilder.RegisterTool<StyleShapeTool>();
     mcpBuilder.RegisterTool<ArrangeDiagramTool>();
+    mcpBuilder.RegisterTool<RotateShapeTool>();
+    mcpBuilder.RegisterTool<FlipShapeTool>();
+    mcpBuilder.RegisterTool<SetDiagramBackgroundTool>();
+    mcpBuilder.RegisterTool<ConnectShapesAtPointsTool>();
 });
 
 // Add additional endpoints
@@ -74,320 +79,8 @@ app.Run();
 // Define the Program class to allow WebApplicationFactory<Program> to work in tests
 public partial class Program { }
 
-// Service to manage DrawIO diagram operations
-public class DrawIoService
-{
-    private readonly ILogger<DrawIoService> _logger;
-    private readonly string _diagramsDirectory;
-
-    public DrawIoService(ILogger<DrawIoService> logger)
-    {
-        _logger = logger;
-        _diagramsDirectory = Environment.GetEnvironmentVariable("DIAGRAMS_DIR") ?? 
-                             Path.Combine(Directory.GetCurrentDirectory(), "diagrams");
-        
-        if (!Directory.Exists(_diagramsDirectory))
-        {
-            Directory.CreateDirectory(_diagramsDirectory);
-        }
-    }
-
-    public string DiagramsDirectory => _diagramsDirectory;
-
-    public List<string> GetAllDiagrams()
-    {
-        return Directory.GetFiles(_diagramsDirectory, "*.drawio")
-            .Select(file => Path.GetFileName(file) ?? string.Empty)
-            .Where(name => !string.IsNullOrEmpty(name))
-            .ToList();
-    }
-
-    public async Task<Dictionary<string, string>?> GetDiagramImageAsBase64(string fileName, int pageIndex = 0, string format = "png")
-    {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".drawio";
-        }
-        
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
-        
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException($"Diagram file not found: {fileName}");
-        }
-        
-        _logger.LogInformation($"Generating diagram image for {fileName}, page {pageIndex}, format {format}");
-        
-        try
-        {
-            // Check if drawio CLI is available
-            if (!await IsDrawIoCliAvailableAsync())
-            {
-                _logger.LogWarning("drawio CLI is not available for image export");
-                return null;
-            }
-            
-            // Create a temporary file to store the output image
-            string tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{pageIndex}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
-            string outputImagePath = Path.Combine(_diagramsDirectory, tempFileName);
-            
-            // Build the drawio CLI command with proper escaping
-            string drawioCommand = $"drawio --export --format {format} --page-index {pageIndex} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
-            
-            // Try bash first
-            var bashStartInfo = new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "bash",
-                Arguments = $"-c \"{drawioCommand}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            _logger.LogDebug($"Attempting to export with bash: {bashStartInfo.FileName} {bashStartInfo.Arguments}");
-            
-            bool exportSuccess = false;
-            
-            try
-            {
-                using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
-                if (bashProcess != null)
-                {
-                    await bashProcess.WaitForExitAsync();
-                    if (bashProcess.ExitCode == 0)
-                    {
-                        exportSuccess = true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning($"bash export failed: {ex.Message}");
-            }
-
-            // If bash failed, try direct drawio call
-            if (!exportSuccess)
-            {
-                _logger.LogDebug("Falling back to direct drawio CLI call...");
-                var processStartInfo = new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = "drawio",
-                    Arguments = $"--export --format {format} --page-index {pageIndex} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                _logger.LogDebug($"Executing command: {processStartInfo.FileName} {processStartInfo.Arguments}");
-                
-                using var process = System.Diagnostics.Process.Start(processStartInfo);
-                if (process != null)
-                {
-                    await process.WaitForExitAsync();
-                    if (process.ExitCode == 0)
-                    {
-                        exportSuccess = true;
-                    }
-                }
-            }
-
-            if (!exportSuccess || !File.Exists(outputImagePath))
-            {
-                _logger.LogWarning($"Failed to generate diagram image");
-                return null;
-            }
-            
-            // Read the generated image and convert it to base64
-            byte[] imageBytes = await File.ReadAllBytesAsync(outputImagePath);
-            string base64Image = Convert.ToBase64String(imageBytes);
-            
-            // Clean up the temporary file
-            try
-            {
-                File.Delete(outputImagePath);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning($"Failed to delete temporary file {outputImagePath}: {ex.Message}");
-            }
-            
-            return new Dictionary<string, string>
-            {
-                ["type"] = "image",
-                ["data"] = base64Image,
-                ["mimeType"] = $"image/{format.ToLower()}"
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error generating diagram image: {ex.Message}");
-            return null;
-        }
-    }
-
-    private async Task<bool> IsDrawIoCliAvailableAsync()
-    {
-        try
-        {
-            var processStartInfo = new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "drawio",
-                Arguments = "--version",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            
-            using var process = System.Diagnostics.Process.Start(processStartInfo);
-            if (process != null)
-            {
-                await process.WaitForExitAsync();
-                return process.ExitCode == 0;
-            }
-        }
-        catch
-        {
-            // Command not found or other error
-        }
-        
-        return false;
-    }
-
-    public CoreTypes.Diagram GetDiagram(string fileName)
-    {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".drawio";
-        }
-        
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
-        
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException($"Diagram file not found: {fileName}");
-        }
-        
-        return CoreFileOps.loadDiagram(filePath) ?? throw new InvalidOperationException($"Failed to load diagram: {fileName}");
-    }
-
-    public CoreTypes.Diagram CreateDiagram(string fileName)
-    {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".drawio";
-        }
-        
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
-        
-        if (File.Exists(filePath))
-        {
-            throw new InvalidOperationException($"Diagram '{fileName}' already exists");
-        }
-        
-        return CoreFileOps.createNewDiagram(filePath) ?? throw new InvalidOperationException($"Failed to create new diagram: {fileName}");
-    }
-
-    public (CoreTypes.Diagram?, string) AddShape(string fileName, string value, float x, float y, float width, float height, string shape = "rectangle")
-    {
-        var diagram = GetDiagram(fileName);
-        (CoreTypes.Diagram updatedDiagram, string newId) = CoreDiagramOps.addShape(diagram, 0, value, x, y, width, height, shape);
-        SaveDiagram(updatedDiagram, fileName);
-        return (updatedDiagram, newId);
-    }
-
-    public (CoreTypes.Diagram, string) ConnectShapes(string fileName, string sourceId, string targetId)
-    {
-        var diagram = GetDiagram(fileName);
-        
-        var (updatedDiagram, connectorId) = CoreDiagramOps.connectShapes(diagram, 0, sourceId, targetId);
-        SaveDiagram(updatedDiagram, fileName);
-        
-        return (updatedDiagram, connectorId);
-    }
-
-    public CoreTypes.Diagram DeleteShape(string fileName, string shapeId)
-    {
-        var diagram = GetDiagram(fileName);
-        
-        var updatedDiagram = CoreDiagramOps.deleteShape(diagram, 0, shapeId);
-        SaveDiagram(updatedDiagram, fileName);
-        
-        return updatedDiagram;
-    }
-
-    public CoreTypes.Diagram UpdateShape(string fileName, string shapeId, string value, float? x = null, float? y = null, float? width = null, float? height = null, string? style = null)
-    {
-        var diagram = GetDiagram(fileName);
-        
-        // Convert nullable parameters to F# options with correct types (double instead of float)
-        var xOpt = x.HasValue ? FSharpOption<double>.Some((double)x.Value) : FSharpOption<double>.None;
-        var yOpt = y.HasValue ? FSharpOption<double>.Some((double)y.Value) : FSharpOption<double>.None;
-        var widthOpt = width.HasValue ? FSharpOption<double>.Some((double)width.Value) : FSharpOption<double>.None;
-        var heightOpt = height.HasValue ? FSharpOption<double>.Some((double)height.Value) : FSharpOption<double>.None;
-        var styleOpt = !string.IsNullOrEmpty(style) ? FSharpOption<string>.Some(style) : FSharpOption<string>.None;
-        
-        var updatedDiagram = CoreDiagramOps.updateShape(diagram, 0, shapeId, value, xOpt, yOpt, widthOpt, heightOpt, styleOpt);
-        SaveDiagram(updatedDiagram, fileName);
-        
-        return updatedDiagram;
-    }
-
-    public CoreTypes.Diagram ArrangeDiagram(string fileName, string layoutType)
-    {
-        var diagram = GetDiagram(fileName);
-        
-        // Convert the layout type to a valid value if needed
-        string layout = layoutType.ToLowerInvariant() switch
-        {
-            "horizontal" => "horizontal",
-            "vertical" => "vertical",
-            "radial" => "radial",
-            _ => "horizontal"
-        };
-
-        var updatedDiagram = CoreDiagramOps.arrangeLayout(diagram, 0, layout);
-        SaveDiagram(updatedDiagram, fileName);
-        
-        return updatedDiagram;
-    }
-
-    public CoreTypes.Diagram GenerateVpcDiagram(string fileName)
-    {
-        var diagram = CoreDiagramOps.createEmptyDiagram();
-
-        // Add components
-        (CoreTypes.Diagram diagramWithVpc, string vpcId) = CoreDiagramOps.addShape(diagram, 0, "VPC", 20, 20, 400, 300, "rectangle");
-        (CoreTypes.Diagram diagramWithPublicSubnet, string publicSubnetId) = CoreDiagramOps.addShape(diagramWithVpc, 0, "Public Subnet", 40, 60, 150, 120, "rectangle");
-        (CoreTypes.Diagram diagramWithPrivateSubnet, string privateSubnetId) = CoreDiagramOps.addShape(diagramWithPublicSubnet, 0, "Private Subnet", 240, 60, 150, 120, "rectangle");
-        (CoreTypes.Diagram diagramWithIgw, string igwId) = CoreDiagramOps.addShape(diagramWithPrivateSubnet, 0, "Internet Gateway", 180, 0, 80, 40, "ellipse");
-
-        // Connect components
-        (CoreTypes.Diagram diagramWithConnector1, string _) = CoreDiagramOps.connectShapes(diagramWithIgw, 0, igwId, vpcId);
-        (CoreTypes.Diagram diagramWithConnector2, string _) = CoreDiagramOps.connectShapes(diagramWithConnector1, 0, vpcId, publicSubnetId);
-        (CoreTypes.Diagram finalDiagram, string _) = CoreDiagramOps.connectShapes(diagramWithConnector2, 0, vpcId, privateSubnetId);
-
-        SaveDiagram(finalDiagram, fileName);
-        return finalDiagram;
-    }
-
-    private void SaveDiagram(CoreTypes.Diagram diagram, string fileName)
-    {
-        if (!fileName.EndsWith(".drawio", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".drawio";
-        }
-        
-        string filePath = Path.Combine(_diagramsDirectory, fileName);
-        
-        CoreFileOps.saveDiagram(diagram, filePath);
-    }
-}
-
 // MCP Resource Provider
-public class DiagramResourceProvider(DrawIoService drawIoService, ILogger<DiagramResourceProvider> logger)
+public class DiagramResourceProvider(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<DiagramResourceProvider> logger)
     : ResourceProvider
 {
     private readonly ILogger<DiagramResourceProvider> _logger = logger;
@@ -502,7 +195,7 @@ public class DiagramResourceProvider(DrawIoService drawIoService, ILogger<Diagra
 }
 
 // MCP Tools
-public class CreateNewDiagramTool(DrawIoService drawIoService, ILogger<CreateNewDiagramTool> logger)
+public class CreateNewDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<CreateNewDiagramTool> logger)
     : Tool
 {
     public override string Name => "create_new_diagram";
@@ -520,20 +213,27 @@ public class CreateNewDiagramTool(DrawIoService drawIoService, ILogger<CreateNew
         }
     };
 
-    public override Task<object> ExecuteAsync(ToolParameters parameters)
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string name = parameters.GetValue<string>("name") ?? "new-diagram.drawio";
+        string name = parameters.GetValue<string>("name") ?? throw new ArgumentException("Diagram name is required");
+        
+        if (string.IsNullOrEmpty(Path.GetExtension(name)))
+        {
+            name += ".drawio";
+        }
         
         try
         {
             var diagram = drawIoService.CreateDiagram(name);
             
-            return Task.FromResult<object>(new
+            var response = new
             {
                 Status = "created",
                 DiagramId = $"diagram://{name}",
                 FileName = name
-            });
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {
@@ -543,7 +243,7 @@ public class CreateNewDiagramTool(DrawIoService drawIoService, ILogger<CreateNew
     }
 }
 
-public class AddShapeTool(DrawIoService drawIoService, ILogger<AddShapeTool> logger) : Tool
+public class AddShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<AddShapeTool> logger) : Tool
 {
     public override string Name => "add_shape";
 
@@ -623,8 +323,7 @@ public class AddShapeTool(DrawIoService drawIoService, ILogger<AddShapeTool> log
                 DiagramId = $"diagram://{diagram}"
             };
             
-            // Add diagram image to response if requested
-            return await AddDiagramImageToResponseAsync(response, parameters, drawIoService);
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {
@@ -634,7 +333,7 @@ public class AddShapeTool(DrawIoService drawIoService, ILogger<AddShapeTool> log
     }
 }
 
-public class ConnectShapesTool(DrawIoService drawIoService, ILogger<ConnectShapesTool> logger)
+public class ConnectShapesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<ConnectShapesTool> logger)
     : Tool
 {
     public override string Name => "connect_shapes";
@@ -666,7 +365,7 @@ public class ConnectShapesTool(DrawIoService drawIoService, ILogger<ConnectShape
         }
     };
 
-    public override Task<object> ExecuteAsync(ToolParameters parameters)
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
         string sourceId = parameters.GetValue<string>("sourceId") ?? throw new ArgumentException("Source ID is required");
@@ -676,12 +375,14 @@ public class ConnectShapesTool(DrawIoService drawIoService, ILogger<ConnectShape
         {
             var (_, newId) = drawIoService.ConnectShapes(diagram, sourceId, targetId);
             
-            return Task.FromResult<object>(new
+            var response = new
             {
                 Status = "success",
                 ConnectorId = newId,
                 DiagramId = $"diagram://{diagram}"
-            });
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {
@@ -691,7 +392,7 @@ public class ConnectShapesTool(DrawIoService drawIoService, ILogger<ConnectShape
     }
 }
 
-public class GenerateVpcDiagramTool(DrawIoService drawIoService, ILogger<GenerateVpcDiagramTool> logger)
+public class GenerateVpcDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<GenerateVpcDiagramTool> logger)
     : Tool
 {
     public override string Name => "generate_vpc";
@@ -709,20 +410,27 @@ public class GenerateVpcDiagramTool(DrawIoService drawIoService, ILogger<Generat
         }
     };
 
-    public override Task<object> ExecuteAsync(ToolParameters parameters)
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         string name = parameters.GetValue<string>("name", "vpc.drawio");
+        
+        if (string.IsNullOrEmpty(Path.GetExtension(name)))
+        {
+            name += ".drawio";
+        }
         
         try
         {
             var diagram = drawIoService.GenerateVpcDiagram(name);
             
-            return Task.FromResult<object>(new
+            var response = new
             {
                 Status = "created",
                 DiagramId = $"diagram://{name}",
                 FileName = name
-            });
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {
@@ -732,7 +440,7 @@ public class GenerateVpcDiagramTool(DrawIoService drawIoService, ILogger<Generat
     }
 }
 
-public class DeleteShapeTool(DrawIoService drawIoService, ILogger<DeleteShapeTool> logger)
+public class DeleteShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<DeleteShapeTool> logger)
     : Tool
 {
     public override string Name => "delete_shape";
@@ -757,7 +465,7 @@ public class DeleteShapeTool(DrawIoService drawIoService, ILogger<DeleteShapeToo
         }
     };
 
-    public override Task<object> ExecuteAsync(ToolParameters parameters)
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
         string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
@@ -766,12 +474,14 @@ public class DeleteShapeTool(DrawIoService drawIoService, ILogger<DeleteShapeToo
         {
             drawIoService.DeleteShape(diagram, shapeId);
             
-            return Task.FromResult<object>(new
+            var response = new
             {
                 Status = "success",
                 Message = $"Shape {shapeId} deleted from {diagram}",
                 DiagramId = $"diagram://{diagram}"
-            });
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {
@@ -781,7 +491,7 @@ public class DeleteShapeTool(DrawIoService drawIoService, ILogger<DeleteShapeToo
     }
 }
 
-public class UpdateShapeTool(DrawIoService drawIoService, ILogger<UpdateShapeTool> logger)
+public class UpdateShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<UpdateShapeTool> logger)
     : Tool
 {
     public override string Name => "update_shape";
@@ -848,28 +558,30 @@ public class UpdateShapeTool(DrawIoService drawIoService, ILogger<UpdateShapeToo
         }
     };
 
-    public override Task<object> ExecuteAsync(ToolParameters parameters)
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
         string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
-        string value = parameters.GetValue<string>("value") ?? string.Empty;
+        string value = parameters.GetValue<string>("value") ?? "";
         
         float? x = parameters.HasValue("x") ? parameters.GetValue<float>("x") : null;
         float? y = parameters.HasValue("y") ? parameters.GetValue<float>("y") : null;
         float? width = parameters.HasValue("width") ? parameters.GetValue<float>("width") : null;
         float? height = parameters.HasValue("height") ? parameters.GetValue<float>("height") : null;
-        string? style = parameters.HasValue("style") ? parameters.GetValue<string>("style") : null;
+        string style = parameters.GetValue<string>("style");
         
         try
         {
             drawIoService.UpdateShape(diagram, shapeId, value, x, y, width, height, style);
             
-            return Task.FromResult<object>(new
+            var response = new
             {
                 Status = "success",
                 Message = $"Shape {shapeId} updated in {diagram}",
                 DiagramId = $"diagram://{diagram}"
-            });
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {
@@ -879,7 +591,7 @@ public class UpdateShapeTool(DrawIoService drawIoService, ILogger<UpdateShapeToo
     }
 }
 
-public class StyleShapeTool(DrawIoService drawIoService, ILogger<StyleShapeTool> logger)
+public class StyleShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<StyleShapeTool> logger)
     : Tool
 {
     // Dictionary of predefined styles
@@ -932,27 +644,54 @@ public class StyleShapeTool(DrawIoService drawIoService, ILogger<StyleShapeTool>
         }
     };
 
-    public override Task<object> ExecuteAsync(ToolParameters parameters)
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
         string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
         string styleName = parameters.GetValue<string>("style") ?? throw new ArgumentException("Style name is required");
-        
-        if (!PredefinedStyles.TryGetValue(styleName, out var styleString))
-        {
-            throw new ArgumentException($"Unknown style: {styleName}. Available styles: {string.Join(", ", PredefinedStyles.Keys)}");
-        }
+        string fillColor = parameters.GetValue<string>("fill_color") ?? "";
+        string strokeColor = parameters.GetValue<string>("stroke_color") ?? "";
         
         try
         {
-            drawIoService.UpdateShape(diagram, shapeId, value: string.Empty, null, null, null, null, styleString);
+            if (PredefinedStyles.TryGetValue(styleName, out var styleString))
+            {
+                // Use predefined style
+                drawIoService.UpdateShape(diagram, shapeId, "", null, null, null, null, styleString);
+            }
+            else
+            {
+                // Use custom colors
+                if (string.IsNullOrEmpty(fillColor) && string.IsNullOrEmpty(strokeColor))
+                {
+                    throw new ArgumentException("Either a predefined style, fill color, or stroke color must be provided");
+                }
+                
+                var styleProps = new List<string>();
+                
+                if (!string.IsNullOrEmpty(fillColor))
+                {
+                    styleProps.Add($"fillColor={fillColor}");
+                }
+                
+                if (!string.IsNullOrEmpty(strokeColor))
+                {
+                    styleProps.Add($"strokeColor={strokeColor}");
+                }
+                
+                string customStyle = string.Join(";", styleProps);
+                
+                drawIoService.UpdateShape(diagram, shapeId, "", null, null, null, null, customStyle);
+            }
             
-            return Task.FromResult<object>(new
+            var response = new
             {
                 Status = "success",
                 Message = $"Style '{styleName}' applied to shape {shapeId} in {diagram}",
                 DiagramId = $"diagram://{diagram}"
-            });
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {
@@ -962,7 +701,7 @@ public class StyleShapeTool(DrawIoService drawIoService, ILogger<StyleShapeTool>
     }
 }
 
-public class ArrangeDiagramTool(DrawIoService drawIoService, ILogger<ArrangeDiagramTool> logger)
+public class ArrangeDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<ArrangeDiagramTool> logger)
     : Tool
 {
     public override string Name => "arrange_diagram";
@@ -987,25 +726,356 @@ public class ArrangeDiagramTool(DrawIoService drawIoService, ILogger<ArrangeDiag
         }
     };
 
-    public override Task<object> ExecuteAsync(ToolParameters parameters)
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string layout = parameters.GetValue<string>("layout", "horizontal");
+        string layout = parameters.GetValue<string>("layout") ?? "horizontal";
+        
+        // Validate layout
+        if (!new[] { "horizontal", "vertical", "radial" }.Contains(layout.ToLowerInvariant()))
+        {
+            layout = "horizontal";
+        }
         
         try
         {
             var updatedDiagram = drawIoService.ArrangeDiagram(diagram, layout);
             
-            return Task.FromResult<object>(new
+            var response = new
             {
                 Status = "success",
                 DiagramId = $"diagram://{diagram}",
                 FileName = diagram
-            });
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error arranging diagram");
+            throw;
+        }
+    }
+}
+
+public class RotateShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<RotateShapeTool> logger)
+    : Tool
+{
+    public override string Name => "rotate_shape";
+
+    public override string Description => "Rotate a shape by a specified angle";
+
+    public override ToolParameter[] Parameters => new[]
+    {
+        new ToolParameter
+        {
+            Name = "diagram",
+            Type = "string",
+            Description = "Diagram filename",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "shapeId",
+            Type = "string",
+            Description = "ID of the shape to rotate",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "angle",
+            Type = "number",
+            Description = "Rotation angle in degrees",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "returnDiagram",
+            Type = "boolean",
+            Description = "Whether to include the diagram image in the response",
+            Required = false
+        }
+    };
+
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
+    {
+        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
+        float angle = parameters.GetValue<float>("angle");
+        
+        try
+        {
+            drawIoService.RotateShape(diagram, shapeId, angle);
+            
+            var response = new
+            {
+                Status = "success",
+                Message = $"Shape {shapeId} rotated by {angle} degrees",
+                DiagramId = $"diagram://{diagram}"
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error rotating shape");
+            throw;
+        }
+    }
+}
+
+public class FlipShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<FlipShapeTool> logger)
+    : Tool
+{
+    public override string Name => "flip_shape";
+
+    public override string Description => "Flip a shape horizontally or vertically";
+
+    public override ToolParameter[] Parameters => new[]
+    {
+        new ToolParameter
+        {
+            Name = "diagram",
+            Type = "string",
+            Description = "Diagram filename",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "shapeId",
+            Type = "string",
+            Description = "ID of the shape to flip",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "direction",
+            Type = "string",
+            Description = "Direction to flip (horizontal or vertical)",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "returnDiagram",
+            Type = "boolean",
+            Description = "Whether to include the diagram image in the response",
+            Required = false
+        }
+    };
+
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
+    {
+        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
+        string direction = parameters.GetValue<string>("direction") ?? throw new ArgumentException("Flip direction is required");
+        
+        // Validate direction
+        if (!string.Equals(direction, "horizontal", StringComparison.OrdinalIgnoreCase) && 
+            !string.Equals(direction, "vertical", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException("Direction must be either 'horizontal' or 'vertical'");
+        }
+        
+        try
+        {
+            drawIoService.FlipShape(diagram, shapeId, direction);
+            
+            var response = new
+            {
+                Status = "success",
+                Message = $"Shape {shapeId} flipped {direction}",
+                DiagramId = $"diagram://{diagram}"
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error flipping shape");
+            throw;
+        }
+    }
+}
+
+public class SetDiagramBackgroundTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<SetDiagramBackgroundTool> logger)
+    : Tool
+{
+    public override string Name => "set_diagram_background";
+
+    public override string Description => "Set the background color or image for a diagram";
+
+    public override ToolParameter[] Parameters => new[]
+    {
+        new ToolParameter
+        {
+            Name = "diagram",
+            Type = "string",
+            Description = "Diagram filename",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "backgroundColor",
+            Type = "string",
+            Description = "Background color in hex format (e.g., #f5f5f5)",
+            Required = false
+        },
+        new ToolParameter
+        {
+            Name = "backgroundImage",
+            Type = "string",
+            Description = "URL or path to background image",
+            Required = false
+        },
+        new ToolParameter
+        {
+            Name = "returnDiagram",
+            Type = "boolean",
+            Description = "Whether to include the diagram image in the response",
+            Required = false
+        }
+    };
+
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
+    {
+        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        string backgroundColor = parameters.GetValue<string>("backgroundColor");
+        string backgroundImage = parameters.GetValue<string>("backgroundImage");
+        
+        if (string.IsNullOrEmpty(backgroundColor) && string.IsNullOrEmpty(backgroundImage))
+        {
+            throw new ArgumentException("Either backgroundColor or backgroundImage must be provided");
+        }
+        
+        try
+        {
+            drawIoService.SetDiagramBackground(diagram, backgroundImage, backgroundColor);
+            
+            string message = "";
+            if (!string.IsNullOrEmpty(backgroundColor))
+            {
+                message += $"Background color set to {backgroundColor}. ";
+            }
+            
+            if (!string.IsNullOrEmpty(backgroundImage))
+            {
+                message += $"Background image set to {backgroundImage}. ";
+            }
+            
+            var response = new
+            {
+                Status = "success",
+                Message = message.Trim()
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error setting diagram background");
+            throw;
+        }
+    }
+}
+
+public class ConnectShapesAtPointsTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<ConnectShapesAtPointsTool> logger)
+    : Tool
+{
+    public override string Name => "connect_shapes_at_points";
+
+    public override string Description => "Connect two shapes with an arrow at specific points";
+
+    public override ToolParameter[] Parameters => new[]
+    {
+        new ToolParameter
+        {
+            Name = "diagram",
+            Type = "string",
+            Description = "Diagram filename",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "sourceId",
+            Type = "string",
+            Description = "ID of the source shape",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "targetId",
+            Type = "string",
+            Description = "ID of the target shape",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "sourceX",
+            Type = "number",
+            Description = "X coordinate on the source shape",
+            Required = false
+        },
+        new ToolParameter
+        {
+            Name = "sourceY",
+            Type = "number",
+            Description = "Y coordinate on the source shape",
+            Required = false
+        },
+        new ToolParameter
+        {
+            Name = "targetX",
+            Type = "number",
+            Description = "X coordinate on the target shape",
+            Required = false
+        },
+        new ToolParameter
+        {
+            Name = "targetY",
+            Type = "number",
+            Description = "Y coordinate on the target shape",
+            Required = false
+        },
+        new ToolParameter
+        {
+            Name = "returnDiagram",
+            Type = "boolean",
+            Description = "Whether to include the diagram image in the response",
+            Required = false
+        }
+    };
+
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
+    {
+        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        string sourceId = parameters.GetValue<string>("sourceId") ?? throw new ArgumentException("Source ID is required");
+        string targetId = parameters.GetValue<string>("targetId") ?? throw new ArgumentException("Target ID is required");
+        
+        float? sourceX = parameters.GetValue<float?>("sourceX");
+        float? sourceY = parameters.GetValue<float?>("sourceY");
+        float? targetX = parameters.GetValue<float?>("targetX");
+        float? targetY = parameters.GetValue<float?>("targetY");
+        
+        try
+        {
+            var result = drawIoService.ConnectShapesAtPoints(
+                diagram, sourceId, targetId, sourceX, sourceY, targetX, targetY);
+            
+            var updatedDiagram = result.Item1;
+            var connectorId = result.Item2;
+            
+            var response = new
+            {
+                Status = "success",
+                ConnectorId = connectorId,
+                DiagramId = $"diagram://{diagram}"
+            };
+            
+            return await ToolExtensions.AddDiagramImageToResponseAsync(response, parameters, drawIoService);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error connecting shapes at points in diagram");
             throw;
         }
     }
@@ -1025,5 +1095,93 @@ public static class ToolParametersExtensions
         {
             return false;
         }
+    }
+}
+
+// Tool base class extension for the current file
+public static class ToolExtensions
+{
+    // Helper method to add diagram image to response if requested
+    public static async Task<object> AddDiagramImageToResponseAsync(
+        object response, 
+        ToolParameters parameters, 
+        DrawIO.MCP.SSE.DrawIoService drawIoService)
+    {
+        // If return_diagram is true and diagram parameter exists, add image to response
+        bool returnDiagram = parameters.GetValue<bool>("return_diagram");
+        string? diagramName = parameters.GetValue<string>("diagram");
+        
+        if (returnDiagram && !string.IsNullOrEmpty(diagramName))
+        {
+            // Get page index if specified
+            int pageIndex = parameters.GetValue<int>("page_index", 
+                          parameters.GetValue<int>("page", 0));
+            
+            // Get image data
+            var imageData = await Task.FromResult(drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex, "png"));
+            
+            if (imageData != null)
+            {
+                // Create a copy of the response object with the image added
+                // Convert to dictionaries for manipulation
+                if (response is Dictionary<string, object> respDict)
+                {
+                    // Check if there's already a content property
+                    if (respDict.TryGetValue("content", out var existingContent))
+                    {
+                        if (existingContent is List<object> contentList)
+                        {
+                            // Add the image to existing content
+                            contentList.Add(imageData);
+                        }
+                        else if (existingContent is object[] contentArray)
+                        {
+                            // Convert array to list, add image, then convert back
+                            var newContent = new List<object>(contentArray) { imageData };
+                            respDict["content"] = newContent;
+                        }
+                        else if (existingContent != null)
+                        {
+                            // Create new content with original and image
+                            respDict["content"] = new List<object> { existingContent, imageData };
+                        }
+                        else
+                        {
+                            // Just set the image as content
+                            respDict["content"] = new List<object> { imageData };
+                        }
+                    }
+                    else
+                    {
+                        // Add new content with just the image
+                        respDict["content"] = new List<object> { imageData };
+                    }
+                    
+                    return respDict;
+                }
+                else 
+                {
+                    // Convert response to dictionary
+                    var responseDict = new Dictionary<string, object>();
+                    
+                    // Add all properties from original response
+                    foreach (var prop in response.GetType().GetProperties())
+                    {
+                        var value = prop.GetValue(response);
+                        if (value != null)
+                        {
+                            responseDict[prop.Name] = value;
+                        }
+                    }
+                    
+                    // Add content with the image
+                    responseDict["content"] = new List<object> { imageData };
+                    
+                    return responseDict;
+                }
+            }
+        }
+        
+        return response;
     }
 }

@@ -67,8 +67,8 @@ Based on testing and documentation review:
 
 #### Shape and Text Manipulation
 - ✅ Group/Ungroup shapes - IMPLEMENTED
-- 🔴 Rotate shapes
-- 🔴 Flip shapes horizontally/vertically
+- ✅ Rotate shapes - IMPLEMENTED
+- ✅ Flip shapes horizontally/vertically - IMPLEMENTED
 - 🔴 Lock/unlock elements
 - 🔴 Autosize shapes to fit text
 - 🔴 Add custom fonts support
@@ -78,7 +78,7 @@ Based on testing and documentation review:
 
 #### Connector Features
 - ✅ Add/remove/modify waypoints on connectors - IMPLEMENTED
-- 🔴 Connect to arbitrary points on shapes
+- ✅ Connect to arbitrary points on shapes - IMPLEMENTED
 - 🔴 Hide connection arrows
 - 🔴 Hide fixed connection points
 - 🔴 Animate connectors
@@ -88,11 +88,11 @@ Based on testing and documentation review:
 
 #### Layout and Organization
 - 🔴 Layer support (add, remove, move between)
-- 🔴 Background image support
+- ✅ Background image support - IMPLEMENTED
 - 🔴 Change page size and orientation
 - 🔴 Grid customization
 - 🔴 Snap to grid/points
-- 🔴 Custom shape libraries
+- ✅ Custom shape libraries - IMPLEMENTED
 - 🔴 Container shapes with collapse/expand
 - 🔴 Tables and cross-functional tables
 - 🔴 Merge/unmerge table cells

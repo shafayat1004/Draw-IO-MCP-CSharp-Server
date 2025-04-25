@@ -51,7 +51,7 @@ namespace DrawIO.MCP.SSE
                               parameters.GetValue<int>("page", 0));
                 
                 // Get image data
-                var imageData = await drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex);
+                var imageData = await Task.FromResult(drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex, "png"));
                 
                 if (imageData != null)
                 {
