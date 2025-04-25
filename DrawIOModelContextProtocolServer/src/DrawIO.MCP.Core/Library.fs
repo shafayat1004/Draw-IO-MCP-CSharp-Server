@@ -776,19 +776,15 @@ module DiagramManipulation =
                 match cell.Geometry with
                 | None -> None
                 | Some geo ->
-                    let updatedPosition = {
-                        X = defaultArg x geo.Position.X
-                        Y = defaultArg y geo.Position.Y
-                    }
-                    
-                    let updatedSize = {
-                        Width = defaultArg width geo.Size.Width
-                        Height = defaultArg height geo.Size.Height
-                    }
-                    
                     Some {
-                        Position = updatedPosition
-                        Size = updatedSize
+                        Position = {
+                            X = defaultArg x geo.Position.X
+                            Y = defaultArg y geo.Position.Y
+                        }
+                        Size = {
+                            Width = defaultArg width geo.Size.Width
+                            Height = defaultArg height geo.Size.Height
+                        }
                         Relative = geo.Relative
                         Waypoints = geo.Waypoints
                     }
@@ -816,7 +812,7 @@ module DiagramManipulation =
             // Create updated cell
             let updatedCell = {
                 cell with
-                    Value = if value <> null then value else cell.Value
+                    Value = if String.IsNullOrEmpty(value) then cell.Value else value
                     Style = updatedStyle
                     Geometry = updatedGeometry
             }

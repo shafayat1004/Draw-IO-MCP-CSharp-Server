@@ -32,7 +32,7 @@ namespace DrawIO.MCP.SSE.Tests
             // Parse as generic JsonElement since we're dealing with System.Text.Json
             var content = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
             
-            Assert.NotNull(content);
+            // Start assertions - content can't be null as JsonElement is a value type
             Assert.True(content.TryGetProperty("status", out var statusElement));
             Assert.Equal("success", statusElement.GetString());
             

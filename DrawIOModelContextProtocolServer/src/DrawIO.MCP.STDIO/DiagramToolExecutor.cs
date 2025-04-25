@@ -516,76 +516,112 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> UpdateShapeAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            
-            // Try both naming conventions for parameters
-            string shapeId;
-            if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+            try
             {
-                shapeId = shapeIdElement.GetString();
-            }
-            else
-            {
-                shapeId = GetParameterString(parameters, "shape_id");
-            }
-            
-            string value = GetParameterString(parameters, "value", null);
-            
-            float? x = null;
-            float? y = null;
-            float? width = null;
-            float? height = null;
-            
-            if (parameters.TryGetProperty("x", out var xElement))
-            {
-                x = xElement.GetSingle();
-            }
-            
-            if (parameters.TryGetProperty("y", out var yElement))
-            {
-                y = yElement.GetSingle();
-            }
-            
-            if (parameters.TryGetProperty("width", out var widthElement))
-            {
-                width = widthElement.GetSingle();
-            }
-            
-            if (parameters.TryGetProperty("height", out var heightElement))
-            {
-                height = heightElement.GetSingle();
-            }
-            
-            string style = null;
-            if (parameters.TryGetProperty("style", out var styleElement))
-            {
-                style = styleElement.GetString();
-            }
-            
-            string filePath = Path.Combine(diagramsDirectory, diagram);
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
-            }
-            
-            // Load the diagram, update the shape, and save it
-            var diagramObj = LoadDiagram(filePath);
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(diagramObj, 0, shapeId, value, x, y, width, height, style);
-            SaveDiagram(updatedDiagram, filePath);
-            
-            return Task.FromResult<object>(new 
-            {
-                status = "success",
-                DiagramId = $"diagram://{diagram}",
-                content = new[] 
-                { 
-                    new 
-                    { 
-                        type = "text", 
-                        text = $"Updated shape with ID {shapeId}" 
-                    } 
+                string diagram = GetParameterString(parameters, "diagram");
+                
+                // Try both naming conventions for parameters
+                string shapeId;
+                if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
+                {
+                    shapeId = shapeIdElement.GetString();
                 }
-            });
+                else
+                {
+                    shapeId = GetParameterString(parameters, "shape_id");
+                }
+                
+                // Handle null value properly - set to empty string if not provided
+                string value = "";
+                if (parameters.TryGetProperty("value", out var valueElement))
+                {
+                    value = valueElement.GetString() ?? "";
+                }
+                
+                // Convert nullable parameters to F# options
+                Microsoft.FSharp.Core.FSharpOption<double> x = null;
+                Microsoft.FSharp.Core.FSharpOption<double> y = null;
+                Microsoft.FSharp.Core.FSharpOption<double> width = null;
+                Microsoft.FSharp.Core.FSharpOption<double> height = null;
+                Microsoft.FSharp.Core.FSharpOption<string> style = null;
+                
+                if (parameters.TryGetProperty("x", out var xElement))
+                {
+                    x = Microsoft.FSharp.Core.FSharpOption<double>.Some(xElement.GetDouble());
+                }
+                
+                if (parameters.TryGetProperty("y", out var yElement))
+                {
+                    y = Microsoft.FSharp.Core.FSharpOption<double>.Some(yElement.GetDouble());
+                }
+                
+                if (parameters.TryGetProperty("width", out var widthElement))
+                {
+                    width = Microsoft.FSharp.Core.FSharpOption<double>.Some(widthElement.GetDouble());
+                }
+                
+                if (parameters.TryGetProperty("height", out var heightElement))
+                {
+                    height = Microsoft.FSharp.Core.FSharpOption<double>.Some(heightElement.GetDouble());
+                }
+                
+                if (parameters.TryGetProperty("style", out var styleElement))
+                {
+                    style = Microsoft.FSharp.Core.FSharpOption<string>.Some(styleElement.GetString());
+                }
+                
+                string filePath = Path.Combine(diagramsDirectory, diagram);
+                if (!File.Exists(filePath))
+                {
+                    throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                }
+                
+                // Load the diagram, update the shape, and save it
+                var diagramObj = LoadDiagram(filePath);
+                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                    diagramObj, 
+                    0, // page index
+                    shapeId,
+                    value,
+                    x,
+                    y,
+                    width,
+                    height,
+                    style
+                );
+                SaveDiagram(updatedDiagram, filePath);
+                
+                return Task.FromResult<object>(new 
+                {
+                    status = "success",
+                    DiagramId = $"diagram://{diagram}",
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Updated shape with ID {shapeId}" 
+                        } 
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new 
+                { 
+                    status = "error",
+                    error = ex.Message,
+                    detail = ex.ToString(),
+                    content = new[] 
+                    { 
+                        new 
+                        { 
+                            type = "text", 
+                            text = $"Error updating shape: {ex.Message}" 
+                        } 
+                    }
+                });
+            }
         }
 
         private static Task<object> StyleShapeAsync(JsonElement parameters, string diagramsDirectory)
@@ -2689,9 +2725,6 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram
             var loadedDiagram = LoadDiagram(filePath);
-            
-            // Convert FlipDirection from string to enum
-            Microsoft.FSharp.Core.FSharpOption<string> direction = null;
             
             // Rotate the shape
             var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.rotateShape(loadedDiagram, shapeId, angle);

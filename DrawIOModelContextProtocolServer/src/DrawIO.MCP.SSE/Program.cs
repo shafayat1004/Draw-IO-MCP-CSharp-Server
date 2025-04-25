@@ -569,7 +569,7 @@ public class UpdateShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger
         float? y = parameters.HasValue("y") ? parameters.GetValue<float>("y") : null;
         float? width = parameters.HasValue("width") ? parameters.GetValue<float>("width") : null;
         float? height = parameters.HasValue("height") ? parameters.GetValue<float>("height") : null;
-        string style = parameters.GetValue<string>("style");
+        string style = parameters.GetValue<string>("style") ?? "";
         
         try
         {
@@ -940,8 +940,8 @@ public class SetDiagramBackgroundTool(DrawIO.MCP.SSE.DrawIoService drawIoService
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string backgroundColor = parameters.GetValue<string>("backgroundColor");
-        string backgroundImage = parameters.GetValue<string>("backgroundImage");
+        string backgroundColor = parameters.GetValue<string>("backgroundColor") ?? "";
+        string backgroundImage = parameters.GetValue<string>("backgroundImage") ?? "";
         
         if (string.IsNullOrEmpty(backgroundColor) && string.IsNullOrEmpty(backgroundImage))
         {
@@ -1188,8 +1188,10 @@ public static class ToolExtensions
 }
 
 // Add a ListShapeTypesTool class similar to other tool classes
-public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<ListShapeTypesTool> logger)
+#pragma warning disable CS9113 // Parameter is unread
+public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService _, ILogger<ListShapeTypesTool> logger)
     : Tool
+#pragma warning restore CS9113
 {
     private readonly ILogger<ListShapeTypesTool> _logger = logger;
 
@@ -1199,7 +1201,7 @@ public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILog
 
     public override ToolParameter[] Parameters => Array.Empty<ToolParameter>();
 
-    public override async Task<object> ExecuteAsync(ToolParameters parameters)
+    public override Task<object> ExecuteAsync(ToolParameters parameters)
     {
         try
         {
@@ -1212,20 +1214,20 @@ public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILog
                 ["Containers"] = new() { "document", "note", "cylinder", "diamond" }
             };
 
-            return new
+            return Task.FromResult<object>(new
             {
                 status = "success",
                 shapeCategories = shapeTypes
-            };
+            });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error listing shape types");
-            return new
+            return Task.FromResult<object>(new
             {
                 status = "error",
                 message = ex.Message
-            };
+            });
         }
     }
 }
