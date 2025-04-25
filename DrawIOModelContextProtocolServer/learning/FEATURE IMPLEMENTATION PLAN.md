@@ -54,6 +54,15 @@ The DrawIO MCP Server currently implements the following tools:
   - Output diagram as PNG image
   - Include diagram image in tool responses with `return_diagram` parameter
   - All tools now support returning the diagram image after execution
+- ✅ Connect Shapes at Points (`connect_shapes_at_points`)
+- ✅ Update Diagram Page (`update_diagram_page`)
+- ✅ Delete Shape (`delete_shape`)
+- ✅ Set Diagram Background (`set_diagram_background`)
+- ✅ Update Shape Style (`update_shape_style`) with:
+  - Rounded corners
+  - Shadow effects
+  - Glass effects
+  - Opacity control
 
 ### Enhanced Tool Functionality
 - ✅ Return Diagram Image with Tool Response:

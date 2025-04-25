@@ -127,6 +127,15 @@ namespace DrawIO.MCP.STDIO
                                 Description = "Shape type (rectangle, ellipse, etc.)",
                                 Required = false
                             }
+                        },
+                        {
+                            "return_diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "boolean",
+                                Description = "Whether to include the diagram image in the response",
+                                Required = true
+                            }
                         }
                     }
                 },
@@ -160,6 +169,15 @@ namespace DrawIO.MCP.STDIO
                             {
                                 Type = "string",
                                 Description = "ID of the target shape",
+                                Required = true
+                            }
+                        },
+                        {
+                            "return_diagram",
+                            new McpParameterDefinition
+                            {
+                                Type = "boolean",
+                                Description = "Whether to include the diagram image in the response",
                                 Required = true
                             }
                         }
@@ -1489,13 +1507,24 @@ namespace DrawIO.MCP.STDIO
             {
                 Type = "boolean",
                 Description = "Whether to include the diagram image in the response",
-                Required = false
+                Required = true // Make it required for all tools
             };
             
             // Add it to each tool definition except get_diagram_image
             foreach (var tool in tools.Where(t => t.Name != "get_diagram_image" && t.SchemaInputs.ContainsKey("diagram")))
             {
-                tool.SchemaInputs["return_diagram"] = returnDiagramParam;
+                // Check if the parameter already exists (some tools might have it defined already)
+                if (!tool.SchemaInputs.ContainsKey("return_diagram"))
+                {
+                    tool.SchemaInputs["return_diagram"] = returnDiagramParam;
+                }
+                else
+                {
+                    // Update the existing parameter to make it required
+                    var existingParam = tool.SchemaInputs["return_diagram"];
+                    existingParam.Required = true;
+                    tool.SchemaInputs["return_diagram"] = existingParam;
+                }
             }
 
             // Return a result with the array of tools properly structured

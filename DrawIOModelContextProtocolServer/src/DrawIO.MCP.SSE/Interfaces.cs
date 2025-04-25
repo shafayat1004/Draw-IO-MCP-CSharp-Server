@@ -31,9 +31,15 @@ namespace DrawIO.MCP.SSE
 
     public abstract class Tool
     {
+        // Protected field for parameters that can be modified via reflection
+        protected ToolParameter[]? _parameters;
+        
         public abstract string Name { get; }
         public abstract string Description { get; }
-        public abstract ToolParameter[] Parameters { get; }
+        
+        // Parameters property will initialize the field if null
+        public virtual ToolParameter[] Parameters => _parameters ??= Array.Empty<ToolParameter>();
+        
         public abstract Task<object> ExecuteAsync(ToolParameters parameters);
         
         // Helper method to add diagram image to response if requested
@@ -42,8 +48,33 @@ namespace DrawIO.MCP.SSE
             ToolParameters parameters, 
             DrawIoService drawIoService)
         {
-            // If return_diagram is true and diagram parameter exists, add image to response
-            bool returnDiagram = parameters.GetValue<bool>("return_diagram");
+            // More robust handling of return_diagram parameter
+            bool returnDiagram = false;
+            
+            try 
+            {
+                // First try to get as bool (properly typed parameter)
+                returnDiagram = parameters.GetValue<bool>("return_diagram");
+            }
+            catch 
+            {
+                // If that fails, try to handle it as a string value
+                try 
+                {
+                    string? returnDiagramStr = parameters.GetValue<string>("return_diagram");
+                    if (!string.IsNullOrEmpty(returnDiagramStr))
+                    {
+                        returnDiagramStr = returnDiagramStr.ToLowerInvariant();
+                        returnDiagram = (returnDiagramStr == "true");
+                    }
+                }
+                catch 
+                {
+                    // Parameter doesn't exist or is not a valid type, leave as false
+                    returnDiagram = false;
+                }
+            }
+            
             string? diagramName = parameters.GetValue<string>("diagram");
             
             if (returnDiagram && !string.IsNullOrEmpty(diagramName))
@@ -64,55 +95,43 @@ namespace DrawIO.MCP.SSE
                         // Check if there's already a content property
                         if (respDict.TryGetValue("content", out var existingContent))
                         {
-                            if (existingContent is List<object> contentList)
+                            // If content is an array, add the image to the array
+                            if (existingContent is object[] contentArray)
                             {
-                                // Add the image to existing content
+                                var newContentList = contentArray.ToList();
+                                newContentList.Add(imageData);
+                                respDict["content"] = newContentList.ToArray();
+                            }
+                            else if (existingContent is List<object> contentList)
+                            {
                                 contentList.Add(imageData);
-                            }
-                            else if (existingContent is object[] contentArray)
-                            {
-                                // Convert array to list, add image, then convert back
-                                var newContent = new List<object>(contentArray) { imageData };
-                                respDict["content"] = newContent;
-                            }
-                            else if (existingContent != null)
-                            {
-                                // Create new content with original and image
-                                respDict["content"] = new List<object> { existingContent, imageData };
                             }
                             else
                             {
-                                // Just set the image as content
-                                respDict["content"] = new List<object> { imageData };
+                                // If content is not an array, create a new array with both old content and image
+                                respDict["content"] = new object[] { existingContent, imageData };
                             }
                         }
                         else
                         {
-                            // Add new content with just the image
-                            respDict["content"] = new List<object> { imageData };
+                            // If no content property exists, create one with the image
+                            respDict["content"] = new object[] { imageData };
                         }
+                        
+                        // Also add the image as a separate property for backward compatibility
+                        respDict["diagram"] = imageData;
                         
                         return respDict;
                     }
-                    else 
+                    else
                     {
-                        // Convert response to dictionary
-                        var responseDict = new Dictionary<string, object>();
-                        
-                        // Add all properties from original response
-                        foreach (var prop in response.GetType().GetProperties())
+                        // If response is not a dictionary, create a new one with both the original response and image
+                        return new Dictionary<string, object>
                         {
-                            var value = prop.GetValue(response);
-                            if (value != null)
-                            {
-                                responseDict[prop.Name] = value;
-                            }
-                        }
-                        
-                        // Add content with the image
-                        responseDict["content"] = new List<object> { imageData };
-                        
-                        return responseDict;
+                            ["result"] = response,
+                            ["diagram"] = imageData,
+                            ["content"] = new object[] { imageData }
+                        };
                     }
                 }
             }

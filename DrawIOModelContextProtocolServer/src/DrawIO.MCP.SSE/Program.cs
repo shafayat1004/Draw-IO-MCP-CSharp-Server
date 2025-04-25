@@ -3,6 +3,11 @@ using Microsoft.FSharp.Core;
 using CoreTypes = DrawIO.MCP.Core.Types;
 using CoreFileOps = DrawIO.MCP.Core.FileOperations;
 using CoreDiagramOps = DrawIO.MCP.Core.DiagramManipulation;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +40,16 @@ if (!Directory.Exists(diagramsDir))
 
 builder.Services.AddSingleton<DrawIO.MCP.SSE.DrawIoService>(sp => 
     new DrawIO.MCP.SSE.DrawIoService(diagramsDir));
+
+// Register tool services - find all classes that implement Tool
+builder.Services.AddSingleton<DrawIO.MCP.SSE.DrawIoService>();
+builder.Services.AddSingleton<AddShapeTool>();
+builder.Services.AddSingleton<ConnectShapesTool>();
+builder.Services.AddSingleton<GetDiagramImageTool>();
+// Add each tool class explicitly instead of using Scrutor scanning
+
+// Add a tool parameter transformer to ensure return_diagram is required
+builder.Services.AddTransient<IStartupFilter, ToolParameterStartupFilter>();
 
 var app = builder.Build();
 
@@ -69,6 +84,7 @@ app.UseMcp(mcpBuilder =>
     mcpBuilder.RegisterTool<SetDiagramBackgroundTool>();
     mcpBuilder.RegisterTool<ConnectShapesAtPointsTool>();
     mcpBuilder.RegisterTool<ListShapeTypesTool>();
+    mcpBuilder.RegisterTool<GetDiagramImageTool>();
 });
 
 // Add additional endpoints
@@ -250,20 +266,20 @@ public class AddShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<Ad
 
     public override string Description => "Add a new shape to a diagram";
 
-    public override ToolParameter[] Parameters => new[]
+    public override ToolParameter[] Parameters => _parameters ??= new[]
     {
         new ToolParameter
         {
             Name = "diagram",
             Type = "string",
-            Description = "Diagram file name",
+            Description = "Diagram filename",
             Required = true
         },
         new ToolParameter
         {
             Name = "value",
             Type = "string",
-            Description = "Text label for the shape",
+            Description = "Shape label/text",
             Required = true
         },
         new ToolParameter
@@ -284,14 +300,14 @@ public class AddShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<Ad
         {
             Name = "width",
             Type = "number",
-            Description = "Width of the shape",
+            Description = "Width of shape",
             Required = true
         },
         new ToolParameter
         {
             Name = "height",
             Type = "number",
-            Description = "Height of the shape",
+            Description = "Height of shape",
             Required = true
         },
         new ToolParameter
@@ -300,8 +316,15 @@ public class AddShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<Ad
             Type = "string",
             Description = "Shape type (rectangle, ellipse, etc.)",
             Required = false
+        },
+        new ToolParameter
+        {
+            Name = "returnDiagram",
+            Type = "boolean",
+            Description = "Whether to include the diagram image in the response",
+            Required = true
         }
-    }.AddCommonParameters();
+    };
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
@@ -341,13 +364,13 @@ public class ConnectShapesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogg
 
     public override string Description => "Connect two shapes with an arrow";
 
-    public override ToolParameter[] Parameters => new[]
+    public override ToolParameter[] Parameters => _parameters ??= new[]
     {
         new ToolParameter
         {
             Name = "diagram",
             Type = "string",
-            Description = "Diagram file name",
+            Description = "Diagram filename",
             Required = true
         },
         new ToolParameter
@@ -362,6 +385,13 @@ public class ConnectShapesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogg
             Name = "targetId",
             Type = "string",
             Description = "ID of the target shape",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "returnDiagram",
+            Type = "boolean",
+            Description = "Whether to include the diagram image in the response",
             Required = true
         }
     };
@@ -1228,6 +1258,167 @@ public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService _, ILogger<ListShap
                 status = "error",
                 message = ex.Message
             });
+        }
+    }
+}
+
+// Add this class at the end of the file
+public class ToolParameterStartupFilter : IStartupFilter
+{
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+    {
+        return app =>
+        {
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var tools = scope.ServiceProvider.GetServices<Tool>().ToList();
+                
+                // Make return_diagram a required parameter for all tools that have diagram parameter
+                foreach (var tool in tools)
+                {
+                    // Skip get_diagram_image tool
+                    if (tool.Name == "get_diagram_image")
+                        continue;
+                        
+                    var parameters = tool.Parameters.ToList();
+                    
+                    // Check if tool has diagram parameter
+                    if (parameters.Any(p => p.Name == "diagram"))
+                    {
+                        bool parametersUpdated = false;
+                        
+                        // Check if tool already has return_diagram parameter
+                        for (int i = 0; i < parameters.Count; i++)
+                        {
+                            if (parameters[i].Name == "returnDiagram")
+                            {
+                                // Create a new ToolParameter with Required=true
+                                parameters[i] = new ToolParameter
+                                {
+                                    Name = "returnDiagram",
+                                    Type = parameters[i].Type,
+                                    Description = parameters[i].Description,
+                                    Required = true
+                                };
+                                parametersUpdated = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!parametersUpdated)
+                        {
+                            // Add return_diagram parameter
+                            parameters.Add(new ToolParameter
+                            {
+                                Name = "returnDiagram",
+                                Type = "boolean",
+                                Description = "Whether to include the diagram image in the response",
+                                Required = true
+                            });
+                        }
+                        
+                        // Now we can directly access the _parameters field
+                        var parametersField = typeof(Tool).GetField("_parameters", 
+                            System.Reflection.BindingFlags.NonPublic | 
+                            System.Reflection.BindingFlags.Instance);
+                            
+                        if (parametersField != null)
+                        {
+                            parametersField.SetValue(tool, parameters.ToArray());
+                        }
+                    }
+                }
+            }
+            
+            next(app);
+        };
+    }
+}
+
+public class GetDiagramImageTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<GetDiagramImageTool> logger) : Tool
+{
+    public override string Name => "get_diagram_image";
+
+    public override string Description => "Get a diagram as a base64-encoded image";
+
+    public override ToolParameter[] Parameters => _parameters ??= new[]
+    {
+        new ToolParameter
+        {
+            Name = "diagram",
+            Type = "string",
+            Description = "Diagram filename",
+            Required = true
+        },
+        new ToolParameter
+        {
+            Name = "format",
+            Type = "string",
+            Description = "Image format (png, jpeg, etc.)",
+            Required = false
+        },
+        new ToolParameter
+        {
+            Name = "page",
+            Type = "integer",
+            Description = "Page index (defaults to 0)",
+            Required = false
+        }
+    };
+
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
+    {
+        try
+        {
+            string diagramName = parameters.GetValue<string>("diagram") ?? throw new ArgumentNullException("diagram", "Diagram name is required");
+            string format = parameters.GetValue<string>("format", "png");
+            int pageIndex = parameters.GetValue<int>("page", 0);
+            
+            logger.LogInformation($"Getting diagram image for {diagramName}, page {pageIndex}, format {format}");
+            
+            var imageData = await Task.FromResult(drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex, format));
+            
+            if (imageData == null)
+            {
+                return new Dictionary<string, object>
+                {
+                    ["isError"] = true,
+                    ["content"] = new[]
+                    {
+                        new Dictionary<string, string>
+                        {
+                            ["type"] = "text",
+                            ["text"] = $"Error: Failed to generate diagram image for {diagramName}"
+                        }
+                    }
+                };
+            }
+            
+            return new Dictionary<string, object>
+            {
+                ["status"] = "success",
+                ["content"] = new[]
+                {
+                    imageData
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error in get_diagram_image tool: {ex.Message}");
+            
+            return new Dictionary<string, object>
+            {
+                ["isError"] = true,
+                ["content"] = new[]
+                {
+                    new Dictionary<string, string>
+                    {
+                        ["type"] = "text",
+                        ["text"] = $"Error: {ex.Message}"
+                    }
+                }
+            };
         }
     }
 }

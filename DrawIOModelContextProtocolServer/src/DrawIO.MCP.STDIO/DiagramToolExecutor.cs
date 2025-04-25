@@ -34,13 +34,36 @@ namespace DrawIO.MCP.STDIO
         {
             try
             {
+                // Parse bool value explicitly to handle proper JSON boolean values
+                bool returnDiagram = false;
+                if (arguments.TryGetProperty("return_diagram", out var returnDiagramElement))
+                {
+                    // Ensure we handle true/false values properly
+                    if (returnDiagramElement.ValueKind == JsonValueKind.True)
+                    {
+                        returnDiagram = true;
+                    }
+                    else if (returnDiagramElement.ValueKind == JsonValueKind.False)
+                    {
+                        returnDiagram = false;
+                    }
+                    else if (returnDiagramElement.ValueKind == JsonValueKind.String)
+                    {
+                        // Handle string values like "true" or "false"
+                        string strValue = returnDiagramElement.GetString().ToLowerInvariant();
+                        returnDiagram = (strValue == "true");
+                    }
+                }
+                
+                LogMessage(logWriter, verbose, $"Executing tool {toolName} with return_diagram={returnDiagram}");
+                
                 // If updating shape with style, use custom method
                 if (toolName == "update_shape_style")
                 {
                     return await UpdateShapeWithStyleAsync(arguments, diagramsDirectory);
                 }
                 
-                // Execute the tool and get the result
+                // Execute the appropriate tool based on the name
                 object result = toolName switch
                 {
                     "create_new_diagram" => await CreateNewDiagramAsync(arguments, diagramsDirectory),
@@ -82,10 +105,6 @@ namespace DrawIO.MCP.STDIO
                     "list_shape_types" => await McpToolHandlers.ListShapeTypesAsync(arguments, diagramsDirectory, logWriter, verbose),
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
-
-                // Check if the client has requested the diagram image to be included in the response
-                bool returnDiagram = arguments.TryGetProperty("return_diagram", out var returnDiagramElement) && 
-                                    returnDiagramElement.ValueKind == JsonValueKind.True;
                 
                 // If not the get_diagram_image tool and return_diagram is true, append the diagram image
                 if (returnDiagram && toolName != "get_diagram_image" && arguments.TryGetProperty("diagram", out var diagramElement))
@@ -102,32 +121,43 @@ namespace DrawIO.MCP.STDIO
                     var resultDict = ConvertToDictionary(result) as Dictionary<string, object>;
                     if (resultDict != null)
                     {
-                        // Append the diagram image to the content
-                        if (resultDict.TryGetValue("content", out var contentObj) && contentObj is IEnumerable<object> contentList)
+                        if (diagramImage != null)
                         {
-                            // Convert to list to be able to modify
-                            var content = contentList.ToList();
-                            
-                            // Add the image to the content
-                            if (diagramImage != null)
+                            // Add the diagram image to the content property
+                            if (resultDict.TryGetValue("content", out var existingContent))
                             {
-                                content.Add(diagramImage);
-                                
-                                // Update the content in the result
-                                resultDict["content"] = content;
+                                // If content is an array, add the image to the array
+                                if (existingContent is object[] contentArray)
+                                {
+                                    var newContentList = contentArray.ToList();
+                                    newContentList.Add(diagramImage);
+                                    resultDict["content"] = newContentList.ToArray();
+                                }
+                                else if (existingContent is List<object> contentList)
+                                {
+                                    contentList.Add(diagramImage);
+                                }
+                                else
+                                {
+                                    // If content is not an array, create a new array with both old content and image
+                                    resultDict["content"] = new object[] { existingContent, diagramImage };
+                                }
                             }
-                        }
-                        else if (diagramImage != null)
-                        {
-                            // Create new content list with the message
-                            resultDict["content"] = new List<object> { diagramImage };
+                            else
+                            {
+                                // If no content property exists, create one with the image
+                                resultDict["content"] = new object[] { diagramImage };
+                            }
+                            
+                            // Also add the image as a separate property for backward compatibility
+                            resultDict["diagram"] = diagramImage;
                         }
                         
-                        // Return the updated result
                         return resultDict;
                     }
                 }
-
+                
+                // Always convert to Dictionary<string, object> for consistent return type
                 return ConvertToDictionary(result);
             }
             catch (Exception ex)
