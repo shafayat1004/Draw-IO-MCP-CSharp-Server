@@ -50,13 +50,17 @@ The DrawIO MCP Server currently implements the following tools:
 - ✅ Group/Ungroup Shapes:
   - Group Shapes (`group_shapes`)
   - Ungroup Shapes (`ungroup_shapes`)
+- ✅ Get Diagram Image (`get_diagram_image`):
+  - Output diagram as PNG image
+  - Include diagram image in tool responses with `return_diagram` parameter
+  - All tools now support returning the diagram image after execution
 
-### Needs Investigation
-- 🟨 Get Diagram Image (`get_diagram_image`) - drawio CLI integration issues:
-  - CLI is installed and available
-  - Image generation works but file creation reports errors
-  - Need to investigate file paths and permissions
-  - Consider alternative export methods if CLI issues persist
+### Enhanced Tool Functionality
+- ✅ Return Diagram Image with Tool Response:
+  - All tools support the `return_diagram` parameter
+  - When set to `true`, tools return both the operation result and a rendered image of the current diagram state
+  - Provides immediate visual feedback after each operation
+  - Eliminates the need for separate image requests after edits
 
 ### Known Missing Features
 Based on testing and documentation review:
@@ -274,10 +278,11 @@ Our current implementation supports sophisticated connector styling and routing 
    - ✅ Created tools for group manipulation
    - ✅ Added tests for grouping functionality
 
-3. **Fix Image Export**
-   - Investigate CLI integration
-   - Implement reliable export pipeline
-   - Support multiple formats
+3. ✅ **Fix Image Export** - COMPLETED
+   - ✅ Implemented diagram image export functionality
+   - ✅ Added `return_diagram` parameter to all tool calls
+   - ✅ Created reliable pipeline to render diagrams after operations
+   - ✅ Supporting PNG image format
 
 4. **Enhanced Layout Engine**
    - Implement more layout algorithms
