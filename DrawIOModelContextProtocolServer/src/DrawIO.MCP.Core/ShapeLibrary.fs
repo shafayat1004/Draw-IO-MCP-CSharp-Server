@@ -29,6 +29,43 @@ module ShapeLibrary =
             XmlDefinition = xmlDefinition
         }
     
+    /// Map common shape types to their style strings
+    /// This provides mapping for shapes available in standard draw.io libraries
+    let getShapeStyleByType (shapeType: string) =
+        match shapeType.ToLowerInvariant() with
+        | "rectangle" -> "rounded=0;whiteSpace=wrap;html=1;"
+        | "ellipse" -> "ellipse;whiteSpace=wrap;html=1;"
+        | "circle" -> "ellipse;whiteSpace=wrap;html=1;aspect=fixed;"
+        | "triangle" -> "triangle;whiteSpace=wrap;html=1;"
+        | "rhombus" -> "rhombus;whiteSpace=wrap;html=1;"
+        | "hexagon" -> "shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;"
+        | "cloud" -> "ellipse;shape=cloud;whiteSpace=wrap;html=1;"
+        | "document" -> "shape=document;whiteSpace=wrap;html=1;boundedLbl=1;"
+        | "cylinder" -> "shape=cylinder;whiteSpace=wrap;html=1;"
+        | "diamond" -> "shape=diamond;whiteSpace=wrap;html=1;"
+        | "process" -> "shape=process;whiteSpace=wrap;html=1;"
+        | "actor" -> "shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;"
+        | "note" -> "shape=note;whiteSpace=wrap;html=1;size=14;fillColor=#FFFF99;"
+        // UML shapes
+        | "class" -> "shape=umlFrame;whiteSpace=wrap;html=1;width=120;height=30;"
+        | "interface" -> "shape=umlFrame;whiteSpace=wrap;html=1;width=120;height=30;dashed=1;"
+        | "package" -> "shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;"
+        // Flowchart shapes
+        | "decision" -> "rhombus;whiteSpace=wrap;html=1;"
+        | "data" -> "shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;"
+        | "predefined" -> "shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;"
+        | "stored-data" -> "shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;"
+        // Network shapes
+        | "server" -> "shape=mxgraph.networks.server;html=1;"
+        | "database" -> "shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;"
+        | "cloud-service" -> "ellipse;shape=cloud;whiteSpace=wrap;html=1;"
+        // Default rectangular shape if not matched
+        | _ -> "rounded=0;whiteSpace=wrap;html=1;"
+    
+    /// Create a custom shape from a standard library shape type
+    let createStandardLibraryShape (name: string) (shapeType: string) (width: float) (height: float) =
+        createCustomShape name (getShapeStyleByType shapeType) width height None
+    
     /// Save a shape library to a file
     let saveLibraryToFile (library: ShapeLibrary) (filePath: string) =
         // Create a basic XML structure for the library
@@ -177,3 +214,45 @@ module ShapeLibrary =
             (updatedDiagram, newId)
         | None ->
             raise (ArgumentException($"Shape with ID {shapeId} not found in library {library.Name}")) 
+            
+    /// Add a shape to a diagram by using a shape type identifier rather than a library shape id
+    let addShapeByType (diagram: Diagram) (pageIndex: int) (shapeName: string) (shapeType: string) (x: float) (y: float) (width: float) (height: float) =
+        if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
+            raise <| IndexOutOfRangeException("Page index out of range")
+        
+        let page = diagram.Pages.[pageIndex]
+        let shapeId = DiagramManipulation.generateId()
+        
+        // Get the style for the shape type
+        let shapeStyle = getShapeStyleByType shapeType
+        
+        // Create a new vertex with the shape's properties
+        let newVertex = DiagramManipulation.createVertex 
+                            shapeId 
+                            shapeName 
+                            x 
+                            y 
+                            width 
+                            height 
+                            shapeStyle 
+                            "1" // Default layer
+                            
+        // Add the new vertex to the page
+        let updatedPage = {
+            page with
+                Cells = page.Cells @ [newVertex]
+        }
+        
+        // Update the diagram with the new page
+        let updatedPages = 
+            diagram.Pages
+            |> List.mapi (fun i p -> if i = pageIndex then updatedPage else p)
+        
+        // Return the updated diagram and the new shape ID
+        let updatedDiagram = {
+            diagram with
+                Modified = DateTime.Now
+                Pages = updatedPages
+        }
+        
+        (updatedDiagram, shapeId) 

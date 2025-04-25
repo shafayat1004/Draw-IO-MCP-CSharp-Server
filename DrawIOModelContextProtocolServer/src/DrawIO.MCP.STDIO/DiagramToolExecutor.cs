@@ -72,6 +72,7 @@ namespace DrawIO.MCP.STDIO
                     "flip_shape" => await FlipShapeAsync(arguments, diagramsDirectory, verbose, logWriter),
                     "set_diagram_background" => await SetDiagramBackgroundAsync(arguments, diagramsDirectory, logWriter, verbose),
                     "connect_shapes_at_points" => await ConnectShapesAtPointsAsync(arguments, diagramsDirectory, logWriter, verbose),
+                    "list_shape_types" => await McpToolHandlers.ListShapeTypesAsync(arguments, diagramsDirectory, logWriter, verbose),
                     _ => throw new ArgumentException($"Unknown tool: {toolName}")
                 };
 
@@ -346,17 +347,17 @@ namespace DrawIO.MCP.STDIO
                 var width = parameters.GetProperty("width").GetDouble();
                 var height = parameters.GetProperty("height").GetDouble();
                 var shape = parameters.TryGetProperty("shape", out var shapeElement) ? shapeElement.GetString() : "rectangle";
-
+                
                 // Load diagram
                 var diagramPath = Path.Combine(diagramsDirectory, diagramName);
                 var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
-
-                // Add shape
-                var (updatedDiagram, shapeId) = DrawIO.MCP.Core.DiagramManipulation.addShape(diagramObj, 0, value, x, y, width, height, shape);
-
+                
+                // Add shape using the new ShapeLibrary.addShapeByType function for more flexibility with shape types
+                var (updatedDiagram, shapeId) = DrawIO.MCP.Core.ShapeLibrary.addShapeByType(diagramObj, 0, value, shape, x, y, width, height);
+                
                 // Save updated diagram
                 DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
-
+                
                 return Task.FromResult<object>(new 
                 { 
                     status = "success",
@@ -373,16 +374,16 @@ namespace DrawIO.MCP.STDIO
             }
             catch (Exception ex)
             {
-                return Task.FromResult<object>(new
-                {
-                    isError = true,
-                    error = ex.Message,
+                return Task.FromResult<object>(new 
+                { 
+                    status = "error", 
+                    message = ex.Message,
                     content = new[]
                     {
                         new
                         {
                             type = "text",
-                            text = $"Error: {ex.Message}"
+                            text = $"Error adding shape: {ex.Message}"
                         }
                     }
                 });

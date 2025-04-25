@@ -109,7 +109,10 @@ namespace DrawIO.MCP.SSE
         public (Diagram, string) AddShape(string diagramName, string value, float x, float y, float width, float height, string shape)
         {
             var diagram = LoadDiagram(diagramName);
-            var (updatedDiagram, shapeId) = DiagramManipulation.addShape(diagram, 0, value, x, y, width, height, shape);
+            
+            // Use the new ShapeLibrary.addShapeByType function which supports a wider range of shape types
+            var (updatedDiagram, shapeId) = DrawIO.MCP.Core.ShapeLibrary.addShapeByType(diagram, 0, value, shape, x, y, width, height);
+            
             SaveDiagram(updatedDiagram, diagramName);
             return (updatedDiagram, shapeId);
         }
@@ -199,7 +202,7 @@ namespace DrawIO.MCP.SSE
         /// <summary>
         /// Sets the background color or image for a diagram
         /// </summary>
-        public void SetDiagramBackground(string diagramName, string backgroundImage, string backgroundColor)
+        public void SetDiagramBackground(string diagramName, string? backgroundImage, string? backgroundColor)
         {
             var diagram = LoadDiagram(diagramName);
             
@@ -522,7 +525,7 @@ namespace DrawIO.MCP.SSE
         /// <summary>
         /// Updates a shape in a diagram
         /// </summary>
-        public Diagram UpdateShape(string fileName, string shapeId, string value, float? x = null, float? y = null, float? width = null, float? height = null, string style = null)
+        public Diagram UpdateShape(string fileName, string shapeId, string value, float? x = null, float? y = null, float? width = null, float? height = null, string? style = null)
         {
             var diagram = LoadDiagram(fileName);
             

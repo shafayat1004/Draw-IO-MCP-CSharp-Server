@@ -68,6 +68,7 @@ app.UseMcp(mcpBuilder =>
     mcpBuilder.RegisterTool<FlipShapeTool>();
     mcpBuilder.RegisterTool<SetDiagramBackgroundTool>();
     mcpBuilder.RegisterTool<ConnectShapesAtPointsTool>();
+    mcpBuilder.RegisterTool<ListShapeTypesTool>();
 });
 
 // Add additional endpoints
@@ -1183,5 +1184,48 @@ public static class ToolExtensions
         }
         
         return response;
+    }
+}
+
+// Add a ListShapeTypesTool class similar to other tool classes
+public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<ListShapeTypesTool> logger)
+    : Tool
+{
+    private readonly ILogger<ListShapeTypesTool> _logger = logger;
+
+    public override string Name => "list_shape_types";
+
+    public override string Description => "List available shape types that can be used with add_shape";
+
+    public override ToolParameter[] Parameters => Array.Empty<ToolParameter>();
+
+    public override async Task<object> ExecuteAsync(ToolParameters parameters)
+    {
+        try
+        {
+            var shapeTypes = new Dictionary<string, List<string>>
+            {
+                ["Basic"] = new() { "rectangle", "ellipse", "circle", "triangle", "rhombus", "hexagon" },
+                ["Flowchart"] = new() { "decision", "data", "predefined", "stored-data", "process" },
+                ["UML"] = new() { "class", "interface", "package", "actor" },
+                ["Network"] = new() { "server", "database", "cloud", "cloud-service" },
+                ["Containers"] = new() { "document", "note", "cylinder", "diamond" }
+            };
+
+            return new
+            {
+                status = "success",
+                shapeCategories = shapeTypes
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error listing shape types");
+            return new
+            {
+                status = "error",
+                message = ex.Message
+            };
+        }
     }
 }

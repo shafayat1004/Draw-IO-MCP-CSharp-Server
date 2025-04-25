@@ -143,4 +143,57 @@ let ``SetDiagramBackground should set background image`` () =
     let xml = XmlSerializer.serializeDiagram updatedDiagram
     
     // Assert
-    Assert.Contains($"backgroundImage=\"{imagePath}\"", xml) 
+    Assert.Contains($"backgroundImage=\"{imagePath}\"", xml)
+
+[<Fact>]
+let ``GetShapeStyleByType should return valid style strings for known shape types`` () =
+    // Test basic shapes
+    let rectangleStyle = getShapeStyleByType "rectangle"
+    let ellipseStyle = getShapeStyleByType "ellipse"
+    let triangleStyle = getShapeStyleByType "triangle"
+    
+    // Test UML shapes
+    let classStyle = getShapeStyleByType "class"
+    let packageStyle = getShapeStyleByType "package"
+    
+    // Test flowchart shapes
+    let decisionStyle = getShapeStyleByType "decision"
+    
+    // Test network shapes
+    let databaseStyle = getShapeStyleByType "database"
+    
+    // Verify the styles contain expected values
+    Assert.Contains("rounded=0", rectangleStyle)
+    Assert.Contains("ellipse", ellipseStyle)
+    Assert.Contains("triangle", triangleStyle)
+    Assert.Contains("shape=umlFrame", classStyle)
+    Assert.Contains("shape=folder", packageStyle)
+    Assert.Contains("rhombus", decisionStyle)
+    Assert.Contains("shape=cylinder", databaseStyle)
+    
+    // Test unknown shape type returns default rectangle style
+    let unknownStyle = getShapeStyleByType "nonexistent_shape_type"
+    Assert.Contains("rounded=0", unknownStyle)
+    
+    // Test case-insensitivity
+    let mixedCaseStyle = getShapeStyleByType "ELLipsE"
+    Assert.Contains("ellipse", mixedCaseStyle)
+
+[<Fact>]
+let ``AddShapeByType should add a shape with correct style for the given shape type`` () =
+    // Arrange
+    let diagram = createEmptyDiagram()
+    
+    // Act
+    let (updatedDiagram, shapeId) = addShapeByType diagram 0 "Database" "database" 100.0 100.0 80.0 100.0
+    
+    // Assert
+    Assert.NotNull(updatedDiagram)
+    let addedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
+    
+    Assert.Equal("Database", addedShape.Value)
+    Assert.Equal(100.0, addedShape.Geometry.Value.Position.X)
+    Assert.Equal(100.0, addedShape.Geometry.Value.Position.Y)
+    Assert.Equal(80.0, addedShape.Geometry.Value.Size.Width)
+    Assert.Equal(100.0, addedShape.Geometry.Value.Size.Height)
+    Assert.Contains("shape=cylinder", addedShape.Style) 

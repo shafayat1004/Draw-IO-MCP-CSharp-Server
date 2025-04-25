@@ -11,6 +11,8 @@ using Microsoft.FSharp.Core;
 using static DrawIO.MCP.STDIO.FileOperations;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace DrawIO.MCP.STDIO
 {

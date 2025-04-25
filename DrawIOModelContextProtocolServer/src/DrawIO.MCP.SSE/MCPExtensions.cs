@@ -1,4 +1,7 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DrawIO.MCP.SSE
 {
@@ -10,8 +13,51 @@ namespace DrawIO.MCP.SSE
             var builder = new McpBuilder();
             configure(builder);
             
-            // Register the configured resources and tools
-            // This would normally set up the SSE connections and endpoints
+            // Get the WebApplication instance
+            if (app is WebApplication webApp)
+            {
+                var serviceProvider = webApp.Services;
+                
+                // Map the tools endpoint
+                webApp.MapPost("/mcp/tools/{toolName}", async (HttpContext context, string toolName) =>
+                {
+                    // Get all registered tool types from the container
+                    var tools = builder.GetTools();
+                    var toolInstances = tools.Select(t => serviceProvider.GetRequiredService(t) as Tool).ToList();
+                    
+                    // Find the tool with the matching name
+                    var matchingTool = toolInstances.FirstOrDefault(t => t?.Name.Equals(toolName, StringComparison.OrdinalIgnoreCase) == true);
+                    
+                    if (matchingTool == null)
+                    {
+                        context.Response.StatusCode = 404;
+                        await context.Response.WriteAsJsonAsync(new { status = "error", message = $"Tool not found: {toolName}" });
+                        return;
+                    }
+                    
+                    try
+                    {
+                        // Parse the request body to get parameters
+                        var requestBody = await context.Request.ReadFromJsonAsync<JsonElement>();
+                        var parameters = new ToolParameters(requestBody);
+                        
+                        // Execute the tool
+                        var result = await matchingTool.ExecuteAsync(parameters);
+                        
+                        // Return the result
+                        await context.Response.WriteAsJsonAsync(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsJsonAsync(new { status = "error", message = ex.Message });
+                    }
+                });
+                
+                // Map resources endpoint if needed
+                // (implementation omitted for brevity)
+            }
+            
             return app;
         }
 
@@ -74,6 +120,8 @@ namespace DrawIO.MCP.SSE
     {
         IMcpBuilder RegisterResourceProvider<T>() where T : ResourceProvider;
         IMcpBuilder RegisterTool<T>() where T : Tool;
+        IReadOnlyList<Type> GetTools();
+        IReadOnlyList<Type> GetResourceProviders();
     }
     
     // Implementation of MCP builder
@@ -93,6 +141,10 @@ namespace DrawIO.MCP.SSE
             _tools.Add(typeof(T));
             return this;
         }
+        
+        public IReadOnlyList<Type> GetTools() => _tools;
+        
+        public IReadOnlyList<Type> GetResourceProviders() => _resourceProviders;
     }
     
     // Extension method to add MCP services
@@ -100,7 +152,17 @@ namespace DrawIO.MCP.SSE
     {
         public static IServiceCollection AddMcpServer(this IServiceCollection services)
         {
-            // Register MCP-related services
+            // Register all tool types
+            var toolTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => !t.IsAbstract && t.IsClass && t.IsSubclassOf(typeof(Tool)))
+                .ToList();
+                
+            foreach (var toolType in toolTypes)
+            {
+                services.AddTransient(toolType);
+            }
+            
             return services;
         }
     }

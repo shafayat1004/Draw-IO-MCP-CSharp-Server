@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace DrawIO.MCP.SSE
 {
     // Base interfaces for MCP implementation
@@ -130,6 +132,22 @@ namespace DrawIO.MCP.SSE
     public class ToolParameters
     {
         private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
+
+        public ToolParameters()
+        {
+        }
+        
+        public ToolParameters(JsonElement element)
+        {
+            if (element.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var property in element.EnumerateObject())
+                {
+                    // Convert JsonElement to appropriate CLR type
+                    _values[property.Name] = property.Value.ToFriendlyObject() ?? string.Empty;
+                }
+            }
+        }
 
         public void SetValue(string name, object value)
         {

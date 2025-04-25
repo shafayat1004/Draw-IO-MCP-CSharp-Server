@@ -8,6 +8,7 @@ using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Microsoft.FSharp.Core;
 using static DrawIO.MCP.STDIO.FileOperations;
+using Microsoft.Extensions.Logging;
 
 namespace DrawIO.MCP.STDIO
 {
@@ -1472,6 +1473,61 @@ namespace DrawIO.MCP.STDIO
 
             // Return a result with the array of tools properly structured
             return Task.FromResult<object>(new { tools });
+        }
+
+        /// <summary>
+        /// List available shape types that can be used with add_shape
+        /// </summary>
+        public static Task<object> ListShapeTypesAsync(JsonElement parameters, string diagramsDirectory, TextWriter logWriter, bool verbose)
+        {
+            try
+            {
+                // Define common shape categories and their types
+                var shapeTypes = new Dictionary<string, List<string>>
+                {
+                    ["Basic"] = new() { "rectangle", "ellipse", "circle", "triangle", "rhombus", "hexagon" },
+                    ["Flowchart"] = new() { "decision", "data", "predefined", "stored-data", "process" },
+                    ["UML"] = new() { "class", "interface", "package", "actor" },
+                    ["Network"] = new() { "server", "database", "cloud", "cloud-service" },
+                    ["Containers"] = new() { "document", "note", "cylinder", "diamond" }
+                };
+
+                return Task.FromResult<object>(new
+                {
+                    status = "success",
+                    shapeCategories = shapeTypes,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = "Available shape types for use with add_shape tool"
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                if (verbose)
+                {
+                    logWriter.WriteLine($"Error listing shape types: {ex.Message}");
+                    logWriter.WriteLine(ex.StackTrace);
+                }
+                
+                return Task.FromResult<object>(new
+                {
+                    status = "error",
+                    message = ex.Message,
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = $"Error listing shape types: {ex.Message}"
+                        }
+                    }
+                });
+            }
         }
     }
 } 
