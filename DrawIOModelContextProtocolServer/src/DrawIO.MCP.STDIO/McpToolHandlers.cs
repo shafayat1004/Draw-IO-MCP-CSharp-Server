@@ -518,7 +518,16 @@ namespace DrawIO.MCP.STDIO
                             {
                                 Type = "integer",
                                 Description = "Index of the page to delete",
-                                Required = true
+                                Required = false
+                            }
+                        },
+                        {
+                            "page_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the page to delete",
+                                Required = false
                             }
                         }
                     }
@@ -553,7 +562,7 @@ namespace DrawIO.MCP.STDIO
                             {
                                 Type = "integer",
                                 Description = "Index of the source page",
-                                Required = true
+                                Required = false
                             }
                         },
                         {
@@ -562,7 +571,25 @@ namespace DrawIO.MCP.STDIO
                             {
                                 Type = "integer",
                                 Description = "Index of the target page",
-                                Required = true
+                                Required = false
+                            }
+                        },
+                        {
+                            "source_page_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the source page",
+                                Required = false
+                            }
+                        },
+                        {
+                            "target_page_id",
+                            new McpParameterDefinition
+                            {
+                                Type = "string",
+                                Description = "ID of the target page",
+                                Required = false
                             }
                         }
                     }

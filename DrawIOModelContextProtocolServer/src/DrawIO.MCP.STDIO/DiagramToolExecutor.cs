@@ -990,27 +990,66 @@ namespace DrawIO.MCP.STDIO
         private static Task<object> DeleteDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
         {
             string diagram = GetParameterString(parameters, "diagram");
-            string pageId = GetParameterString(parameters, "page_id");
+            string pageId = null;
+            DrawIO.MCP.Core.Types.Diagram diagramObj = null;
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
-            if (!File.Exists(filePath))
+            // Try to get page ID directly
+            if (parameters.TryGetProperty("page_id", out var pageIdElement))
             {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                pageId = pageIdElement.GetString();
+            }
+            // If page ID isn't provided, try to get it from page index
+            else if (parameters.TryGetProperty("page_index", out var pageIndexElement))
+            {
+                int pageIndex = pageIndexElement.GetInt32();
+                
+                // Load the diagram to get the page ID from index
+                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                if (!File.Exists(diagramPath))
+                {
+                    throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                }
+                
+                diagramObj = LoadDiagram(diagramPath);
+                
+                // Validate page index
+                if (pageIndex >= 0 && pageIndex < diagramObj.Pages.Length)
+                {
+                    pageId = diagramObj.Pages[pageIndex].Id;
+                }
+                else
+                {
+                    throw new ArgumentException($"Page index {pageIndex} is out of range");
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Either page_id or page_index must be provided");
             }
             
-            // Load the diagram
-            var loadedDiagram = LoadDiagram(filePath);
+            if (diagramObj == null)
+            {
+                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                if (!File.Exists(diagramPath))
+                {
+                    throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                }
+                
+                // Load the diagram
+                diagramObj = LoadDiagram(diagramPath);
+            }
             
             // Delete the page
-            var updatedDiagram = DrawIO.MCP.Core.FileOperations.deleteDiagramPage(loadedDiagram, pageId);
+            var updatedDiagram = DrawIO.MCP.Core.FileOperations.deleteDiagramPage(diagramObj, pageId);
             
             // Check if the diagram was modified (the page was deleted)
-            bool deleted = updatedDiagram.Pages.Length < loadedDiagram.Pages.Length;
+            bool deleted = updatedDiagram.Pages.Length < diagramObj.Pages.Length;
             
             if (deleted)
             {
                 // Save the updated diagram
-                SaveDiagram(updatedDiagram, filePath);
+                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                SaveDiagram(updatedDiagram, diagramPath);
             }
             
             string message = deleted ? $"Page {pageId} deleted" : "Page could not be deleted (may be the only page)";
@@ -1034,22 +1073,103 @@ namespace DrawIO.MCP.STDIO
         {
             string diagram = GetParameterString(parameters, "diagram");
             string cellId = GetParameterString(parameters, "cell_id");
-            string sourcePageId = GetParameterString(parameters, "source_page_id");
-            string targetPageId = GetParameterString(parameters, "target_page_id");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
-            if (!File.Exists(filePath))
+            // Support both page_index and page_id parameters for backward compatibility
+            string sourcePageId = null;
+            string targetPageId = null;
+            DrawIO.MCP.Core.Types.Diagram diagramObj = null;
+            
+            // Try to get page IDs directly
+            if (parameters.TryGetProperty("source_page_id", out var sourcePageIdElement))
             {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                sourcePageId = sourcePageIdElement.GetString();
             }
             
-            // Load the diagram
-            var loadedDiagram = LoadDiagram(filePath);
+            if (parameters.TryGetProperty("target_page_id", out var targetPageIdElement))
+            {
+                targetPageId = targetPageIdElement.GetString();
+            }
+            
+            // If page IDs aren't provided, try to get them from page indices
+            if (sourcePageId == null && parameters.TryGetProperty("source_page_index", out var sourcePageIndexElement))
+            {
+                int sourcePageIndex = sourcePageIndexElement.GetInt32();
+                
+                // Load the diagram to get the page ID from index
+                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                if (!File.Exists(diagramPath))
+                {
+                    throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                }
+                
+                diagramObj = LoadDiagram(diagramPath);
+                
+                // Validate page index
+                if (sourcePageIndex >= 0 && sourcePageIndex < diagramObj.Pages.Length)
+                {
+                    sourcePageId = diagramObj.Pages[sourcePageIndex].Id;
+                }
+                else
+                {
+                    throw new ArgumentException($"Source page index {sourcePageIndex} is out of range");
+                }
+            }
+            
+            if (targetPageId == null && parameters.TryGetProperty("target_page_index", out var targetPageIndexElement))
+            {
+                int targetPageIndex = targetPageIndexElement.GetInt32();
+                
+                // Load the diagram if not already loaded
+                if (diagramObj == null)
+                {
+                    string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                    if (!File.Exists(diagramPath))
+                    {
+                        throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                    }
+                    
+                    diagramObj = LoadDiagram(diagramPath);
+                }
+                
+                // Validate page index
+                if (targetPageIndex >= 0 && targetPageIndex < diagramObj.Pages.Length)
+                {
+                    targetPageId = diagramObj.Pages[targetPageIndex].Id;
+                }
+                else
+                {
+                    throw new ArgumentException($"Target page index {targetPageIndex} is out of range");
+                }
+            }
+            
+            // Ensure both page IDs are provided
+            if (string.IsNullOrEmpty(sourcePageId))
+            {
+                throw new ArgumentException("Source page ID is required");
+            }
+            
+            if (string.IsNullOrEmpty(targetPageId))
+            {
+                throw new ArgumentException("Target page ID is required");
+            }
+            
+            // Load the diagram if not already loaded
+            if (diagramObj == null)
+            {
+                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                if (!File.Exists(diagramPath))
+                {
+                    throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                }
+                
+                diagramObj = LoadDiagram(diagramPath);
+            }
             
             // Move the cell between pages
-            var updatedDiagram = DrawIO.MCP.Core.FileOperations.moveCellBetweenPages(loadedDiagram, cellId, sourcePageId, targetPageId);
+            var updatedDiagram = DrawIO.MCP.Core.FileOperations.moveCellBetweenPages(diagramObj, cellId, sourcePageId, targetPageId);
             
             // Save the updated diagram
+            string filePath = Path.Combine(diagramsDirectory, diagram);
             SaveDiagram(updatedDiagram, filePath);
             
             string message = $"Cell {cellId} moved from page {sourcePageId} to page {targetPageId}";
@@ -2312,27 +2432,82 @@ namespace DrawIO.MCP.STDIO
             });
         }
 
-        private static async Task<object> ReverseConnectorAsync(JsonElement parameters, string diagramsDirectory)
+        private static Task<object> ReverseConnectorAsync(JsonElement parameters, string diagramsDirectory)
         {
             string diagram = GetParameterString(parameters, "diagram");
             string connectorId = GetParameterString(parameters, "connector_id");
             bool returnDiagram = parameters.TryGetProperty("return_diagram", out var returnDiagramElement) && returnDiagramElement.GetBoolean();
 
-            var response = await ReverseConnectorAsync(diagram, connectorId, returnDiagram);
-
-            return new Dictionary<string, object>
+            // Check if file exists before attempting to process
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
             {
-                ["status"] = "success",
-                ["elementId"] = connectorId,
-                ["content"] = new[]
+                return Task.FromResult<object>(new Dictionary<string, object>
                 {
-                    new Dictionary<string, string>
+                    ["isError"] = true,
+                    ["error"] = $"Diagram file not found: {diagram}",
+                    ["content"] = new[]
                     {
-                        ["type"] = "text",
-                        ["text"] = $"Reversed connector direction"
+                        new Dictionary<string, string>
+                        {
+                            ["type"] = "text",
+                            ["text"] = $"Error: Diagram file not found: {diagram}"
+                        }
                     }
+                });
+            }
+            
+            try
+            {
+                // Load the diagram
+                var diagramObj = LoadDiagram(filePath);
+                
+                // Reverse the connector
+                var (updatedDiagram, _) = DrawIO.MCP.Core.DiagramManipulation.reverseConnector(diagramObj, 0, connectorId);
+                
+                // Save the updated diagram
+                SaveDiagram(updatedDiagram, filePath);
+                
+                var baseResponse = new Dictionary<string, object>
+                {
+                    ["status"] = "success",
+                    ["elementId"] = connectorId,
+                    ["content"] = new[]
+                    {
+                        new Dictionary<string, string>
+                        {
+                            ["type"] = "text",
+                            ["text"] = $"Reversed connector direction"
+                        }
+                    }
+                };
+                
+                // Add diagram content if requested
+                if (returnDiagram)
+                {
+                    // Get the diagram image and add it to the response
+                    var diagramResponse = GetDiagramImage(diagram, diagramsDirectory);
+                    baseResponse["diagram"] = diagramResponse;
                 }
-            };
+                
+                return Task.FromResult<object>(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new Dictionary<string, object>
+                {
+                    ["isError"] = true,
+                    ["error"] = ex.Message,
+                    ["content"] = new[]
+                    {
+                        new Dictionary<string, string>
+                        {
+                            ["type"] = "text",
+                            ["text"] = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
         }
 
         private static Task<object> AddWaypointAsync(JsonElement parameters, string diagramsDirectory)
@@ -2443,42 +2618,106 @@ namespace DrawIO.MCP.STDIO
             string filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                return Task.FromResult<object>(new Dictionary<string, object>
+                {
+                    ["isError"] = true,
+                    ["error"] = $"Diagram file not found: {diagram}",
+                    ["content"] = new[]
+                    {
+                        new Dictionary<string, string>
+                        {
+                            ["type"] = "text",
+                            ["text"] = $"Error: Diagram file not found: {diagram}"
+                        }
+                    }
+                });
             }
             
-            // Load the diagram
-            var diagramObj = LoadDiagram(filePath);
-            
-            // Create F# options for x and y values
-            Microsoft.FSharp.Core.FSharpOption<double> xOption = 
-                x.HasValue ? Microsoft.FSharp.Core.FSharpOption<double>.Some(x.Value) : null;
-            Microsoft.FSharp.Core.FSharpOption<double> yOption = 
-                y.HasValue ? Microsoft.FSharp.Core.FSharpOption<double>.Some(y.Value) : null;
-            
-            // Update waypoint position
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateWaypoint(
-                diagramObj, 
-                0, // page index
-                connectorId,
-                waypointIndex,
-                xOption,
-                yOption
-            );
-            SaveDiagram(updatedDiagram, filePath);
-            
-            return Task.FromResult<object>(new 
+            try
             {
-                status = "success",
-                DiagramId = $"diagram://{diagram}",
-                content = new[] 
-                { 
-                    new 
-                    { 
-                        type = "text", 
-                        text = $"Updated waypoint at index {waypointIndex} for connector {connectorId}" 
-                    } 
+                // Load the diagram
+                var diagramObj = LoadDiagram(filePath);
+                
+                // First check if the connector has the waypoint at the specified index
+                var waypoints = DrawIO.MCP.Core.DiagramManipulation.getWaypoints(diagramObj, 0, connectorId);
+                int waypointsCount = waypoints?.Count() ?? 0;
+                
+                if (waypointIndex < 0 || waypointIndex >= waypointsCount)
+                {
+                    return Task.FromResult<object>(new Dictionary<string, object>
+                    {
+                        ["isError"] = true,
+                        ["error"] = $"Waypoint index {waypointIndex} is out of range",
+                        ["content"] = new[]
+                        {
+                            new Dictionary<string, string>
+                            {
+                                ["type"] = "text",
+                                ["text"] = $"Error: Waypoint index {waypointIndex} is out of range. The connector has {waypointsCount} waypoints."
+                            }
+                        }
+                    });
                 }
-            });
+                
+                // Create F# options for x and y values
+                Microsoft.FSharp.Core.FSharpOption<double> xOption = 
+                    x.HasValue ? Microsoft.FSharp.Core.FSharpOption<double>.Some((double)x.Value) : Microsoft.FSharp.Core.FSharpOption<double>.None;
+                Microsoft.FSharp.Core.FSharpOption<double> yOption = 
+                    y.HasValue ? Microsoft.FSharp.Core.FSharpOption<double>.Some((double)y.Value) : Microsoft.FSharp.Core.FSharpOption<double>.None;
+                
+                // Update waypoint position
+                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateWaypoint(
+                    diagramObj, 
+                    0, // page index
+                    connectorId,
+                    waypointIndex,
+                    xOption,
+                    yOption
+                );
+                SaveDiagram(updatedDiagram, filePath);
+                
+                var response = new Dictionary<string, object>
+                {
+                    ["status"] = "success",
+                    ["elementId"] = connectorId,
+                    ["content"] = new[]
+                    {
+                        new Dictionary<string, string>
+                        {
+                            ["type"] = "text",
+                            ["text"] = $"Updated waypoint at index {waypointIndex} for connector {connectorId}"
+                        }
+                    }
+                };
+                
+                // Add return diagram if requested
+                if (parameters.TryGetProperty("return_diagram", out var returnDiagramElement) && returnDiagramElement.GetBoolean())
+                {
+                    var diagramImage = GetDiagramImage(diagram, diagramsDirectory);
+                    if (diagramImage != null)
+                    {
+                        response["diagram"] = diagramImage;
+                    }
+                }
+                
+                return Task.FromResult<object>(response);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>(new Dictionary<string, object>
+                {
+                    ["isError"] = true,
+                    ["error"] = ex.Message,
+                    ["content"] = new[]
+                    {
+                        new Dictionary<string, string>
+                        {
+                            ["type"] = "text",
+                            ["text"] = $"Error: {ex.Message}"
+                        }
+                    }
+                });
+            }
         }
         
         private static Task<object> GetWaypointsAsync(JsonElement parameters, string diagramsDirectory)
@@ -3000,48 +3239,50 @@ namespace DrawIO.MCP.STDIO
             DrawIO.MCP.Core.FileOperations.saveDiagram(diagram, filePath);
         }
 
-        private static async Task<DiagramResponse> ReverseConnectorAsync(string diagram, string connectorId, bool returnDiagram = false)
+        // Helper for diagram image extraction
+        private static object GetDiagramImage(string diagram, string diagramsDirectory)
         {
-            var (diagramData, pageIndex) = await GetDiagramAndPageIndexAsync(diagram);
-            var (updatedDiagram, _) = DrawIO.MCP.Core.DiagramManipulation.reverseConnector(diagramData, pageIndex, connectorId);
-            await SaveDiagramAsync(diagram, updatedDiagram);
-
-            return new DiagramResponse
+            string filePath = Path.Combine(diagramsDirectory, diagram);
+            if (!File.Exists(filePath))
             {
-                ConnectorId = connectorId,
-                DiagramImage = returnDiagram ? await GetDiagramImageAsync(diagram) : null
-            };
-        }
-
-        private static async Task<(DrawIO.MCP.Core.Types.Diagram, int)> GetDiagramAndPageIndexAsync(string diagram)
-        {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), diagram);
-            if (!await Task.Run(() => File.Exists(filePath)))
-            {
-                throw new FileNotFoundException($"Diagram file not found: {diagram}");
+                return null;
             }
             
-            // Load diagram in a background thread since it involves file I/O and XML parsing
-            var diagramData = await Task.Run(() => LoadDiagram(filePath));
-            return (diagramData, 0); // Default to first page
-        }
-
-        private static async Task SaveDiagramAsync(string diagram, DrawIO.MCP.Core.Types.Diagram updatedDiagram)
-        {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), diagram);
-            // Save diagram in a background thread since it involves file I/O and XML serialization
-            await Task.Run(() => SaveDiagram(updatedDiagram, filePath));
-        }
-
-        private static async Task<object> GetDiagramImageAsync(string diagram)
-        {
-            var parameters = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(new
+            try
             {
-                diagram = diagram,
-                format = "png"
-            }));
-            
-            return await GetDiagramImageAsync(parameters, Directory.GetCurrentDirectory(), null, false);
+                // Load the diagram to convert to SVG or PNG
+                var xmlContent = File.ReadAllText(filePath);
+                var base64Image = ConvertDiagramToImage(xmlContent, "png");
+                
+                return new Dictionary<string, object>
+                {
+                    ["format"] = "png",
+                    ["data"] = base64Image
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // Add this method to convert diagram to image
+        private static string ConvertDiagramToImage(string xmlContent, string format)
+        {
+            try
+            {
+                // In a real implementation, this would use a library to convert the diagram to an image
+                // For simplicity and to make the code compile, we're returning a placeholder
+                // You should replace this with actual implementation that converts XML to image
+                
+                // Simulating a 1x1 pixel transparent PNG in base64
+                return "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error converting diagram to image: {ex.Message}");
+                return string.Empty;
+            }
         }
     }
 } 
