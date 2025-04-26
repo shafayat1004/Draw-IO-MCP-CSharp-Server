@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.FSharp.Core;
-using Microsoft.FSharp.Collections;
 using static DrawIO.MCP.STDIO.FileOperations;
 
 // Add a type alias for easier reference to F# types
@@ -13,15 +12,6 @@ using FSharpTypes = DrawIO.MCP.Core.Types;
 
 namespace DrawIO.MCP.STDIO
 {
-    /// <summary>
-    /// Response type for diagram operations that return a connector ID and optional image
-    /// </summary>
-    public class DiagramResponse
-    {
-        public string ConnectorId { get; set; }
-        public object DiagramImage { get; set; }
-    }
-
     /// <summary>
     /// Handles execution of diagram manipulation tools
     /// </summary>
@@ -38,20 +28,22 @@ namespace DrawIO.MCP.STDIO
                 bool returnDiagram = false;
                 if (arguments.TryGetProperty("return_diagram", out var returnDiagramElement))
                 {
-                    // Ensure we handle true/false values properly
-                    if (returnDiagramElement.ValueKind == JsonValueKind.True)
+                    switch (returnDiagramElement.ValueKind)
                     {
-                        returnDiagram = true;
-                    }
-                    else if (returnDiagramElement.ValueKind == JsonValueKind.False)
-                    {
-                        returnDiagram = false;
-                    }
-                    else if (returnDiagramElement.ValueKind == JsonValueKind.String)
-                    {
-                        // Handle string values like "true" or "false"
-                        string strValue = returnDiagramElement.GetString().ToLowerInvariant();
-                        returnDiagram = (strValue == "true");
+                        // Ensure we handle true/false values properly
+                        case JsonValueKind.True:
+                            returnDiagram = true;
+                            break;
+                        case JsonValueKind.False:
+                            returnDiagram = false;
+                            break;
+                        case JsonValueKind.String:
+                        {
+                            // Handle string values like "true" or "false"
+                            string strValue = returnDiagramElement.GetString()?.ToLowerInvariant();
+                            returnDiagram = (strValue == "true");
+                            break;
+                        }
                     }
                 }
                 

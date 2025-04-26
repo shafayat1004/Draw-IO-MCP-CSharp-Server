@@ -1,12 +1,4 @@
-using System;
-using System.IO;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Xunit;
-using DrawIO.MCP.STDIO;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace DrawIO.MCP.STDIO.Tests
 {

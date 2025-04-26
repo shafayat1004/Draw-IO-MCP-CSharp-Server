@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Microsoft.FSharp.Core;
-using Microsoft.FSharp.Collections;
 using DrawIO.MCP.Core;
 using static DrawIO.MCP.Core.Types;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace DrawIO.MCP.SSE
 {

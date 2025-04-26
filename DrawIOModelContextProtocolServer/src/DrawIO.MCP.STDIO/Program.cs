@@ -3,16 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.CommandLine;
-using Microsoft.FSharp.Core;
-using static DrawIO.MCP.STDIO.FileOperations;
 using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace DrawIO.MCP.STDIO
 {

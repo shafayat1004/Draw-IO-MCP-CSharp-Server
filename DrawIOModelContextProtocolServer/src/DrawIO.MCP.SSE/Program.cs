@@ -1,13 +1,5 @@
 using DrawIO.MCP.SSE;
-using Microsoft.FSharp.Core;
 using CoreTypes = DrawIO.MCP.Core.Types;
-using CoreFileOps = DrawIO.MCP.Core.FileOperations;
-using CoreDiagramOps = DrawIO.MCP.Core.DiagramManipulation;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
