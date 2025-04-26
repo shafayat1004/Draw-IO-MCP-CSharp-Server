@@ -1772,37 +1772,62 @@ namespace DrawIO.MCP.STDIO
                 } 
             };
 
-            var result = new Dictionary<string, object>
+            // Build the info object
+            var infoObj = new Dictionary<string, object>
             {
-                ["status"] = "success",
                 ["id"] = info.Id,
                 ["type"] = info.Type,
                 ["value"] = info.Value,
                 ["style"] = info.Style,
                 ["parent"] = info.Parent,
-                ["connections"] = connections,
-                ["content"] = infoMessage
+                ["connections"] = connections
             };
-
             if (info.Position.IsSome())
             {
                 var pos = info.Position.Value;
-                result["position"] = new Dictionary<string, double>
+                infoObj["position"] = new Dictionary<string, double>
                 {
                     ["x"] = pos.X,
                     ["y"] = pos.Y
                 };
             }
-
             if (info.Size.IsSome())
             {
                 var size = info.Size.Value;
-                result["size"] = new Dictionary<string, double>
+                infoObj["size"] = new Dictionary<string, double>
                 {
                     ["width"] = size.Width,
                     ["height"] = size.Height
                 };
             }
+            if (info.IsEdge)
+            {
+                infoObj["isEdge"] = true;
+                if (info.Source != null && info.Source.IsSome())
+                    infoObj["source"] = info.Source.Value;
+                if (info.Target != null && info.Target.IsSome())
+                    infoObj["target"] = info.Target.Value;
+            }
+            if (info.Waypoints != null && info.Waypoints.IsSome())
+            {
+                var waypoints = info.Waypoints.Value
+                    .Select(wp => new Dictionary<string, object>
+                    {
+                        ["x"] = wp.X,
+                        ["y"] = wp.Y,
+                        ["isRelative"] = wp.IsRelative
+                    })
+                    .ToList();
+                infoObj["waypoints"] = waypoints;
+            }
+
+            // Build the result dictionary with both top-level and elementInfo
+            var result = new Dictionary<string, object>(infoObj)
+            {
+                ["status"] = "success",
+                ["content"] = infoMessage,
+                ["elementInfo"] = infoObj // for SimplifiedMcpTests
+            };
 
             return Task.FromResult<object>(result);
         }
@@ -1898,6 +1923,18 @@ namespace DrawIO.MCP.STDIO
                 } 
             };
             
+            // Build bounds object
+            var boundsObj = new Dictionary<string, object>
+            {
+                ["minX"] = boundingBox.MinX,
+                ["minY"] = boundingBox.MinY,
+                ["maxX"] = boundingBox.MaxX,
+                ["maxY"] = boundingBox.MaxY,
+                ["width"] = boundingBox.Width,
+                ["height"] = boundingBox.Height
+            };
+
+            // Return both top-level and bounds property
             return Task.FromResult<object>(new Dictionary<string, object>
             {
                 ["status"] = "success",
@@ -1907,6 +1944,7 @@ namespace DrawIO.MCP.STDIO
                 ["maxY"] = boundingBox.MaxY,
                 ["width"] = boundingBox.Width,
                 ["height"] = boundingBox.Height,
+                ["bounds"] = boundsObj, // for SimplifiedMcpTests
                 ["content"] = boundsMessage
             });
         }
