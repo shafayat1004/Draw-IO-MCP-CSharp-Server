@@ -265,10 +265,27 @@ Our current implementation supports sophisticated connector styling and routing 
 34. **Comments** 🔴
     - Approach: Metadata storage
     - Complexity: Medium
-    
-35. **Revision History** 🔴
-    - Approach: State management
-    - Complexity: High
+
+35. **Revision History / Undo-Redo** 🔴 - *High priority for usability*
+    - **Feature:** Implement undo/redo functionality controllable via MCP tools (`undo`, `redo`).
+    - **Approach (Refined based on Codebase Analysis):**
+        - **State Management:** Store complete diagram states as XML strings. This aligns with the existing load/save pattern per operation and avoids complex object cloning.
+        - **Data Structures:** Use a static `System.Collections.Concurrent.ConcurrentDictionary<string, Tuple<Stack<string>, Stack<string>>>` within the STDIO server (e.g., in `DiagramToolExecutor` or a dedicated state manager class). Key: diagram filename, Value: Tuple of (`undoStack`, `redoStack`) containing XML strings.
+        - **History Limit:** Make the undo depth configurable via settings (e.g., `DRAWIO_UNDO_HISTORY_DEPTH`, default 20). Enforce limit when pushing to `undoStack`.
+        - **Tool Integration Point:** Hook into `DiagramToolExecutor.ExecuteToolAsync`.
+        - **Logic Flow for Modifying Tools:**
+            1.  Identify state-changing tools (requires a predefined list/check).
+            2.  Extract `diagramName`.
+            3.  Read the *current* diagram XML content (`File.ReadAllTextAsync`) *before* calling the specific tool's implementation method (e.g., `AddShapeAsync`).
+            4.  Get/create the `undo`/`redo` stacks for this `diagramName` from the dictionary.
+            5.  Execute the specific tool's method (which loads, calls Core F# logic, and returns the updated `Diagram` object).
+            6.  **On Success:** Push the *pre-modification* XML onto the `undoStack` (enforcing history limit), clear the `redoStack`. *Then*, call `SaveDiagram` with the modified `Diagram` object.
+            7.  **On Failure:** Do not modify stacks or save.
+        - **New Tool Implementation (within `DiagramToolExecutor` switch):**
+            - `undo`: Get stacks, pop XML from `undoStack`, push *current* XML (read from file) to `redoStack`, parse popped XML back to `Diagram` object, call `SaveDiagram` with restored object. Handle empty stack case.
+            - `redo`: Get stacks, pop XML from `redoStack`, push *current* XML to `undoStack`, parse popped XML back to `Diagram` object, call `SaveDiagram` with restored object. Handle empty stack case.
+    - **Complexity:** High (Requires careful state management, modification to `DiagramToolExecutor`, potentially new Core functions for XML parsing, robust stack logic, configuration handling).
+    - **Dependencies:** Affects `DiagramToolExecutor`, requires changes to how state-modifying tools are called, needs robust session/state management via the dictionary.
 
 ## Core Architecture Enhancements
 
@@ -304,10 +321,10 @@ Our current implementation supports sophisticated connector styling and routing 
    - Support global styles
 
 ### Future Enhancements
-1. **State Management**
-   - Implement undo/redo
-   - Support revision history
-   - Enable collaboration
+1. **State Management / Undo-Redo Engine**
+   - Implement the undo/redo stack mechanism using the refined plan (ConcurrentDictionary, XML state, integration in `DiagramToolExecutor`).
+   - Support revision history snapshots (potentially building on the undo stack).
+   - Enable collaboration features based on robust state tracking.
 
 2. **Plugin Architecture**
    - Design plugin interface
@@ -339,14 +356,22 @@ Our current implementation supports sophisticated connector styling and routing 
    - Create tool for automatic shape resizing
    - Add tests for text measurement and shape resizing
 
-4. **Remaining Tier 2 Implementation**
+4. **Undo/Redo Implementation** (High Priority)
+    - Implement the `ConcurrentDictionary`-based state management for undo/redo stacks (storing XML strings).
+    - Refactor `DiagramToolExecutor.ExecuteToolAsync` to integrate state capture (reading current XML), stack manipulation, and conditional saving for state-modifying tools.
+    - Implement the `undo` and `redo` tools within the `DiagramToolExecutor` switch, including logic for stack handling and saving restored states.
+    - Add configuration for history depth.
+    - Develop comprehensive tests covering various undo/redo sequences, edge cases (empty stacks, history limit), and interactions with different tool types.
+
+5. **Remaining Tier 2 Implementation**
    - Focus on alignment and distribution options
    - Implement layer management
    - Add advanced styling features
 
-5. **Documentation**
-   - Update API documentation
-   - Add usage examples
-   - Create tutorials for new features
-   - Document waypoint handling and connector styling
-   - Document grouping functionality 
+6. **Documentation**
+   - Update API documentation for all tools, including `undo` and `redo`.
+   - Add usage examples for undo/redo.
+   - Create tutorials for new features.
+   - Document waypoint handling and connector styling.
+   - Document grouping functionality.
+   - Document the undo/redo mechanism, its implementation details (dictionary, XML state), and configuration. 
