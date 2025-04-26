@@ -161,8 +161,12 @@ Date: 2024-03-27
 - Tool: generate_vpc
 - Status: ❌ FAILED
 - File Name: vpc_example_2024.drawio
-- Error: Tool execution failed
-- Note: Unable to generate VPC layout diagram
+- Error: Implementation mismatch - tool schema vs actual requirements
+- Details: 
+  - Schema only requires diagram_name parameter
+  - Implementation requires additional content array parameter
+  - Error: "invalid_type, expected: array, received: undefined, path: [content]"
+- Note: Tool needs schema update to match implementation requirements
 
 ### 25. Update Shape Style
 - Tool: update_shape_style
@@ -180,9 +184,12 @@ Date: 2024-03-27
 
 ### 27. Connect Shapes at Points
 - Tool: connect_shapes_at_points
-- Status: ❌ FAILED
-- Error: Target shape not found
-- Note: Failed because Shape 2 was moved to page 2 in previous test
+- Status: ✅ SUCCESS
+- Source Shape: Connection Test Shape 1 (mcp_d0cca2f3)
+- Target Shape: Connection Test Shape 2 (mcp_2654222e)
+- Connector ID: mcp_c30055aa
+- Details: Successfully connected shapes at specified points
+- Note: Connection created with proper arrow direction and positioning
 
 ### 28. Group Shapes
 - Tool: group_shapes
@@ -312,27 +319,29 @@ Date: 2024-03-27
 Total: 44 tools tested successfully
 
 ### Failed Tools (❌)
-1. generate_vpc (tool execution failed)
-2. connect_shapes_at_points (target shape not found)
+1. generate_vpc (implementation mismatch - tool schema vs actual requirements)
 
 ### Success Rate
 - Total Tools Tested: 44
-- Successful Tests: 42 (95.45%)
-- Failed Tests: 2 (4.55%)
-- Success Rate: 95.45%
+- Successful Tests: 43 (97.73%)
+- Failed Tests: 1 (2.27%)
+- Success Rate: 97.73%
 
 ## Key Findings
 
 ### 1. Core Functionality
-- Basic diagram operations work reliably
+- All basic diagram operations work reliably
 - Shape manipulation tools function as expected
 - Style operations are robust
-- Page management has some implementation requirements
+- Page management operations work as intended
+- Point-to-point connections work correctly
+- VPC layout generation needs parameter validation
 
 ### 2. Common Issues
 - Page operations require explicit page IDs
 - Style properties must be passed as strings
 - Some operations have specific parameter requirements
+- VPC generation tool requires content array parameter
 
 ### 3. Strengths
 - Reliable shape manipulation
@@ -344,6 +353,7 @@ Total: 44 tools tested successfully
 - Page management API consistency
 - Parameter type handling
 - Documentation clarity about required parameters
+- Tool schema and implementation alignment (particularly for VPC generation)
 
 ## Recommendations
 
@@ -351,21 +361,25 @@ Total: 44 tools tested successfully
    - Standardize parameter naming across all operations
    - Align documentation with actual implementation
    - Consider using consistent ID vs index approach
+   - Update tool schemas to match implementation requirements
 
 2. Error Handling
    - Implement more descriptive error messages
    - Add parameter validation
    - Improve file existence checks
+   - Add schema validation for all required parameters
 
 3. Documentation
    - Update parameter descriptions to match implementation
    - Add examples for complex operations
    - Document parameter types and constraints
+   - Document all required parameters, even if not in schema
 
 4. Testing
    - Implement automated tests for all operations
    - Add edge case testing
    - Create integration tests for complex workflows
+   - Add schema validation tests
 
 ## Next Steps
 1. Report identified issues to development team
@@ -374,4 +388,4 @@ Total: 44 tools tested successfully
 4. Implement suggested improvements
 
 ## Final Notes
-The testing has provided valuable insights into the API's functionality and areas for improvement. The high success rate of 95.45% indicates a robust implementation, with only minor issues in specific tool executions. All core functionality, including grouping and ungrouping operations, has been successfully verified. 
+The testing has provided valuable insights into the API's functionality and areas for improvement. The high success rate of 97.73% indicates a robust implementation, with only one tool execution failure. All core functionality, including grouping and ungrouping operations, has been successfully verified. 
