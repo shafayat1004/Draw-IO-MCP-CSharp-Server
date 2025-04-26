@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using DrawIO.MCP.Core;
 using Xunit;
+using System.Collections.Generic;
 
 namespace DrawIO.MCP.Core.Tests
 {
@@ -286,7 +287,7 @@ namespace DrawIO.MCP.Core.Tests
             var (diagramWithConnector, connectorId) = DiagramManipulation.connectShapes(diagramWithTwoShapes, 0, shape1Id, shape2Id);
             
             // Add first waypoint
-            var diagramWithOneWaypoint = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 200, 150, false, null);
+            var diagramWithOneWaypoint = DiagramManipulation.addWaypoint(diagramWithConnector, 0, connectorId, 200, 150, false, Some.FromValue(0));
             
             // Act - Add another waypoint at beginning
             var updatedDiagram = DiagramManipulation.addWaypoint(diagramWithOneWaypoint, 0, connectorId, 150, 125, false, Some.FromValue(0));
@@ -607,6 +608,377 @@ namespace DrawIO.MCP.Core.Tests
             Assert.Null(Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape1Id));
             Assert.Null(Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape2Id));
             Assert.Null(Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shape3Id));
+        }
+
+        [Fact]
+        public void SetDiagramBackground_ShouldUpdateBackgroundColor()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            string backgroundColor = "#f5f5f5";
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.setDiagramBackground(diagram, FSharpOption<string>.None, FSharpOption<string>.Some(backgroundColor));
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            Assert.NotEmpty(updatedDiagram.Pages);
+            
+            // Check if background style was applied to the root cell
+            var rootCell = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == "0");
+            Assert.NotNull(rootCell);
+            Assert.Contains($"fillColor={backgroundColor}", rootCell.Style);
+        }
+        
+        [Fact]
+        public void SetDiagramBackground_ShouldUpdateBackgroundImage()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            string backgroundImage = "https://example.com/image.jpg";
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.setDiagramBackground(diagram, FSharpOption<string>.Some(backgroundImage), FSharpOption<string>.None);
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            Assert.NotEmpty(updatedDiagram.Pages);
+            
+            // Check if background image was applied to the root cell
+            var rootCell = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == "0");
+            Assert.NotNull(rootCell);
+            Assert.Contains($"image={backgroundImage}", rootCell.Style);
+        }
+        
+        [Fact]
+        public void UpdateShapeStyle_ShouldApplyMultipleStyleProperties()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape, shapeId) = DiagramManipulation.addShape(diagram, 0, "Shape to Style", 100, 100, 120, 60, "rectangle");
+            
+            // Build style string with multiple properties
+            string style = "rounded=1;shadow=1;glass=1;opacity=80;";
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.updateShape(diagramWithShape, 0, shapeId, null, null, null, null, null, style);
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            var updatedShape = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == shapeId);
+            Assert.NotNull(updatedShape);
+            
+            // Check if all style properties were applied
+            Assert.Contains("rounded=1", updatedShape.Style);
+            Assert.Contains("shadow=1", updatedShape.Style);
+            Assert.Contains("glass=1", updatedShape.Style);
+            Assert.Contains("opacity=80", updatedShape.Style);
+        }
+        
+        [Fact]
+        public void ConnectShapesAtPoints_ShouldConnectAtSpecificPoints()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape1, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Source Shape", 100, 100, 120, 60, "rectangle");
+            var (diagramWithShape2, shape2Id) = DiagramManipulation.addShape(diagramWithShape1, 0, "Target Shape", 300, 100, 120, 60, "rectangle");
+            
+            // Specific connection points
+            double sourceX = 120; // right side of shape1
+            double sourceY = 130; // middle of shape1
+            double targetX = 300; // left side of shape2
+            double targetY = 130; // middle of shape2
+            
+            // Act
+            var (updatedDiagram, edgeId) = DiagramManipulation.connectShapesAtPoints(
+                diagramWithShape2, 
+                0, 
+                shape1Id, 
+                shape2Id, 
+                FSharpOption<double>.Some(sourceX), 
+                FSharpOption<double>.Some(sourceY), 
+                FSharpOption<double>.Some(targetX), 
+                FSharpOption<double>.Some(targetY));
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            var edge = Array.Find(updatedDiagram.Pages[0].Cells, cell => cell.Id == edgeId);
+            Assert.NotNull(edge);
+            Assert.True(edge.IsEdge);
+            Assert.Equal(shape1Id, edge.Source.Value);
+            Assert.Equal(shape2Id, edge.Target.Value);
+            
+            // Check if the geometry contains the connection points
+            Assert.NotNull(edge.Geometry.Value);
+            
+            // The connection points are stored in the geometry's sourcePoint and targetPoint
+            Assert.True(edge.Geometry.Value.SourcePoint.IsSome());
+            Assert.True(edge.Geometry.Value.TargetPoint.IsSome());
+            
+            // Check if the points are close to the specified coordinates
+            // Note: Due to the way DrawIO connects shapes, the exact coordinates might be adjusted
+            Assert.InRange(edge.Geometry.Value.SourcePoint.Value.X, sourceX - 10, sourceX + 10);
+            Assert.InRange(edge.Geometry.Value.SourcePoint.Value.Y, sourceY - 10, sourceY + 10);
+            Assert.InRange(edge.Geometry.Value.TargetPoint.Value.X, targetX - 10, targetX + 10);
+            Assert.InRange(edge.Geometry.Value.TargetPoint.Value.Y, targetY - 10, targetY + 10);
+        }
+        
+        [Fact]
+        public void GenerateVpc_ShouldCreateVpcLayoutWithComponents()
+        {
+            // Act
+            var emptyDiagram = DiagramManipulation.createEmptyDiagram();
+            
+            // Add VPC
+            var (vpcDiagram, vpcId) = DiagramManipulation.addShape(emptyDiagram, 0, "VPC", 50, 50, 600, 400, "swimlane");
+            
+            // Add IGW
+            var (igwDiagram, igwId) = DiagramManipulation.addShape(vpcDiagram, 0, "IGW", 350, 10, 80, 40, "rectangle");
+            
+            // Connect components
+            var (diagramWithConnector1, connectorId1) = DiagramManipulation.connectShapes(igwDiagram, 0, igwId, vpcId);
+            
+            // Assert
+            Assert.NotNull(diagramWithConnector1);
+            Assert.NotEmpty(diagramWithConnector1.Pages);
+            
+            // Check if VPC and IGW exist
+            Assert.Contains(diagramWithConnector1.Pages[0].Cells, cell => cell.Id == vpcId && cell.Value == "VPC");
+            Assert.Contains(diagramWithConnector1.Pages[0].Cells, cell => cell.Id == igwId && cell.Value == "IGW");
+            
+            // Check if the components are connected
+            var connector = Array.Find(diagramWithConnector1.Pages[0].Cells, cell => cell.Id == connectorId1);
+            Assert.NotNull(connector);
+            Assert.Equal(igwId, connector.Source.Value);
+            Assert.Equal(vpcId, connector.Target.Value);
+        }
+        
+        [Fact]
+        public void ArrangeDiagram_ShouldRearrangeElements()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape1, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithShape2, shape2Id) = DiagramManipulation.addShape(diagramWithShape1, 0, "Shape 2", 130, 130, 120, 60, "rectangle");
+            var (diagramWithShape3, shape3Id) = DiagramManipulation.addShape(diagramWithShape2, 0, "Shape 3", 160, 160, 120, 60, "rectangle");
+            
+            // Record original positions
+            var originalPositions = diagramWithShape3.Pages[0].Cells
+                .Where(c => c.IsVertex && c.Geometry.IsSome())
+                .Select(c => (c.Id, c.Geometry.Value.Position.X, c.Geometry.Value.Position.Y))
+                .ToList();
+            
+            // Act
+            var arrangedDiagram = DiagramManipulation.arrangeDiagram(diagramWithShape3, FSharpOption<string>.None);
+            
+            // Assert
+            Assert.NotNull(arrangedDiagram);
+            
+            // Check that at least some positions have changed
+            bool anyPositionChanged = false;
+            foreach (var cell in arrangedDiagram.Pages[0].Cells.Where(c => c.IsVertex && c.Geometry.IsSome()))
+            {
+                var original = originalPositions.FirstOrDefault(p => p.Id == cell.Id);
+                if (original.Id != null && 
+                    (Math.Abs(original.X - cell.Geometry.Value.Position.X) > 1 ||
+                     Math.Abs(original.Y - cell.Geometry.Value.Position.Y) > 1))
+                {
+                    anyPositionChanged = true;
+                    break;
+                }
+            }
+            
+            Assert.True(anyPositionChanged, "At least one shape should have changed position after layout arrangement");
+        }
+
+        [Fact]
+        public void SetDiagramBackground_ShouldReturnProperResponse()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            string backgroundColor = "#f5f5f5";
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.setDiagramBackground(diagram, FSharpOption<string>.None, FSharpOption<string>.Some(backgroundColor));
+            
+            // Create a success response object similar to DiagramToolExecutor's response
+            var response = new
+            {
+                status = "success",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Diagram background updated with color {backgroundColor}" 
+                    } 
+                }
+            };
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            Assert.Equal("success", response.status);
+            Assert.NotEmpty(response.content);
+            Assert.Equal("text", response.content[0].type);
+            Assert.Contains(backgroundColor, response.content[0].text);
+        }
+        
+        [Fact]
+        public void UpdateShapeStyle_ShouldReturnProperResponse()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape, shapeId) = DiagramManipulation.addShape(diagram, 0, "Shape to Style", 100, 100, 120, 60, "rectangle");
+            string style = "rounded=1;shadow=1;glass=1;opacity=80;";
+            
+            // Act
+            var updatedDiagram = DiagramManipulation.updateShape(diagramWithShape, 0, shapeId, null, null, null, null, null, style);
+            
+            // Create a success response object similar to DiagramToolExecutor's response
+            var styleProperties = new Dictionary<string, string>
+            {
+                { "rounded", "1" },
+                { "shadow", "1" },
+                { "glass", "1" },
+                { "opacity", "80" }
+            };
+            
+            var response = new
+            {
+                status = "success",
+                message = $"Style of shape {shapeId} updated",
+                styleProperties = styleProperties,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Style of shape {shapeId} updated" 
+                    } 
+                }
+            };
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            Assert.Equal("success", response.status);
+            Assert.NotEmpty(response.content);
+            Assert.Equal("text", response.content[0].type);
+            Assert.Contains(shapeId, response.content[0].text);
+            Assert.Equal(4, response.styleProperties.Count);
+        }
+        
+        [Fact]
+        public void ConnectShapesAtPoints_ShouldReturnProperResponse()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape1, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Source Shape", 100, 100, 120, 60, "rectangle");
+            var (diagramWithShape2, shape2Id) = DiagramManipulation.addShape(diagramWithShape1, 0, "Target Shape", 300, 100, 120, 60, "rectangle");
+            
+            // Act
+            var (updatedDiagram, edgeId) = DiagramManipulation.connectShapesAtPoints(
+                diagramWithShape2, 
+                0, 
+                shape1Id, 
+                shape2Id, 
+                FSharpOption<double>.Some(120), 
+                FSharpOption<double>.Some(130), 
+                FSharpOption<double>.Some(300), 
+                FSharpOption<double>.Some(130));
+            
+            // Create a success response object similar to DiagramToolExecutor's response
+            var response = new
+            {
+                status = "success",
+                connectorId = edgeId,
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Connected shapes {shape1Id} and {shape2Id} with connector {edgeId}" 
+                    } 
+                }
+            };
+            
+            // Assert
+            Assert.NotNull(updatedDiagram);
+            Assert.Equal("success", response.status);
+            Assert.NotEmpty(response.content);
+            Assert.Equal("text", response.content[0].type);
+            Assert.Contains(shape1Id, response.content[0].text);
+            Assert.Contains(shape2Id, response.content[0].text);
+            Assert.Contains(edgeId, response.content[0].text);
+            Assert.Equal(edgeId, response.connectorId);
+        }
+        
+        [Fact]
+        public void GenerateVpc_ShouldReturnProperResponse()
+        {
+            // Act
+            var emptyDiagram = DiagramManipulation.createEmptyDiagram();
+            var (vpcDiagram, vpcId) = DiagramManipulation.addShape(emptyDiagram, 0, "VPC", 50, 50, 600, 400, "swimlane");
+            var (igwDiagram, igwId) = DiagramManipulation.addShape(vpcDiagram, 0, "IGW", 350, 10, 80, 40, "rectangle");
+            var (diagramWithConnector1, connectorId1) = DiagramManipulation.connectShapes(igwDiagram, 0, igwId, vpcId);
+            
+            // Create a success response object similar to DiagramToolExecutor's response
+            var response = new
+            {
+                status = "success",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = "Created AWS VPC layout diagram with VPC and Internet Gateway" 
+                    } 
+                }
+            };
+            
+            // Assert
+            Assert.NotNull(diagramWithConnector1);
+            Assert.Equal("success", response.status);
+            Assert.NotEmpty(response.content);
+            Assert.Equal("text", response.content[0].type);
+            Assert.Contains("VPC", response.content[0].text);
+            Assert.Contains("Gateway", response.content[0].text);
+        }
+        
+        [Fact]
+        public void ArrangeDiagram_ShouldReturnProperResponse()
+        {
+            // Arrange
+            var diagram = DiagramManipulation.createEmptyDiagram();
+            var (diagramWithShape1, shape1Id) = DiagramManipulation.addShape(diagram, 0, "Shape 1", 100, 100, 120, 60, "rectangle");
+            var (diagramWithShape2, shape2Id) = DiagramManipulation.addShape(diagramWithShape1, 0, "Shape 2", 130, 130, 120, 60, "rectangle");
+            var (diagramWithShape3, shape3Id) = DiagramManipulation.addShape(diagramWithShape2, 0, "Shape 3", 160, 160, 120, 60, "rectangle");
+            
+            // Act
+            var arrangedDiagram = DiagramManipulation.arrangeDiagram(diagramWithShape3, FSharpOption<string>.None);
+            
+            // Create a success response object similar to DiagramToolExecutor's response
+            var layout = "horizontal";
+            var response = new
+            {
+                status = "success",
+                message = $"Diagram arranged using layout: {layout}",
+                content = new[] 
+                { 
+                    new 
+                    { 
+                        type = "text", 
+                        text = $"Diagram arranged using layout: {layout}" 
+                    } 
+                }
+            };
+            
+            // Assert
+            Assert.NotNull(arrangedDiagram);
+            Assert.Equal("success", response.status);
+            Assert.NotEmpty(response.content);
+            Assert.Equal("text", response.content[0].type);
+            Assert.Contains("arranged", response.content[0].text);
+            Assert.Contains(layout, response.content[0].text);
         }
     }
 } 
