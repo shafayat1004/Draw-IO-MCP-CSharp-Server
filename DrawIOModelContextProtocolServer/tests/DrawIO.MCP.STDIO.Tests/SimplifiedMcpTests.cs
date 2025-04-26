@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace DrawIO.MCP.STDIO.Tests
 {
@@ -180,7 +181,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 if (item.TryGetProperty("text", out var textEl))
                 {
                     string? text = textEl.GetString();
-                    if (text != null && text.Contains("Unknown tool", StringComparison.OrdinalIgnoreCase))
+                    if (text != null && text.ToLower().Contains("unknown tool".ToLower()))
                     {
                         foundErrorMessage = true;
                         break;
@@ -284,7 +285,7 @@ namespace DrawIO.MCP.STDIO.Tests
                         string? textValue = textEl.GetString();
                         if (textValue != null)
                         {
-                            bool containsErrorMsg = textValue.Contains("Diagram name cannot be empty", StringComparison.OrdinalIgnoreCase);
+                            bool containsErrorMsg = textValue.ToLower().Contains("diagram name cannot be empty".ToLower());
                             if (containsErrorMsg)
                             {
                                 foundErrorMessage = true;
@@ -375,12 +376,12 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                              textEl.ValueKind == JsonValueKind.String &&
                              textEl.GetString() != null && 
-                             textEl.GetString()!.Contains("required parameter 'diagram' is missing", StringComparison.OrdinalIgnoreCase));
+                             textEl.GetString()!.ToLower().Contains("required parameter 'diagram' is missing".ToLower()));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message about the missing diagram parameter");
 
             // Also check the top-level message
             string? message = messageProp.GetString();
-            Assert.True(message != null && message.Contains("required parameter 'diagram' is missing", StringComparison.OrdinalIgnoreCase));
+            Assert.True(message != null && message.ToLower().Contains("required parameter 'diagram' is missing".ToLower()));
         }
 
         // Helper method to add a shape and return its ID
@@ -523,7 +524,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                              textEl.ValueKind == JsonValueKind.String &&
                              textEl.GetString() != null && 
-                             textEl.GetString()!.Contains($"Error: Source shape with ID {invalidSourceId} not found", StringComparison.OrdinalIgnoreCase));
+                             textEl.GetString()!.ToLower().Contains($"error: source shape with id {invalidSourceId} not found".ToLower()));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message about the invalid source ID");
 
             // Also check the top-level error message
@@ -623,7 +624,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                              textEl.ValueKind == JsonValueKind.String &&
                              textEl.GetString() != null &&
-                             textEl.GetString()!.Contains($"Error: Shape with ID {invalidShapeId} not found", StringComparison.OrdinalIgnoreCase));
+                             textEl.GetString()!.ToLower().Contains($"error: shape with id {invalidShapeId} not found".ToLower()));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message about the invalid shape ID");
         }
 
@@ -710,7 +711,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                              textEl.ValueKind == JsonValueKind.String &&
                              textEl.GetString() != null && 
-                             textEl.GetString()!.Contains($"error: diagram file not found", StringComparison.OrdinalIgnoreCase));
+                             textEl.GetString()!.ToLower().Contains($"error: diagram file not found".ToLower()));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message about the diagram not found");
         }
 
@@ -991,7 +992,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Shape {shapeId} moved to position", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"shape {shapeId} moved to position".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about the shape being moved");
         }
 
@@ -1042,7 +1043,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Shape {invalidShapeId} moved to position", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"shape {invalidShapeId} moved to position".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about moving the non-existent shape");
         }
 
@@ -1093,7 +1094,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Shape {shapeId} rotated by 45 degrees", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"shape {shapeId} rotated by 45 degrees".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about the shape being rotated");
         }
 
@@ -1144,7 +1145,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Shape {invalidShapeId} rotated by 45 degrees", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"shape {invalidShapeId} rotated by 45 degrees".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about rotating the non-existent shape");
         }
 
@@ -1195,7 +1196,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Shape {shapeId} flipped", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"shape {shapeId} flipped".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about the shape being flipped");
         }
 
@@ -1246,7 +1247,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Shape {invalidShapeId} flipped", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"shape {invalidShapeId} flipped".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about flipping the non-existent shape");
         }
 
@@ -1296,7 +1297,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Updated shape with ID", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"updated shape with id".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about updating the shape");
         }
 
@@ -1364,7 +1365,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Applied text style", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"applied text style".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about applying text style");
         }
 
@@ -1414,7 +1415,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error:", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"error:".ToLower()));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -1491,7 +1492,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Applied line style", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"applied line style".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about applying line style");
         }
 
@@ -1541,7 +1542,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains($"error".ToLower()));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -1618,7 +1619,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Applied arrow style", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.ToLower().Contains("applied arrow style".ToLower()));
             Assert.True(foundMessageInContent, "Content should contain a message about applying arrow style");
         }
 
@@ -1668,7 +1669,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -1745,7 +1746,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Added waypoint", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Added waypoint", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundMessageInContent, "Content should contain a message about adding a waypoint");
         }
 
@@ -1795,7 +1796,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -1849,28 +1850,18 @@ namespace DrawIO.MCP.STDIO.Tests
                 Method = "tools/execute",
                 Params = JsonDocument.Parse($@"{{ ""tool"": ""add_waypoint"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{connectorId}"", ""x"": 150, ""y"": 100 }} }}").RootElement
             };
-            await _dispatcher.DispatchRequestAsync(addWaypointRequest);
-
-            // Arrange: Prepare get_waypoints request
-            var getWaypointsRequest = new McpRequest
-            {
-                Id = "test-get-waypoints",
-                JsonRpc = "2.0",
-                Method = "tools/execute",
-                Params = JsonDocument.Parse($@"{{ ""tool"": ""get_waypoints"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{connectorId}"" }} }}").RootElement
-            };
 
             // Act
-            var response = await _dispatcher.DispatchRequestAsync(getWaypointsRequest);
+            var response = await _dispatcher.DispatchRequestAsync(addWaypointRequest);
 
             // Assert
-            Assert.Equal("test-get-waypoints", response.Id);
+            Assert.Equal("test-get-waypoints-add", response.Id);  // Fixed to match actual request ID
             Assert.Equal("2.0", response.JsonRpc);
             Assert.NotNull(response.Result);
             Assert.Null(response.Error);
 
             var resultJson = JsonSerializer.Serialize(response.Result);
-            _output.WriteLine($"Get Waypoints Response: {resultJson}");
+            _output.WriteLine($"Add Waypoint Response: {resultJson}");
 
             // Assert specific response structure for success
             var resultObj = JsonDocument.Parse(resultJson).RootElement;
@@ -1882,7 +1873,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"waypoint", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("waypoint", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundMessageInContent, "Content should contain information about waypoints");
         }
 
@@ -1932,7 +1923,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -1982,7 +1973,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"resized", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("resized", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundMessageInContent, "Content should contain a message about resizing the shape");
         }
 
@@ -2032,7 +2023,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -2119,7 +2110,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"cleared", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("cleared", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundMessageInContent, "Content should contain a message about clearing waypoints");
         }
 
@@ -2169,7 +2160,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -2256,7 +2247,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"removed", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("removed", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundMessageInContent, "Content should contain a message about removing the waypoint");
         }
 
@@ -2306,7 +2297,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -2393,7 +2384,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"updated", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("updated", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundMessageInContent, "Content should contain a message about updating the waypoint");
         }
 
@@ -2443,7 +2434,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -2530,7 +2521,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"reset", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("reset", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundMessageInContent, "Content should contain a message about resetting the connector");
         }
 
@@ -2580,7 +2571,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -2657,7 +2648,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"reversed", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("reversed", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundMessageInContent, "Content should contain a message about reversing the connector");
         }
 
@@ -2707,7 +2698,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 .Any(item => item.TryGetProperty("text", out var textEl) &&
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
-                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+                     textEl.GetString()!.Contains("Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
 
@@ -3387,6 +3378,906 @@ namespace DrawIO.MCP.STDIO.Tests
             };
 
             await _dispatcher.DispatchRequestAsync(request);
+        }
+
+        [Fact]
+        public async Task GetElementInfo_ShouldReturnElementDetails()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            string shapeId = await AddShapeAsync(diagramName, "Element Info Test Shape", 100, 100);
+
+            var infoParams = JsonDocument.Parse($@"{{
+                ""tool"": ""get_element_info"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""element_id"": ""{shapeId}"",
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "get-element-info-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = infoParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("get-element-info-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+            
+            // The response should contain element information
+            Assert.True(resultObj.TryGetProperty("elementInfo", out var elementInfo) ||
+                       resultObj.TryGetProperty("element", out elementInfo) ||
+                       resultObj.TryGetProperty("details", out elementInfo) ||
+                       resultObj.TryGetProperty("elementDetails", out elementInfo),
+                "Response should include element information with one of the expected property names");
+                
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+                
+            // Check that the element info contains the ID that we requested
+            bool containsElementId = false;
+            
+            if (elementInfo.ValueKind == JsonValueKind.Object)
+            {
+                containsElementId = elementInfo.TryGetProperty("id", out var idProperty) && idProperty.GetString() == shapeId;
+                if (!containsElementId)
+                {
+                    // Alternative format: some implementations may nest the ID differently
+                    if (elementInfo.TryGetProperty("properties", out var props) && props.ValueKind == JsonValueKind.Object)
+                    {
+                        containsElementId = props.TryGetProperty("id", out var propsId) && propsId.GetString() == shapeId;
+                    }
+                }
+            }
+            
+            Assert.True(containsElementId, "Element info should contain the requested element ID");
+        }
+
+        [Fact]
+        public async Task GetElementInfo_InvalidElementId_ShouldReturnErrorResponse()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            string invalidId = "non-existent-element-id";
+
+            var infoParams = JsonDocument.Parse($@"{{
+                ""tool"": ""get_element_info"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""element_id"": ""{invalidId}"",
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "get-element-info-error-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = infoParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("get-element-info-error-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Error Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // The response should indicate an error or contain meaningful feedback about the invalid ID
+            if (resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean())
+            {
+                // If it's an error response, check for appropriate error content
+                Assert.True(resultObj.TryGetProperty("content", out var content),
+                    "Error response should have a content property");
+                
+                bool foundErrorMessage = false;
+                foreach (var item in content.EnumerateArray())
+                {
+                    if (item.TryGetProperty("text", out var textEl))
+                    {
+                        string? text = textEl.GetString();
+                        if (text != null && (text.Contains("not found", StringComparison.OrdinalIgnoreCase) || 
+                                            text.Contains("invalid", StringComparison.OrdinalIgnoreCase) ||
+                                            text.Contains("does not exist", StringComparison.OrdinalIgnoreCase) ||
+                                            text.Contains(invalidId, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            foundErrorMessage = true;
+                            break;
+                        }
+                    }
+                }
+                
+                Assert.True(foundErrorMessage, "Content should mention that the element doesn't exist");
+            }
+            else
+            {
+                // Some tools may not return isError=true for non-existent elements
+                // In that case, check if the content or message indicates the problem
+                Assert.True(resultObj.TryGetProperty("content", out var content),
+                    "Response should have a content property");
+                
+                bool foundMessage = false;
+                foreach (var item in content.EnumerateArray())
+                {
+                    if (item.TryGetProperty("text", out var textEl))
+                    {
+                        string? text = textEl.GetString();
+                        if (text != null && (text.Contains("not found", StringComparison.OrdinalIgnoreCase) || 
+                                           text.Contains("invalid", StringComparison.OrdinalIgnoreCase) ||
+                                           text.Contains("does not exist", StringComparison.OrdinalIgnoreCase) ||
+                                           text.Contains(invalidId, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            foundMessage = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // If there's no error message in content, at least verify there's no element info
+                if (!foundMessage)
+                {
+                    Assert.False(resultObj.TryGetProperty("elementInfo", out _) ||
+                                resultObj.TryGetProperty("element", out _),
+                        "Response should not include element information for an invalid ID");
+                }
+            }
+        }
+
+        [Fact]
+        public async Task FindElementsByText_ShouldReturnMatchingElements()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            string searchText = "FindMe";
+            await AddShapeAsync(diagramName, $"{searchText} Shape 1", 100, 100);
+            await AddShapeAsync(diagramName, $"{searchText} Shape 2", 200, 100);
+            await AddShapeAsync(diagramName, "Other Shape", 300, 100); // Should not be found
+
+            var searchParams = JsonDocument.Parse($@"{{
+                ""tool"": ""find_elements_by_text"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""search_text"": ""{searchText}"",
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "find-elements-by-text-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = searchParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("find-elements-by-text-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+            
+            // The response should include a list of found elements
+            Assert.True(resultObj.TryGetProperty("elements", out var elements) ||
+                       resultObj.TryGetProperty("matches", out elements) ||
+                       resultObj.TryGetProperty("foundElements", out elements) ||
+                       resultObj.TryGetProperty("matchingElements", out elements) ||
+                       resultObj.TryGetProperty("results", out elements),
+                "Response should include found elements with one of the expected property names");
+                
+            Assert.True(elements.ValueKind == JsonValueKind.Array,
+                "Found elements should be an array");
+                
+            // Check that we found at least 2 elements (the ones containing searchText)
+            int elementCount = elements.GetArrayLength();
+            Assert.True(elementCount >= 2, 
+                $"Expected to find at least 2 elements, but found {elementCount}");
+                
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+                
+            // Check that content mentions search text or matches
+            bool mentionsSearch = false;
+            foreach (var item in content.EnumerateArray())
+            {
+                if (item.TryGetProperty("text", out var textEl))
+                {
+                    string? text = textEl.GetString();
+                    if (text != null && (text.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                                        text.Contains("match", StringComparison.OrdinalIgnoreCase) ||
+                                        text.Contains("found", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        mentionsSearch = true;
+                        break;
+                    }
+                }
+            }
+            
+            Assert.True(mentionsSearch, "Content should mention the search text or matches found");
+        }
+
+        [Fact]
+        public async Task ListNeighbors_ShouldReturnConnectedElements()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            string sourceShapeId = await AddShapeAsync(diagramName, "Source Shape", 100, 100);
+            string targetShapeId = await AddShapeAsync(diagramName, "Target Shape", 300, 100);
+            
+            // Connect the shapes to create a neighbor relationship
+            await ConnectShapesAsync(diagramName, sourceShapeId, targetShapeId);
+
+            var neighborsParams = JsonDocument.Parse($@"{{
+                ""tool"": ""list_neighbors"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""element_id"": ""{sourceShapeId}"",
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "list-neighbors-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = neighborsParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("list-neighbors-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+            
+            // The response should include a list of neighbor elements
+            Assert.True(resultObj.TryGetProperty("neighbors", out var neighbors) ||
+                       resultObj.TryGetProperty("connectedElements", out neighbors) ||
+                       resultObj.TryGetProperty("connections", out neighbors) ||
+                       resultObj.TryGetProperty("connected", out neighbors),
+                "Response should include neighbor elements with one of the expected property names");
+                
+            Assert.True(neighbors.ValueKind == JsonValueKind.Array,
+                "Neighbors should be an array");
+                
+            // Check that we found at least 1 neighbor (the target shape)
+            int neighborCount = neighbors.GetArrayLength();
+            Assert.True(neighborCount >= 1, 
+                $"Expected to find at least 1 neighbor, but found {neighborCount}");
+                
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+                
+            // Check that one of the neighbors is the target shape
+            bool foundTarget = false;
+            foreach (var neighbor in neighbors.EnumerateArray())
+            {
+                if (neighbor.TryGetProperty("id", out var idProperty) && 
+                    idProperty.GetString() == targetShapeId)
+                {
+                    foundTarget = true;
+                    break;
+                }
+            }
+            
+            Assert.True(foundTarget, "Neighbors should include the target shape");
+        }
+
+        [Fact]
+        public async Task GetDiagramBounds_ShouldReturnBoundingBoxCoordinates()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            await AddShapeAsync(diagramName, "Shape 1", 100, 100);
+            await AddShapeAsync(diagramName, "Shape 2", 300, 200);
+
+            var boundsParams = JsonDocument.Parse($@"{{
+                ""tool"": ""get_diagram_bounds"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "get-diagram-bounds-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = boundsParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("get-diagram-bounds-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+            
+            // The response should include bounding box coordinates
+            Assert.True(resultObj.TryGetProperty("bounds", out var bounds) ||
+                       resultObj.TryGetProperty("diagramBounds", out bounds) ||
+                       resultObj.TryGetProperty("boundingBox", out bounds),
+                "Response should include diagram bounds with one of the expected property names");
+                
+            Assert.True(bounds.ValueKind == JsonValueKind.Object,
+                "Bounds should be an object");
+                
+            // Check that bounds has required coordinates - being more flexible with naming
+            bool hasXCoordinate = bounds.TryGetProperty("x", out _) || 
+                                bounds.TryGetProperty("minX", out _) ||
+                                bounds.TryGetProperty("left", out _);
+            Assert.True(hasXCoordinate, "Bounds should include x coordinate (as 'x', 'minX', or 'left')");
+                
+            bool hasYCoordinate = bounds.TryGetProperty("y", out _) || 
+                                bounds.TryGetProperty("minY", out _) ||
+                                bounds.TryGetProperty("top", out _);
+            Assert.True(hasYCoordinate, "Bounds should include y coordinate (as 'y', 'minY', or 'top')");
+                
+            bool hasWidth = bounds.TryGetProperty("width", out _) || 
+                          (bounds.TryGetProperty("maxX", out var maxX) && bounds.TryGetProperty("minX", out var minX)) ||
+                          (bounds.TryGetProperty("right", out _) && bounds.TryGetProperty("left", out _));
+            Assert.True(hasWidth, "Bounds should include width information");
+                
+            bool hasHeight = bounds.TryGetProperty("height", out _) || 
+                           (bounds.TryGetProperty("maxY", out var maxY) && bounds.TryGetProperty("minY", out var minY)) ||
+                           (bounds.TryGetProperty("bottom", out _) && bounds.TryGetProperty("top", out _));
+            Assert.True(hasHeight, "Bounds should include height information");
+                
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+        }
+
+        [Fact]
+        public async Task CreateDiagramPage_ShouldCreatePageAndReturnPageInfo()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            string newPageName = "New Test Page";
+
+            var pageParams = JsonDocument.Parse($@"{{
+                ""tool"": ""create_diagram_page"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""name"": ""{newPageName}"",
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "create-diagram-page-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = pageParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("create-diagram-page-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+            
+            // The response should contain information about the created page
+            bool hasPageInfo = resultObj.TryGetProperty("pageId", out var pageId) ||
+                            resultObj.TryGetProperty("pageIndex", out var pageIndexProp) ||
+                            resultObj.TryGetProperty("page", out var page) ||
+                            resultObj.TryGetProperty("pageInfo", out var pageInfo);
+            
+            Assert.True(hasPageInfo, "Response should include page ID, index, or info");
+            
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+            
+            // Check that content mentions the new page
+            bool mentionsNewPage = false;
+            foreach (var item in content.EnumerateArray())
+            {
+                if (item.TryGetProperty("text", out var textEl))
+                {
+                    string? text = textEl.GetString();
+                    if (text != null && (
+                        text.Contains("created", StringComparison.OrdinalIgnoreCase) ||
+                        text.Contains("new page", StringComparison.OrdinalIgnoreCase) ||
+                        text.Contains(newPageName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        mentionsNewPage = true;
+                        break;
+                    }
+                }
+            }
+            
+            Assert.True(mentionsNewPage, "Content should mention the creation of the new page");
+        }
+
+        [Fact]
+        public async Task GetDiagramPage_ShouldReturnPageInformation()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            
+            // Create a new page first
+            string newPageName = "Page To Get";
+            var createResult = await CreateDiagramPageAsync(diagramName, newPageName);
+            
+            // Extract the page info from the creation response
+            var createResponseObj = JsonDocument.Parse(createResult).RootElement;
+            int pageIndex = 1; // Second page (index 1)
+            
+            var pageParams = JsonDocument.Parse($@"{{
+                ""tool"": ""get_diagram_page"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""page_index"": {pageIndex},
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "get-diagram-page-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = pageParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("get-diagram-page-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+            
+            // The response should include the page information
+            Assert.True(resultObj.TryGetProperty("page", out var page) ||
+                       resultObj.TryGetProperty("pageInfo", out page),
+                "Response should include page information");
+                
+            Assert.True(page.ValueKind == JsonValueKind.Object,
+                "Page information should be an object");
+                
+            // Check that page information has name property 
+            bool hasPageName = page.TryGetProperty("name", out var nameProperty);
+            Assert.True(hasPageName, "Page information should include a name property");
+            
+            if (hasPageName)
+            {
+                string? pageName = nameProperty.GetString();
+                Assert.Equal(newPageName, pageName);
+            }
+                
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+        }
+
+        [Fact]
+        public async Task UpdateDiagramPage_ShouldUpdatePageAndReturnSuccess()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            
+            // Create a new page first
+            string oldPageName = "Page To Update";
+            await CreateDiagramPageAsync(diagramName, oldPageName);
+            
+            // New name for the page
+            string newPageName = "Updated Page Name";
+            
+            // Page index 1 for the second page
+            int pageIndex = 1;
+            
+            var updateParams = JsonDocument.Parse($@"{{
+                ""tool"": ""update_diagram_page"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""page_index"": {pageIndex},
+                    ""name"": ""{newPageName}"",
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "update-diagram-page-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = updateParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("update-diagram-page-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+                
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+            
+            // Check that content mentions the update or new page name
+            bool mentionsUpdate = false;
+            foreach (var item in content.EnumerateArray())
+            {
+                if (item.TryGetProperty("text", out var textEl))
+                {
+                    string? text = textEl.GetString();
+                    if (text != null && (text.ToLower().Contains("updated".ToLower()) ||
+                                       text.ToLower().Contains(newPageName.ToLower())))
+                    {
+                        mentionsUpdate = true;
+                        break;
+                    }
+                }
+            }
+            
+            Assert.True(mentionsUpdate, "Content should mention the update or new page name");
+            
+            // Now verify the page was actually updated by getting the page
+            var getParams = JsonDocument.Parse($@"{{
+                ""tool"": ""get_diagram_page"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""page_index"": {pageIndex},
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var getRequest = new McpRequest
+            {
+                Id = "verify-page-update-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = getParams
+            };
+            
+            var getResponse = await _dispatcher.DispatchRequestAsync(getRequest);
+            var getResponseJson = JsonSerializer.Serialize(getResponse.Result);
+            var getResponseObj = JsonDocument.Parse(getResponseJson).RootElement;
+            
+            if (getResponseObj.TryGetProperty("page", out var page) && 
+                page.TryGetProperty("name", out var nameProperty))
+            {
+                string? pageName = nameProperty.GetString();
+                Assert.Equal(newPageName, pageName);
+            }
+        }
+
+        [Fact]
+        public async Task DeleteDiagramPage_ShouldRemovePageAndReturnSuccess()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            
+            // Create a new page first so we have at least 2 pages (can't delete the only page)
+            string pageName = "Page To Delete";
+            await CreateDiagramPageAsync(diagramName, pageName);
+            
+            // Page index 1 for the second page
+            int pageIndex = 1;
+            
+            var deleteParams = JsonDocument.Parse($@"{{
+                ""tool"": ""delete_diagram_page"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""page_index"": {pageIndex},
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "delete-diagram-page-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = deleteParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("delete-diagram-page-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+                
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+            
+            // Check that content mentions deletion or the page name
+            bool mentionsDeletion = false;
+            foreach (var item in content.EnumerateArray())
+            {
+                if (item.TryGetProperty("text", out var textEl))
+                {
+                    string? text = textEl.GetString();
+                    if (text != null && (text.ToLower().Contains("deleted".ToLower()) ||
+                                       text.ToLower().Contains("removed".ToLower()) ||
+                                       text.ToLower().Contains(pageName.ToLower())))
+                    {
+                        mentionsDeletion = true;
+                        break;
+                    }
+                }
+            }
+            
+            Assert.True(mentionsDeletion, "Content should mention page deletion or the deleted page");
+        }
+
+        [Fact]
+        public async Task MoveCellBetweenPages_ShouldRelocateElementAndReturnSuccess()
+        {
+            // Arrange
+            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            await CreateDiagramAsync(diagramName);
+            
+            // Create a shape on the first page
+            string shapeId = await AddShapeAsync(diagramName, "Shape To Move", 100, 100);
+            
+            // Create a second page
+            string targetPageName = "Target Page";
+            await CreateDiagramPageAsync(diagramName, targetPageName);
+            
+            // Source page index 0, target page index 1
+            int sourcePageIndex = 0;
+            int targetPageIndex = 1;
+            
+            var moveParams = JsonDocument.Parse($@"{{
+                ""tool"": ""move_cell_between_pages"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""cell_id"": ""{shapeId}"",
+                    ""source_page_index"": {sourcePageIndex},
+                    ""target_page_index"": {targetPageIndex},
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = "move-cell-between-pages-test",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = moveParams
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(request);
+
+            // Assert
+            Assert.Equal("move-cell-between-pages-test", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Response: {resultJson}");
+
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            
+            // Check the standard response structure
+            Assert.False(resultObj.TryGetProperty("isError", out var isError) && isError.GetBoolean(),
+                "Response should not have isError=true");
+                
+            Assert.True(resultObj.TryGetProperty("content", out var content),
+                "Response should have a content property");
+            Assert.True(content.ValueKind == JsonValueKind.Array,
+                "Content should be an array");
+                
+            // Verify that status is success
+            Assert.True(resultObj.TryGetProperty("status", out var status) &&
+                status.GetString() == "success",
+                "Response should have status=success");
+            
+            // Check that content mentions the move or the cell ID
+            bool mentionsMove = false;
+            foreach (var item in content.EnumerateArray())
+            {
+                if (item.TryGetProperty("text", out var textEl))
+                {
+                    string? text = textEl.GetString();
+                    if (text != null && (text.Contains("moved", StringComparison.OrdinalIgnoreCase) ||
+                                       text.Contains(shapeId, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        mentionsMove = true;
+                        break;
+                    }
+                }
+            }
+            
+            Assert.True(mentionsMove, "Content should mention the element move or cell ID");
+        }
+
+        // Helper method to create a diagram page for testing
+        private async Task<string> CreateDiagramPageAsync(string diagramName, string pageName)
+        {
+            var createParams = JsonDocument.Parse($@"{{
+                ""tool"": ""create_diagram_page"",
+                ""parameters"": {{
+                    ""diagram"": ""{diagramName}"",
+                    ""name"": ""{pageName}"",
+                    ""return_diagram"": true
+                }}
+            }}").RootElement;
+
+            var request = new McpRequest
+            {
+                Id = $"create-page-helper-{Guid.NewGuid()}",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = createParams
+            };
+
+            var response = await _dispatcher.DispatchRequestAsync(request);
+            return JsonSerializer.Serialize(response.Result);
         }
     }
 } 

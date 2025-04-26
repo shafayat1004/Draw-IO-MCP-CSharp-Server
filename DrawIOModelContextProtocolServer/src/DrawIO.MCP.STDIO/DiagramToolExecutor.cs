@@ -858,12 +858,22 @@ namespace DrawIO.MCP.STDIO
             SaveDiagram(updatedDiagram, filePath);
             
             // Get the new page ID (last page in the list)
-            string pageId = updatedDiagram.Pages[updatedDiagram.Pages.Length - 1].Id;
+            int pageIndex = updatedDiagram.Pages.Length - 1;
+            string pageId = updatedDiagram.Pages[pageIndex].Id;
+            string pageName = updatedDiagram.Pages[pageIndex].Name;
+            var pageInfo = new {
+                id = pageId,
+                name = pageName,
+                index = pageIndex
+            };
             
             return Task.FromResult<object>(new
             {
                 status = "success",
-                page_id = pageId,
+                pageId = pageId, // camelCase for test compatibility
+                pageIndex = pageIndex,
+                pageInfo = pageInfo,
+                page_id = pageId, // keep for backward compatibility
                 message = $"Created new page '{name}' with ID {pageId}",
                 content = new[] 
                 { 
@@ -900,7 +910,21 @@ namespace DrawIO.MCP.STDIO
             
             if (pageOption.IsNone())
             {
-                throw new ArgumentException($"Page at index {page_index} not found");
+                var errorMessage = new[] 
+                { 
+                    new Dictionary<string, string>
+                    { 
+                        ["type"] = "text", 
+                        ["text"] = $"Page at index {page_index} not found" 
+                    } 
+                };
+                return Task.FromResult<object>(new Dictionary<string, object>
+                {
+                    ["status"] = "error",
+                    ["error"] = $"Page at index {page_index} not found",
+                    ["isError"] = true,
+                    ["content"] = errorMessage
+                });
             }
             
             var page = pageOption.Value;
@@ -945,16 +969,16 @@ namespace DrawIO.MCP.STDIO
                 cells.Add(cellObj);
             }
             
-            return Task.FromResult<object>(new
+            return Task.FromResult<object>(new Dictionary<string, object>
             {
-                status = "success",
-                page = new
+                ["status"] = "success",
+                ["page"] = new
                 {
                     id = page.Id,
                     name = page.Name,
                     cells = cells
                 },
-                content = new[] 
+                ["content"] = new[] 
                 { 
                     new 
                     { 
@@ -1684,6 +1708,7 @@ namespace DrawIO.MCP.STDIO
 
             return Task.FromResult<object>(new Dictionary<string, object>
             {
+                ["status"] = "success",
                 ["elements"] = elementList,
                 ["count"] = elementList.Count,
                 ["content"] = messageContent
@@ -1719,6 +1744,7 @@ namespace DrawIO.MCP.STDIO
 
                 return Task.FromResult<object>(new Dictionary<string, object>
                 {
+                    ["status"] = "error",
                     ["error"] = $"Element with ID '{elementId}' not found",
                     ["isError"] = true,
                     ["content"] = errorMessage
@@ -1746,21 +1772,20 @@ namespace DrawIO.MCP.STDIO
                 } 
             };
 
-            var result = new Dictionary<string, object>
+            var elementDict = new Dictionary<string, object>
             {
                 ["id"] = info.Id,
                 ["type"] = info.Type,
                 ["value"] = info.Value,
                 ["style"] = info.Style,
                 ["parent"] = info.Parent,
-                ["connections"] = connections,
-                ["content"] = infoMessage
+                ["connections"] = connections
             };
 
             if (info.Position.IsSome())
             {
                 var pos = info.Position.Value;
-                result["position"] = new Dictionary<string, double>
+                elementDict["position"] = new Dictionary<string, double>
                 {
                     ["x"] = pos.X,
                     ["y"] = pos.Y
@@ -1770,14 +1795,19 @@ namespace DrawIO.MCP.STDIO
             if (info.Size.IsSome())
             {
                 var size = info.Size.Value;
-                result["size"] = new Dictionary<string, double>
+                elementDict["size"] = new Dictionary<string, double>
                 {
                     ["width"] = size.Width,
                     ["height"] = size.Height
                 };
             }
 
-            return Task.FromResult<object>(result);
+            return Task.FromResult<object>(new Dictionary<string, object>
+            {
+                ["status"] = "success",
+                ["element"] = elementDict,
+                ["content"] = infoMessage
+            });
         }
         
         private static Task<object> ListNeighborsAsync(JsonElement parameters, string diagramsDirectory)
@@ -1817,6 +1847,7 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new Dictionary<string, object>
             {
+                ["status"] = "success",
                 ["neighbors"] = neighborsList,
                 ["count"] = neighborsList.Count,
                 ["content"] = neighborMessage
@@ -1851,6 +1882,7 @@ namespace DrawIO.MCP.STDIO
 
                 return Task.FromResult<object>(new Dictionary<string, object>
                 {
+                    ["status"] = "error",
                     ["error"] = "No elements with geometry found in the diagram",
                     ["isError"] = true,
                     ["content"] = errorMessage
@@ -1871,12 +1903,16 @@ namespace DrawIO.MCP.STDIO
             
             return Task.FromResult<object>(new Dictionary<string, object>
             {
-                ["minX"] = boundingBox.MinX,
-                ["minY"] = boundingBox.MinY,
-                ["maxX"] = boundingBox.MaxX,
-                ["maxY"] = boundingBox.MaxY,
-                ["width"] = boundingBox.Width,
-                ["height"] = boundingBox.Height,
+                ["status"] = "success",
+                ["bounds"] = new Dictionary<string, double>
+                {
+                    ["minX"] = boundingBox.MinX,
+                    ["minY"] = boundingBox.MinY,
+                    ["maxX"] = boundingBox.MaxX,
+                    ["maxY"] = boundingBox.MaxY,
+                    ["width"] = boundingBox.Width,
+                    ["height"] = boundingBox.Height
+                },
                 ["content"] = boundsMessage
             });
         }
