@@ -69,12 +69,12 @@ let createStandardLibraryShape (name: string) (shapeType: string) (width: float)
 /// Save a shape library to a file
 let saveLibraryToFile (library: ShapeLibrary) (filePath: string) =
     // Create a basic XML structure for the library
-    let doc = new XDocument()
-    let root = new XElement(XName.Get("mxlibrary"))
+    let doc = XDocument()
+    let root = XElement(XName.Get("mxlibrary"))
     
     // Add each shape to the library
     for shape in library.Shapes do
-        let shapeElement = new XElement(XName.Get("shape"))
+        let shapeElement = XElement(XName.Get("shape"))
         
         shapeElement.SetAttributeValue(XName.Get("id"), shape.Id)
         shapeElement.SetAttributeValue(XName.Get("name"), shape.Name)
@@ -85,7 +85,7 @@ let saveLibraryToFile (library: ShapeLibrary) (filePath: string) =
         // Add XML definition if provided
         match shape.XmlDefinition with
         | Some xml ->
-            let xmlElement = new XElement(XName.Get("xml"))
+            let xmlElement = XElement(XName.Get("xml"))
             xmlElement.Value <- xml
             shapeElement.Add(xmlElement)
         | None -> ()
@@ -180,7 +180,7 @@ let addShapeFromLibrary (diagram: Diagram) (pageIndex: int) (library: ShapeLibra
         if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
             raise <| IndexOutOfRangeException("Page index out of range")
         
-        let page = diagram.Pages.[pageIndex]
+        let page = diagram.Pages[pageIndex]
         
         // Create a new vertex with the shape's properties
         let newVertex = DiagramManipulation.createVertex 
@@ -220,7 +220,7 @@ let addShapeByType (diagram: Diagram) (pageIndex: int) (shapeName: string) (shap
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     let shapeId = DiagramManipulation.generateId()
     
     // Get the style for the shape type

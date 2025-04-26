@@ -47,8 +47,8 @@ let ``AddShapeToLibrary should add shape to library`` () =
     Assert.Equal(2, libraryWithShape2.Shapes.Length)
     
     // The latest shape should be at the beginning of the list (prepended)
-    Assert.Equal(shape2.Id, libraryWithShape2.Shapes.[0].Id)
-    Assert.Equal(shape1.Id, libraryWithShape2.Shapes.[1].Id)
+    Assert.Equal(shape2.Id, libraryWithShape2.Shapes[0].Id)
+    Assert.Equal(shape1.Id, libraryWithShape2.Shapes[1].Id)
 
 [<Fact>]
 let ``SaveLibraryToFile and LoadLibraryFromFile should preserve library data`` () =
@@ -99,11 +99,11 @@ let ``AddShapeFromLibrary should add library shape to diagram`` () =
     let diagram = createEmptyDiagram()
     
     // Act
-    let (updatedDiagram, newShapeId) = addShapeFromLibrary diagram 0 libraryWithShape shape.Id 200.0 150.0
+    let updatedDiagram, newShapeId = addShapeFromLibrary diagram 0 libraryWithShape shape.Id 200.0 150.0
     
     // Assert
     Assert.NotNull(updatedDiagram)
-    let addedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = newShapeId)
+    let addedShape = updatedDiagram.Pages[0].Cells |> List.find (fun c -> c.Id = newShapeId)
     
     Assert.Equal("Custom Shape", addedShape.Value)
     Assert.Equal(200.0, addedShape.Geometry.Value.Position.X)
@@ -185,11 +185,11 @@ let ``AddShapeByType should add a shape with correct style for the given shape t
     let diagram = createEmptyDiagram()
     
     // Act
-    let (updatedDiagram, shapeId) = addShapeByType diagram 0 "Database" "database" 100.0 100.0 80.0 100.0
+    let updatedDiagram, shapeId = addShapeByType diagram 0 "Database" "database" 100.0 100.0 80.0 100.0
     
     // Assert
     Assert.NotNull(updatedDiagram)
-    let addedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
+    let addedShape = updatedDiagram.Pages[0].Cells |> List.find (fun c -> c.Id = shapeId)
     
     Assert.Equal("Database", addedShape.Value)
     Assert.Equal(100.0, addedShape.Geometry.Value.Position.X)

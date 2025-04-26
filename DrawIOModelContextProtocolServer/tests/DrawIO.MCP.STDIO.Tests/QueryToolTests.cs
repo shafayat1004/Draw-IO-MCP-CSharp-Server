@@ -53,7 +53,7 @@ namespace DrawIO.MCP.STDIO.Tests
             
             // Assert the result
             Assert.NotNull(result);
-            var resultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(result);
+            var resultDict = Assert.IsType<Dictionary<string, object>>(result);
             Assert.True(resultDict.ContainsKey("elements"));
             Assert.True(resultDict.ContainsKey("count"));
             
@@ -77,7 +77,7 @@ namespace DrawIO.MCP.STDIO.Tests
             }}").RootElement;
             
             var addResult = await DiagramToolExecutor.ExecuteToolAsync("add_shape", addShapeParams, _testDiagramsDir, _testLogWriter, true);
-            var addResultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(addResult);
+            var addResultDict = Assert.IsType<Dictionary<string, object>>(addResult);
             var elementId = addResultDict.ContainsKey("ElementId") ? addResultDict["ElementId"].ToString() : addResultDict["elementId"].ToString();
             
             // Test getting element info
@@ -90,7 +90,7 @@ namespace DrawIO.MCP.STDIO.Tests
             
             // Assert the result
             Assert.NotNull(result);
-            var resultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(result);
+            var resultDict = Assert.IsType<Dictionary<string, object>>(result);
             Assert.True(resultDict.ContainsKey("id"));
             Assert.True(resultDict.ContainsKey("value"));
             Assert.Equal("Server", resultDict["value"]);
@@ -124,8 +124,8 @@ namespace DrawIO.MCP.STDIO.Tests
             var addResult1 = await DiagramToolExecutor.ExecuteToolAsync("add_shape", addShape1Params, _testDiagramsDir, _testLogWriter, true);
             var addResult2 = await DiagramToolExecutor.ExecuteToolAsync("add_shape", addShape2Params, _testDiagramsDir, _testLogWriter, true);
             
-            var addResultDict1 = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(addResult1);
-            var addResultDict2 = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(addResult2);
+            var addResultDict1 = Assert.IsType<Dictionary<string, object>>(addResult1);
+            var addResultDict2 = Assert.IsType<Dictionary<string, object>>(addResult2);
             
             var serverId = addResultDict1.ContainsKey("ElementId") ? addResultDict1["ElementId"].ToString() : addResultDict1["elementId"].ToString();
             var databaseId = addResultDict2.ContainsKey("ElementId") ? addResultDict2["ElementId"].ToString() : addResultDict2["elementId"].ToString();
@@ -149,7 +149,7 @@ namespace DrawIO.MCP.STDIO.Tests
             
             // Assert the result
             Assert.NotNull(result);
-            var resultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(result);
+            var resultDict = Assert.IsType<Dictionary<string, object>>(result);
             Assert.True(resultDict.ContainsKey("neighbors"));
             Assert.True(resultDict.ContainsKey("count"));
             
@@ -189,7 +189,7 @@ namespace DrawIO.MCP.STDIO.Tests
             
             // Assert the result
             Assert.NotNull(result);
-            var resultDict = Assert.IsType<System.Collections.Generic.Dictionary<string, object>>(result);
+            var resultDict = Assert.IsType<Dictionary<string, object>>(result);
             Assert.True(resultDict.ContainsKey("minX"));
             Assert.True(resultDict.ContainsKey("minY"));
             Assert.True(resultDict.ContainsKey("maxX"));
@@ -233,7 +233,7 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.True(resultDict.ContainsKey("content"), "Result should contain a content property");
             
             // Content could be a List, Array, or a single object
-            bool hasImageOrNullResponse = false;
+            var hasImageOrNullResponse = false;
             var content = resultDict["content"];
             
             if (content is List<object> contentList)
@@ -285,7 +285,7 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.True(resultWithoutDiagramDict.ContainsKey("content"), "Result without return_diagram should contain a content property");
             
             // Content could be a List, Array, or a single object
-            bool hasImage = false;
+            var hasImage = false;
             var contentWithoutDiagram = resultWithoutDiagramDict["content"];
             
             if (contentWithoutDiagram is List<object> contentWithoutDiagramList)
@@ -349,7 +349,7 @@ namespace DrawIO.MCP.STDIO.Tests
                 Assert.Contains("detail", lowerKeys);
                 
                 // Print the error message for diagnostics
-                _testLogWriter.WriteLine($"Error response with isError=true");
+                _testLogWriter.WriteLine("Error response with isError=true");
                 _testLogWriter.WriteLine($"Error detail: {resultDict["detail"]}");
                 
                 // Test passes with a warning since we know about the error

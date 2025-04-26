@@ -1,6 +1,9 @@
-using Microsoft.FSharp.Core;
+using System.Diagnostics;
 using DrawIO.MCP.Core;
+using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Core;
 using static DrawIO.MCP.Core.Types;
+using ShapeLibrary = DrawIO.MCP.Core.ShapeLibrary;
 
 namespace DrawIO.MCP.SSE
 {
@@ -56,7 +59,7 @@ namespace DrawIO.MCP.SSE
                 name += ".drawio";
             }
             
-            string filePath = Path.Combine(_diagramsDirectory, name);
+            var filePath = Path.Combine(_diagramsDirectory, name);
             
             var diagram = FileOperations.createNewDiagram(filePath);
             return diagram;
@@ -72,7 +75,7 @@ namespace DrawIO.MCP.SSE
                 name += ".drawio";
             }
             
-            string filePath = Path.Combine(_diagramsDirectory, name);
+            var filePath = Path.Combine(_diagramsDirectory, name);
             
             if (!File.Exists(filePath))
             {
@@ -92,7 +95,7 @@ namespace DrawIO.MCP.SSE
                 name += ".drawio";
             }
             
-            string filePath = Path.Combine(_diagramsDirectory, name);
+            var filePath = Path.Combine(_diagramsDirectory, name);
             FileOperations.saveDiagram(diagram, filePath);
         }
 
@@ -104,7 +107,7 @@ namespace DrawIO.MCP.SSE
             var diagram = LoadDiagram(diagramName);
             
             // Use the new ShapeLibrary.addShapeByType function which supports a wider range of shape types
-            var (updatedDiagram, shapeId) = DrawIO.MCP.Core.ShapeLibrary.addShapeByType(diagram, 0, value, shape, x, y, width, height);
+            var (updatedDiagram, shapeId) = ShapeLibrary.addShapeByType(diagram, 0, value, shape, x, y, width, height);
             
             SaveDiagram(updatedDiagram, diagramName);
             return (updatedDiagram, shapeId);
@@ -229,24 +232,24 @@ namespace DrawIO.MCP.SSE
             var diagram = LoadDiagram(diagramName);
             
             // Create FSharpOption types for the parameters, converting float to double
-            FSharpOption<double> sourceXOption = 
+            var sourceXOption = 
                 sourceX.HasValue 
-                    ? FSharpOption<double>.Some((double)sourceX.Value) 
+                    ? FSharpOption<double>.Some(sourceX.Value) 
                     : FSharpOption<double>.None;
                     
-            FSharpOption<double> sourceYOption = 
+            var sourceYOption = 
                 sourceY.HasValue 
-                    ? FSharpOption<double>.Some((double)sourceY.Value) 
+                    ? FSharpOption<double>.Some(sourceY.Value) 
                     : FSharpOption<double>.None;
                     
-            FSharpOption<double> targetXOption = 
+            var targetXOption = 
                 targetX.HasValue 
-                    ? FSharpOption<double>.Some((double)targetX.Value) 
+                    ? FSharpOption<double>.Some(targetX.Value) 
                     : FSharpOption<double>.None;
                     
-            FSharpOption<double> targetYOption = 
+            var targetYOption = 
                 targetY.HasValue 
-                    ? FSharpOption<double>.Some((double)targetY.Value) 
+                    ? FSharpOption<double>.Some(targetY.Value) 
                     : FSharpOption<double>.None;
             
             var (updatedDiagram, connectorId) = DiagramManipulation.connectShapesAtPoints(
@@ -267,7 +270,7 @@ namespace DrawIO.MCP.SSE
                 diagramName += ".drawio";
             }
             
-            string diagramPath = Path.Combine(_diagramsDirectory, diagramName);
+            var diagramPath = Path.Combine(_diagramsDirectory, diagramName);
             
             if (!File.Exists(diagramPath))
             {
@@ -275,16 +278,16 @@ namespace DrawIO.MCP.SSE
             }
             
             // Create a temporary file to store the output image
-            string tempFileName = $"{Path.GetFileNameWithoutExtension(diagramName)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
-            string outputImagePath = Path.Combine(_diagramsDirectory, tempFileName);
+            var tempFileName = $"{Path.GetFileNameWithoutExtension(diagramName)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
+            var outputImagePath = Path.Combine(_diagramsDirectory, tempFileName);
             
             // Build the drawio CLI command
-            string drawioCommand = $"drawio --export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{diagramPath}\"";
+            var drawioCommand = $"drawio --export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{diagramPath}\"";
             
             // Execute the command
-            var process = new System.Diagnostics.Process
+            var process = new Process
             {
-                StartInfo = new System.Diagnostics.ProcessStartInfo
+                StartInfo = new ProcessStartInfo
                 {
                     FileName = "/bin/bash",
                     Arguments = $"-c \"{drawioCommand}\"",
@@ -305,8 +308,8 @@ namespace DrawIO.MCP.SSE
             }
             
             // Read the image file as a base64 string
-            byte[] imageBytes = File.ReadAllBytes(outputImagePath);
-            string base64Image = Convert.ToBase64String(imageBytes);
+            var imageBytes = File.ReadAllBytes(outputImagePath);
+            var base64Image = Convert.ToBase64String(imageBytes);
             
             // Clean up the temporary file
             File.Delete(outputImagePath);
@@ -324,7 +327,7 @@ namespace DrawIO.MCP.SSE
                 fileName += ".drawio";
             }
             
-            string filePath = Path.Combine(_diagramsDirectory, fileName);
+            var filePath = Path.Combine(_diagramsDirectory, fileName);
             
             if (!File.Exists(filePath))
             {
@@ -344,14 +347,14 @@ namespace DrawIO.MCP.SSE
                 }
                 
                 // Create a temporary file to store the output image
-                string tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{pageIndex}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
-                string outputImagePath = Path.Combine(_diagramsDirectory, tempFileName);
+                var tempFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{pageIndex}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
+                var outputImagePath = Path.Combine(_diagramsDirectory, tempFileName);
                 
                 // Build the drawio CLI command with proper escaping
-                string drawioCommand = $"drawio --export --format {format} --page-index {pageIndex} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
+                var drawioCommand = $"drawio --export --format {format} --page-index {pageIndex} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
                 
                 // Try bash first
-                var bashStartInfo = new System.Diagnostics.ProcessStartInfo
+                var bashStartInfo = new ProcessStartInfo
                 {
                     FileName = "bash",
                     Arguments = $"-c \"{drawioCommand}\"",
@@ -363,11 +366,11 @@ namespace DrawIO.MCP.SSE
 
                 _logger?.LogDebug($"Attempting to export with bash: {bashStartInfo.FileName} {bashStartInfo.Arguments}");
                 
-                bool exportSuccess = false;
+                var exportSuccess = false;
                 
                 try
                 {
-                    using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
+                    using var bashProcess = Process.Start(bashStartInfo);
                     if (bashProcess != null)
                     {
                         await bashProcess.WaitForExitAsync();
@@ -386,7 +389,7 @@ namespace DrawIO.MCP.SSE
                 if (!exportSuccess)
                 {
                     _logger?.LogDebug("Falling back to direct drawio CLI call...");
-                    var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                    var processStartInfo = new ProcessStartInfo
                     {
                         FileName = "drawio",
                         Arguments = $"--export --format {format} --page-index {pageIndex} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"",
@@ -398,7 +401,7 @@ namespace DrawIO.MCP.SSE
 
                     _logger?.LogDebug($"Executing command: {processStartInfo.FileName} {processStartInfo.Arguments}");
                     
-                    using var process = System.Diagnostics.Process.Start(processStartInfo);
+                    using var process = Process.Start(processStartInfo);
                     if (process != null)
                     {
                         await process.WaitForExitAsync();
@@ -411,13 +414,13 @@ namespace DrawIO.MCP.SSE
 
                 if (!exportSuccess || !File.Exists(outputImagePath))
                 {
-                    _logger?.LogWarning($"Failed to generate diagram image");
+                    _logger?.LogWarning("Failed to generate diagram image");
                     return null;
                 }
                 
                 // Read the generated image and convert it to base64
-                byte[] imageBytes = await File.ReadAllBytesAsync(outputImagePath);
-                string base64Image = Convert.ToBase64String(imageBytes);
+                var imageBytes = await File.ReadAllBytesAsync(outputImagePath);
+                var base64Image = Convert.ToBase64String(imageBytes);
                 
                 // Clean up the temporary file
                 try
@@ -450,7 +453,7 @@ namespace DrawIO.MCP.SSE
         {
             try
             {
-                var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                var processStartInfo = new ProcessStartInfo
                 {
                     FileName = "drawio",
                     Arguments = "--version",
@@ -460,7 +463,7 @@ namespace DrawIO.MCP.SSE
                     CreateNoWindow = true
                 };
                 
-                using var process = System.Diagnostics.Process.Start(processStartInfo);
+                using var process = Process.Start(processStartInfo);
                 if (process != null)
                 {
                     await process.WaitForExitAsync();
@@ -523,10 +526,10 @@ namespace DrawIO.MCP.SSE
             var diagram = LoadDiagram(fileName);
             
             // Convert nullable parameters to F# options with correct types (double instead of float)
-            var xOpt = x.HasValue ? FSharpOption<double>.Some((double)x.Value) : FSharpOption<double>.None;
-            var yOpt = y.HasValue ? FSharpOption<double>.Some((double)y.Value) : FSharpOption<double>.None;
-            var widthOpt = width.HasValue ? FSharpOption<double>.Some((double)width.Value) : FSharpOption<double>.None;
-            var heightOpt = height.HasValue ? FSharpOption<double>.Some((double)height.Value) : FSharpOption<double>.None;
+            var xOpt = x.HasValue ? FSharpOption<double>.Some(x.Value) : FSharpOption<double>.None;
+            var yOpt = y.HasValue ? FSharpOption<double>.Some(y.Value) : FSharpOption<double>.None;
+            var widthOpt = width.HasValue ? FSharpOption<double>.Some(width.Value) : FSharpOption<double>.None;
+            var heightOpt = height.HasValue ? FSharpOption<double>.Some(height.Value) : FSharpOption<double>.None;
             var styleOpt = !string.IsNullOrEmpty(style) ? FSharpOption<string>.Some(style) : FSharpOption<string>.None;
             
             var updatedDiagram = DiagramManipulation.updateShape(diagram, 0, shapeId, value, xOpt, yOpt, widthOpt, heightOpt, styleOpt);
@@ -558,42 +561,42 @@ namespace DrawIO.MCP.SSE
                 fileName += ".drawio";
             }
             
-            string filePath = Path.Combine(_diagramsDirectory, fileName);
+            var filePath = Path.Combine(_diagramsDirectory, fileName);
             
             // Create base diagram
             var diagram = FileOperations.createNewDiagram(filePath);
             
             // Create VPC shapes
-            string vpcId = DiagramManipulation.addShape(diagram, 0, "VPC", 400, 300, 500, 400, "rectangle").Item2;
-            string publicSubnetId = DiagramManipulation.addShape(diagram, 0, "Public Subnet", 250, 150, 200, 120, "rectangle").Item2;
-            string privateSubnetId = DiagramManipulation.addShape(diagram, 0, "Private Subnet", 550, 150, 200, 120, "rectangle").Item2;
-            string igwId = DiagramManipulation.addShape(diagram, 0, "Internet Gateway", 400, 50, 120, 60, "rectangle").Item2;
+            var vpcId = DiagramManipulation.addShape(diagram, 0, "VPC", 400, 300, 500, 400, "rectangle").Item2;
+            var publicSubnetId = DiagramManipulation.addShape(diagram, 0, "Public Subnet", 250, 150, 200, 120, "rectangle").Item2;
+            var privateSubnetId = DiagramManipulation.addShape(diagram, 0, "Private Subnet", 550, 150, 200, 120, "rectangle").Item2;
+            var igwId = DiagramManipulation.addShape(diagram, 0, "Internet Gateway", 400, 50, 120, 60, "rectangle").Item2;
             
             // Apply styles
-            var vpcStyle = Microsoft.FSharp.Collections.MapModule.OfSeq(
-                new[] { 
-                    new Tuple<string, string>("fillColor", "#f5f5f5"),
+            var vpcStyle = MapModule.OfSeq(
+            [
+                new Tuple<string, string>("fillColor", "#f5f5f5"),
                     new Tuple<string, string>("strokeColor", "#666666"),
                     new Tuple<string, string>("strokeWidth", "2")
-                });
+            ]);
             
-            var publicSubnetStyle = Microsoft.FSharp.Collections.MapModule.OfSeq(
-                new[] { 
-                    new Tuple<string, string>("fillColor", "#dae8fc"),
+            var publicSubnetStyle = MapModule.OfSeq(
+            [
+                new Tuple<string, string>("fillColor", "#dae8fc"),
                     new Tuple<string, string>("strokeColor", "#6c8ebf")
-                });
+            ]);
             
-            var privateSubnetStyle = Microsoft.FSharp.Collections.MapModule.OfSeq(
-                new[] { 
-                    new Tuple<string, string>("fillColor", "#d5e8d4"),
+            var privateSubnetStyle = MapModule.OfSeq(
+            [
+                new Tuple<string, string>("fillColor", "#d5e8d4"),
                     new Tuple<string, string>("strokeColor", "#82b366")
-                });
+            ]);
             
-            var igwStyle = Microsoft.FSharp.Collections.MapModule.OfSeq(
-                new[] { 
-                    new Tuple<string, string>("fillColor", "#ffe6cc"),
+            var igwStyle = MapModule.OfSeq(
+            [
+                new Tuple<string, string>("fillColor", "#ffe6cc"),
                     new Tuple<string, string>("strokeColor", "#d79b00")
-                });
+            ]);
             
             diagram = DiagramManipulation.updateShapeStyle(diagram, vpcId, vpcStyle);
             diagram = DiagramManipulation.updateShapeStyle(diagram, publicSubnetId, publicSubnetStyle);

@@ -61,7 +61,7 @@ namespace DrawIO.MCP.SSE
         public static ToolParameter[] AddCommonParameters(this ToolParameter[] parameters)
         {
             // Check if this tool has a diagram parameter
-            bool hasDiagramParameter = false;
+            var hasDiagramParameter = false;
             foreach (var param in parameters)
             {
                 if (param.Name == "diagram")
@@ -72,23 +72,21 @@ namespace DrawIO.MCP.SSE
             }
 
             // If it has a diagram parameter, add the return_diagram parameter
-            if (hasDiagramParameter)
+            if (!hasDiagramParameter) return parameters;
+            var allParameters = new List<ToolParameter>(parameters)
             {
-                var allParameters = new List<ToolParameter>(parameters);
-                
                 // Add return_diagram parameter
-                allParameters.Add(new ToolParameter
+                new ToolParameter
                 {
                     Name = "return_diagram",
                     Type = "boolean",
                     Description = "Whether to include the diagram image in the response",
                     Required = false
-                });
-                
-                return allParameters.ToArray();
-            }
-            
-            return parameters;
+                }
+            };
+
+            return allParameters.ToArray();
+
         }
 
         // Fix to handle nulls properly
@@ -124,8 +122,8 @@ namespace DrawIO.MCP.SSE
     // Implementation of MCP builder
     public class McpBuilder : IMcpBuilder
     {
-        private readonly List<Type> _resourceProviders = new List<Type>();
-        private readonly List<Type> _tools = new List<Type>();
+        private readonly List<Type> _resourceProviders = [];
+        private readonly List<Type> _tools = [];
         
         public IMcpBuilder RegisterResourceProvider<T>() where T : ResourceProvider
         {
@@ -152,7 +150,7 @@ namespace DrawIO.MCP.SSE
             // Register all tool types
             var toolTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(a => a.GetTypes())
-                .Where(t => !t.IsAbstract && t.IsClass && t.IsSubclassOf(typeof(Tool)))
+                .Where(t => t is { IsAbstract: false, IsClass: true } && t.IsSubclassOf(typeof(Tool)))
                 .ToList();
                 
             foreach (var toolType in toolTypes)

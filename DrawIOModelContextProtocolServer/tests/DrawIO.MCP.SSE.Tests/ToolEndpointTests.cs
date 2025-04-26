@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DrawIO.MCP.SSE.Tests
@@ -24,7 +25,7 @@ namespace DrawIO.MCP.SSE.Tests
             response.EnsureSuccessStatusCode();
             
             // Parse as generic JsonElement since we're dealing with System.Text.Json
-            var content = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+            var content = await response.Content.ReadFromJsonAsync<JsonElement>();
             
             // Start assertions - content can't be null as JsonElement is a value type
             Assert.True(content.TryGetProperty("status", out var statusElement));

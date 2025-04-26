@@ -70,8 +70,8 @@ namespace DrawIO.MCP.STDIO
                 LogInfo($"Error handling request {request.Method}: {ex.Message}");
 
                 // Default error code
-                int errorCode = -32603; // Internal error
-                string errorMessage = ex.Message;
+                var errorCode = -32603; // Internal error
+                var errorMessage = ex.Message;
                 object errorDetails = null;
 
                 // Check for specific MCP version mismatch error
@@ -115,29 +115,29 @@ namespace DrawIO.MCP.STDIO
 
         private Task<object> InitializeAsync(JsonElement parameters)
         {
-            this.LogInfo("Initializing MCP server");
+            LogInfo("Initializing MCP server");
 
             // Default to the most recent supported version if client doesn't specify
-            string protocolVersion = "2025-03-26";
+            var protocolVersion = "2025-03-26";
 
             // List of protocol versions we support (most recent first)
             var supportedVersions = new[] { "2025-03-26", "2024-11-05" };
 
             if (parameters.TryGetProperty("protocolVersion", out var versionElement))
             {
-                string requestedVersion = versionElement.GetString();
-                this.LogInfo($"Client requested protocol version: {requestedVersion}");
+                var requestedVersion = versionElement.GetString();
+                LogInfo($"Client requested protocol version: {requestedVersion}");
 
                 // If the requested version is one we support, use it
                 if (Array.IndexOf(supportedVersions, requestedVersion) >= 0)
                 {
                     protocolVersion = requestedVersion;
-                    this.LogInfo($"Using client's requested protocol version: {protocolVersion}");
+                    LogInfo($"Using client's requested protocol version: {protocolVersion}");
                 }
                 else
                 {
                     // Client requested an unsupported version - return specific error
-                    this.LogInfo($"Client requested unsupported version {requestedVersion}. Server supports: [{string.Join(", ", supportedVersions)}]");
+                    LogInfo($"Client requested unsupported version {requestedVersion}. Server supports: [{string.Join(", ", supportedVersions)}]");
                     var errorDetails = new Dictionary<string, object>
                     {
                         { "supported", supportedVersions },
@@ -150,7 +150,7 @@ namespace DrawIO.MCP.STDIO
             }
             else
             {
-                 this.LogInfo($"Client did not specify protocolVersion. Defaulting to {protocolVersion}");
+                 LogInfo($"Client did not specify protocolVersion. Defaulting to {protocolVersion}");
             }
 
             // Return the exact format expected by VS Code
@@ -175,14 +175,14 @@ namespace DrawIO.MCP.STDIO
 
         private Task<object> NotificationsInitializedAsync(JsonElement parameters)
         {
-            this.LogInfo("Received initialized notification");
+            LogInfo("Received initialized notification");
             // Return an empty object instead of null to satisfy JSON-RPC spec
             return Task.FromResult<object>(new { });
         }
 
         private Task<object> ListPromptsAsync(JsonElement parameters)
         {
-            this.LogInfo("Listing prompts");
+            LogInfo("Listing prompts");
             return Task.FromResult<object>(new
             {
                 prompts = new object[] { }
@@ -196,8 +196,8 @@ namespace DrawIO.MCP.STDIO
                 throw new ArgumentException("Resource URI is required");
             }
             
-            string uri = uriElement.GetString();
-            this.LogInfo($"Reading resource: {uri}");
+            var uri = uriElement.GetString();
+            LogInfo($"Reading resource: {uri}");
             
             if (uri.StartsWith("diagram-list://"))
             {
@@ -209,25 +209,26 @@ namespace DrawIO.MCP.STDIO
                     mimeType = "application/json"
                 };
             }
-            else if (uri.StartsWith("diagram://"))
+
+            if (uri.StartsWith("diagram://"))
             {
                 // Handle diagram content
-                string diagramName = uri.Substring("diagram://".Length);
-                string filePath = Path.Combine(_diagramsDirectory, diagramName);
+                var diagramName = uri.Substring("diagram://".Length);
+                var filePath = Path.Combine(_diagramsDirectory, diagramName);
                 
                 if (!File.Exists(filePath))
                 {
                     throw new FileNotFoundException($"Diagram file not found: {diagramName}");
                 }
                 
-                string content = await File.ReadAllTextAsync(filePath);
+                var content = await File.ReadAllTextAsync(filePath);
                 return new
                 {
-                    content = content,
+                    content,
                     mimeType = "application/xml"
                 };
             }
-            
+
             throw new ArgumentException($"Unsupported resource URI: {uri}");
         }
         
@@ -235,11 +236,11 @@ namespace DrawIO.MCP.STDIO
         {
             if (!Directory.Exists(_diagramsDirectory))
             {
-                this.LogInfo($"Diagrams directory does not exist: {_diagramsDirectory}");
-                return Array.Empty<object>();
+                LogInfo($"Diagrams directory does not exist: {_diagramsDirectory}");
+                return [];
             }
             
-            string[] files = Directory.GetFiles(_diagramsDirectory, "*.drawio");
+            var files = Directory.GetFiles(_diagramsDirectory, "*.drawio");
             var diagrams = files.Select(f => new
             {
                 name = Path.GetFileName(f),
@@ -251,7 +252,7 @@ namespace DrawIO.MCP.STDIO
 
         private Task<object> ListResourcesAsync(JsonElement parameters)
         {
-            this.LogInfo("Listing resources");
+            LogInfo("Listing resources");
             
             var resources = new List<object>
             {
@@ -267,10 +268,10 @@ namespace DrawIO.MCP.STDIO
             // Add resources for each existing diagram file
             if (Directory.Exists(_diagramsDirectory))
             {
-                string[] files = Directory.GetFiles(_diagramsDirectory, "*.drawio");
+                var files = Directory.GetFiles(_diagramsDirectory, "*.drawio");
                 foreach (var file in files)
                 {
-                    string fileName = Path.GetFileName(file);
+                    var fileName = Path.GetFileName(file);
                     resources.Add(new
                     {
                         uri = $"diagram://{fileName}",
@@ -294,13 +295,13 @@ namespace DrawIO.MCP.STDIO
                 throw new ArgumentException("Resource ID is required");
             }
             
-            string resourceId = idElement.GetString();
-            this.LogInfo($"Getting resource: {resourceId}");
+            var resourceId = idElement.GetString();
+            LogInfo($"Getting resource: {resourceId}");
             
             if (resourceId.StartsWith("diagram://"))
             {
-                string filename = resourceId.Substring("diagram://".Length);
-                string filePath = Path.Combine(_diagramsDirectory, filename);
+                var filename = resourceId.Substring("diagram://".Length);
+                var filePath = Path.Combine(_diagramsDirectory, filename);
                 
                 if (!File.Exists(filePath))
                 {
@@ -359,7 +360,7 @@ namespace DrawIO.MCP.STDIO
                     {
                         id = page.Id,
                         name = page.Name,
-                        cells = cells
+                        cells
                     });
                 }
                 
@@ -369,12 +370,12 @@ namespace DrawIO.MCP.STDIO
                     id = resourceId,
                     content = new
                     {
-                        modified = diagram.Modified,
-                        pages = pages
+                        modified = diagram.Modified, pages
                     }
                 });
             }
-            else if (resourceId == "diagram-list://all")
+
+            if (resourceId == "diagram-list://all")
             {
                 // Return a list of all diagrams
                 var files = Directory.GetFiles(_diagramsDirectory, "*.drawio")
@@ -388,13 +389,13 @@ namespace DrawIO.MCP.STDIO
                     content = files
                 });
             }
-            
+
             throw new ArgumentException($"Unsupported resource type: {resourceId}");
         }
 
         private Task<object> ListToolsAsync(JsonElement parameters)
         {
-            return McpToolHandlers.ListToolsAsync(this, parameters, _logWriter, _verbose);
+            return this.ListToolsAsync(parameters, _logWriter, _verbose);
         }
 
         private async Task<object> ExecuteToolAsync(JsonElement parameters)
@@ -409,8 +410,8 @@ namespace DrawIO.MCP.STDIO
                 }
             }
             
-            string toolName = toolElement.GetString();
-            this.LogInfo($"Executing tool: {toolName}");
+            var toolName = toolElement.GetString();
+            LogInfo($"Executing tool: {toolName}");
             
             JsonElement arguments;
             
@@ -432,7 +433,7 @@ namespace DrawIO.MCP.STDIO
             try
             {
                 // Use the tool executor to execute the tool
-                object result = await DiagramToolExecutor.ExecuteToolAsync(toolName, arguments, _diagramsDirectory, _logWriter, _verbose);
+                var result = await DiagramToolExecutor.ExecuteToolAsync(toolName, arguments, _diagramsDirectory, _logWriter, _verbose);
                 
                 // Check if the result contains an error object (legacy format, shouldn't happen with new code)
                 if (result is Dictionary<string, object> resultDict && resultDict.ContainsKey("error") && !resultDict.ContainsKey("isError"))
@@ -445,11 +446,9 @@ namespace DrawIO.MCP.STDIO
                             Data = { ["details"] = error.Details }
                         };
                     }
-                    else
-                    {
-                        // Handle other legacy format with error string
-                        throw new Exception(resultDict["error"]?.ToString() ?? "Unknown error occurred");
-                    }
+
+                    // Handle other legacy format with error string
+                    throw new Exception(resultDict["error"]?.ToString() ?? "Unknown error occurred");
                 }
                 
                 // If it's a proper tool error (isError=true), pass it through as a successful result
@@ -478,7 +477,7 @@ namespace DrawIO.MCP.STDIO
 
         private async Task<object> ShutdownAsync(JsonElement parameters)
         {
-            this.LogInfo("Received shutdown request");
+            LogInfo("Received shutdown request");
             // Add a small delay to ensure the response is sent before shutdown
             await Task.Delay(100);
             // Return success response

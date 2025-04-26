@@ -1,4 +1,6 @@
+using System.Reflection;
 using DrawIO.MCP.SSE;
+using Microsoft.FSharp.Core;
 using CoreTypes = DrawIO.MCP.Core.Types;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,11 +32,11 @@ if (!Directory.Exists(diagramsDir))
     Directory.CreateDirectory(diagramsDir);
 }
 
-builder.Services.AddSingleton<DrawIO.MCP.SSE.DrawIoService>(sp => 
-    new DrawIO.MCP.SSE.DrawIoService(diagramsDir));
+builder.Services.AddSingleton<DrawIoService>(_ => 
+    new DrawIoService(diagramsDir));
 
 // Register tool services - find all classes that implement Tool
-builder.Services.AddSingleton<DrawIO.MCP.SSE.DrawIoService>();
+builder.Services.AddSingleton<DrawIoService>();
 builder.Services.AddSingleton<AddShapeTool>();
 builder.Services.AddSingleton<ConnectShapesTool>();
 builder.Services.AddSingleton<GetDiagramImageTool>();
@@ -89,7 +91,7 @@ app.Run();
 public partial class Program { }
 
 // MCP Resource Provider
-public class DiagramResourceProvider(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<DiagramResourceProvider> logger)
+public class DiagramResourceProvider(DrawIoService drawIoService, ILogger<DiagramResourceProvider> logger)
     : ResourceProvider
 {
     private readonly ILogger<DiagramResourceProvider> _logger = logger;
@@ -103,77 +105,75 @@ public class DiagramResourceProvider(DrawIO.MCP.SSE.DrawIoService drawIoService,
     {
         if (resourceId.StartsWith("diagram://"))
         {
-            string filename = resourceId.Substring("diagram://".Length);
+            var filename = resourceId.Substring("diagram://".Length);
             var diagram = drawIoService.GetDiagram(filename);
             
             // Convert the diagram to a format suitable for the MCP protocol
             var pages = new List<object>();
-            
-            if (diagram != null)
+
+            foreach (var page in diagram.Pages)
             {
-                foreach (var page in diagram.Pages)
+                var cells = new List<object>();
+                    
+                foreach (var cell in page.Cells)
                 {
-                    var cells = new List<object>();
-                    
-                    foreach (var cell in page.Cells)
+                    var cellObj = new Dictionary<string, object>
                     {
-                        var cellObj = new Dictionary<string, object>
-                        {
-                            ["id"] = cell.Id,
-                            ["value"] = cell.Value,
-                            ["style"] = cell.Style,
-                            ["isVertex"] = cell.IsVertex,
-                            ["isEdge"] = cell.IsEdge,
-                            ["parent"] = cell.Parent
-                        };
+                        ["id"] = cell.Id,
+                        ["value"] = cell.Value,
+                        ["style"] = cell.Style,
+                        ["isVertex"] = cell.IsVertex,
+                        ["isEdge"] = cell.IsEdge,
+                        ["parent"] = cell.Parent
+                    };
                         
-                        if (Microsoft.FSharp.Core.FSharpOption<string>.get_IsSome(cell.Source))
-                        {
-                            cellObj["source"] = cell.Source.Value;
-                        }
-                        
-                        if (Microsoft.FSharp.Core.FSharpOption<string>.get_IsSome(cell.Target))
-                        {
-                            cellObj["target"] = cell.Target.Value;
-                        }
-                        
-                        if (Microsoft.FSharp.Core.FSharpOption<CoreTypes.Geometry>.get_IsSome(cell.Geometry))
-                        {
-                            var geo = cell.Geometry.Value;
-                            cellObj["geometry"] = new Dictionary<string, object>
-                            {
-                                ["x"] = geo.Position.X,
-                                ["y"] = geo.Position.Y,
-                                ["width"] = geo.Size.Width,
-                                ["height"] = geo.Size.Height,
-                                ["relative"] = geo.Relative
-                            };
-                        }
-                        
-                        cells.Add(cellObj);
+                    if (FSharpOption<string>.get_IsSome(cell.Source))
+                    {
+                        cellObj["source"] = cell.Source.Value;
                     }
-                    
-                    pages.Add(new Dictionary<string, object>
+                        
+                    if (FSharpOption<string>.get_IsSome(cell.Target))
                     {
-                        ["id"] = page.Id,
-                        ["name"] = page.Name, 
-                        ["cells"] = cells
-                    });
+                        cellObj["target"] = cell.Target.Value;
+                    }
+                        
+                    if (FSharpOption<CoreTypes.Geometry>.get_IsSome(cell.Geometry))
+                    {
+                        var geo = cell.Geometry.Value;
+                        cellObj["geometry"] = new Dictionary<string, object>
+                        {
+                            ["x"] = geo.Position.X,
+                            ["y"] = geo.Position.Y,
+                            ["width"] = geo.Size.Width,
+                            ["height"] = geo.Size.Height,
+                            ["relative"] = geo.Relative
+                        };
+                    }
+                        
+                    cells.Add(cellObj);
                 }
+                    
+                pages.Add(new Dictionary<string, object>
+                {
+                    ["id"] = page.Id,
+                    ["name"] = page.Name, 
+                    ["cells"] = cells
+                });
             }
-            
+
             return Task.FromResult(new Resource
             {
                 Id = resourceId,
                 Type = "diagram",
                 Content = new Dictionary<string, object>
                 {
-                    ["modified"] = diagram?.Modified.ToString("o") ?? DateTime.Now.ToString("o"),
+                    ["modified"] = diagram.Modified.ToString("o"),
                     ["pages"] = pages
                 }
             });
         }
-        else if (resourceId == "diagram-list://all")
+
+        if (resourceId == "diagram-list://all")
         {
             // Return a list of all diagrams
             var diagrams = drawIoService.GetAllDiagrams();
@@ -185,7 +185,7 @@ public class DiagramResourceProvider(DrawIO.MCP.SSE.DrawIoService drawIoService,
                 Content = diagrams
             });
         }
-        
+
         throw new ArgumentException($"Unsupported resource ID: {resourceId}");
     }
 
@@ -199,32 +199,32 @@ public class DiagramResourceProvider(DrawIO.MCP.SSE.DrawIoService drawIoService,
             Title = d
         });
         
-        return Task.FromResult<IEnumerable<ResourceInfo>>(resources);
+        return Task.FromResult(resources);
     }
 }
 
 // MCP Tools
-public class CreateNewDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<CreateNewDiagramTool> logger)
+public class CreateNewDiagramTool(DrawIoService drawIoService, ILogger<CreateNewDiagramTool> logger)
     : Tool
 {
     public override string Name => "create_new_diagram";
 
     public override string Description => "Create a new empty diagram file";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "name",
             Type = "string",
             Description = "Name of the diagram file to create",
             Required = true
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string name = parameters.GetValue<string>("name") ?? throw new ArgumentException("Diagram name is required");
+        var name = parameters.GetValue<string>("name") ?? throw new ArgumentException("Diagram name is required");
         
         if (string.IsNullOrEmpty(Path.GetExtension(name)))
         {
@@ -233,7 +233,7 @@ public class CreateNewDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, IL
         
         try
         {
-            var diagram = drawIoService.CreateDiagram(name);
+            drawIoService.CreateDiagram(name);
             
             var response = new
             {
@@ -252,14 +252,14 @@ public class CreateNewDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, IL
     }
 }
 
-public class AddShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<AddShapeTool> logger) : Tool
+public class AddShapeTool(DrawIoService drawIoService, ILogger<AddShapeTool> logger) : Tool
 {
     public override string Name => "add_shape";
 
     public override string Description => "Add a new shape to a diagram";
 
-    public override ToolParameter[] Parameters => _parameters ??= new[]
-    {
+    public override ToolParameter[] Parameters => _parameters ??=
+    [
         new ToolParameter
         {
             Name = "diagram",
@@ -316,17 +316,17 @@ public class AddShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<Ad
             Description = "Whether to include the diagram image in the response",
             Required = true
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string value = parameters.GetValue<string>("value") ?? ""; 
-        float x = parameters.GetValue<float>("x");
-        float y = parameters.GetValue<float>("y");
-        float width = parameters.GetValue<float>("width", 80);
-        float height = parameters.GetValue<float>("height", 40);
-        string shape = parameters.GetValue<string>("shape", "rectangle");
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var value = parameters.GetValue<string>("value") ?? ""; 
+        var x = parameters.GetValue<float>("x");
+        var y = parameters.GetValue<float>("y");
+        var width = parameters.GetValue<float>("width", 80);
+        var height = parameters.GetValue<float>("height", 40);
+        var shape = parameters.GetValue<string>("shape", "rectangle");
         
         try
         {
@@ -349,15 +349,15 @@ public class AddShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<Ad
     }
 }
 
-public class ConnectShapesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<ConnectShapesTool> logger)
+public class ConnectShapesTool(DrawIoService drawIoService, ILogger<ConnectShapesTool> logger)
     : Tool
 {
     public override string Name => "connect_shapes";
 
     public override string Description => "Connect two shapes with an arrow";
 
-    public override ToolParameter[] Parameters => _parameters ??= new[]
-    {
+    public override ToolParameter[] Parameters => _parameters ??=
+    [
         new ToolParameter
         {
             Name = "diagram",
@@ -386,13 +386,13 @@ public class ConnectShapesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogg
             Description = "Whether to include the diagram image in the response",
             Required = true
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string sourceId = parameters.GetValue<string>("sourceId") ?? throw new ArgumentException("Source ID is required");
-        string targetId = parameters.GetValue<string>("targetId") ?? throw new ArgumentException("Target ID is required");
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var sourceId = parameters.GetValue<string>("sourceId") ?? throw new ArgumentException("Source ID is required");
+        var targetId = parameters.GetValue<string>("targetId") ?? throw new ArgumentException("Target ID is required");
         
         try
         {
@@ -415,27 +415,27 @@ public class ConnectShapesTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogg
     }
 }
 
-public class GenerateVpcDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<GenerateVpcDiagramTool> logger)
+public class GenerateVpcDiagramTool(DrawIoService drawIoService, ILogger<GenerateVpcDiagramTool> logger)
     : Tool
 {
     public override string Name => "generate_vpc";
 
     public override string Description => "Generate a sample AWS VPC diagram";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "name",
             Type = "string",
             Description = "Name for the new diagram",
             Required = true
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string name = parameters.GetValue<string>("name", "vpc.drawio");
+        var name = parameters.GetValue<string>("name", "vpc.drawio");
         
         if (string.IsNullOrEmpty(Path.GetExtension(name)))
         {
@@ -444,7 +444,7 @@ public class GenerateVpcDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, 
         
         try
         {
-            var diagram = drawIoService.GenerateVpcDiagram(name);
+            drawIoService.GenerateVpcDiagram(name);
             
             var response = new
             {
@@ -463,35 +463,35 @@ public class GenerateVpcDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, 
     }
 }
 
-public class DeleteShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<DeleteShapeTool> logger)
+public class DeleteShapeTool(DrawIoService drawIoService, ILogger<DeleteShapeTool> logger)
     : Tool
 {
     public override string Name => "delete_shape";
 
     public override string Description => "Delete a shape from a diagram";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "diagram",
             Type = "string",
             Description = "Diagram file name",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "shapeId",
             Type = "string",
             Description = "ID of the shape to delete",
             Required = true
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
         
         try
         {
@@ -514,84 +514,84 @@ public class DeleteShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger
     }
 }
 
-public class UpdateShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<UpdateShapeTool> logger)
+public class UpdateShapeTool(DrawIoService drawIoService, ILogger<UpdateShapeTool> logger)
     : Tool
 {
     public override string Name => "update_shape";
 
     public override string Description => "Update an existing shape in a diagram";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "diagram",
             Type = "string",
             Description = "Diagram file name",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "shapeId",
             Type = "string",
             Description = "ID of the shape to update",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "value",
             Type = "string",
             Description = "New text label for the shape",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "x",
             Type = "number",
             Description = "New X position",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "y",
             Type = "number",
             Description = "New Y position",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "width",
             Type = "number",
             Description = "New width of the shape",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "height",
             Type = "number",
             Description = "New height of the shape",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "style",
             Type = "string",
             Description = "New style for the shape",
             Required = false
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
-        string value = parameters.GetValue<string>("value") ?? "";
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
+        var value = parameters.GetValue<string>("value") ?? "";
         
         float? x = parameters.HasValue("x") ? parameters.GetValue<float>("x") : null;
         float? y = parameters.HasValue("y") ? parameters.GetValue<float>("y") : null;
         float? width = parameters.HasValue("width") ? parameters.GetValue<float>("width") : null;
         float? height = parameters.HasValue("height") ? parameters.GetValue<float>("height") : null;
-        string style = parameters.GetValue<string>("style") ?? "";
+        var style = parameters.GetValue<string>("style") ?? "";
         
         try
         {
@@ -614,7 +614,7 @@ public class UpdateShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger
     }
 }
 
-public class StyleShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<StyleShapeTool> logger)
+public class StyleShapeTool(DrawIoService drawIoService, ILogger<StyleShapeTool> logger)
     : Tool
 {
     // Dictionary of predefined styles
@@ -642,38 +642,38 @@ public class StyleShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<
 
     public override string Description => "Apply a predefined style to a shape in a diagram";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "diagram",
             Type = "string",
             Description = "Diagram file name",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "shapeId",
             Type = "string",
             Description = "ID of the shape to style",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "style",
             Type = "string",
             Description = "Predefined style name (aws-ec2, aws-s3, aws-lambda, aws-rds, azure-vm, gcp-compute, database, server, router, switch, firewall, cloud, success, warning, error, info)",
             Required = true
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
-        string styleName = parameters.GetValue<string>("style") ?? throw new ArgumentException("Style name is required");
-        string fillColor = parameters.GetValue<string>("fill_color") ?? "";
-        string strokeColor = parameters.GetValue<string>("stroke_color") ?? "";
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
+        var styleName = parameters.GetValue<string>("style") ?? throw new ArgumentException("Style name is required");
+        var fillColor = parameters.GetValue<string>("fill_color") ?? "";
+        var strokeColor = parameters.GetValue<string>("stroke_color") ?? "";
         
         try
         {
@@ -702,7 +702,7 @@ public class StyleShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<
                     styleProps.Add($"strokeColor={strokeColor}");
                 }
                 
-                string customStyle = string.Join(";", styleProps);
+                var customStyle = string.Join(";", styleProps);
                 
                 drawIoService.UpdateShape(diagram, shapeId, "", null, null, null, null, customStyle);
             }
@@ -724,35 +724,35 @@ public class StyleShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<
     }
 }
 
-public class ArrangeDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<ArrangeDiagramTool> logger)
+public class ArrangeDiagramTool(DrawIoService drawIoService, ILogger<ArrangeDiagramTool> logger)
     : Tool
 {
     public override string Name => "arrange_diagram";
 
     public override string Description => "Arrange shapes in a diagram";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "diagram",
             Type = "string",
             Description = "Diagram file name",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "layout",
             Type = "string",
             Description = "Layout type (horizontal, vertical, etc.)",
             Required = false
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string layout = parameters.GetValue<string>("layout") ?? "horizontal";
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var layout = parameters.GetValue<string>("layout") ?? "horizontal";
         
         // Validate layout
         if (!new[] { "horizontal", "vertical", "radial" }.Contains(layout.ToLowerInvariant()))
@@ -762,7 +762,7 @@ public class ArrangeDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILog
         
         try
         {
-            var updatedDiagram = drawIoService.ArrangeDiagram(diagram, layout);
+            drawIoService.ArrangeDiagram(diagram, layout);
             
             var response = new
             {
@@ -781,50 +781,50 @@ public class ArrangeDiagramTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILog
     }
 }
 
-public class RotateShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<RotateShapeTool> logger)
+public class RotateShapeTool(DrawIoService drawIoService, ILogger<RotateShapeTool> logger)
     : Tool
 {
     public override string Name => "rotate_shape";
 
     public override string Description => "Rotate a shape by a specified angle";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "diagram",
             Type = "string",
             Description = "Diagram filename",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "shapeId",
             Type = "string",
             Description = "ID of the shape to rotate",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "angle",
             Type = "number",
             Description = "Rotation angle in degrees",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "returnDiagram",
             Type = "boolean",
             Description = "Whether to include the diagram image in the response",
             Required = false
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
-        float angle = parameters.GetValue<float>("angle");
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
+        var angle = parameters.GetValue<float>("angle");
         
         try
         {
@@ -847,50 +847,50 @@ public class RotateShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger
     }
 }
 
-public class FlipShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<FlipShapeTool> logger)
+public class FlipShapeTool(DrawIoService drawIoService, ILogger<FlipShapeTool> logger)
     : Tool
 {
     public override string Name => "flip_shape";
 
     public override string Description => "Flip a shape horizontally or vertically";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "diagram",
             Type = "string",
             Description = "Diagram filename",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "shapeId",
             Type = "string",
             Description = "ID of the shape to flip",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "direction",
             Type = "string",
             Description = "Direction to flip (horizontal or vertical)",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "returnDiagram",
             Type = "boolean",
             Description = "Whether to include the diagram image in the response",
             Required = false
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
-        string direction = parameters.GetValue<string>("direction") ?? throw new ArgumentException("Flip direction is required");
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var shapeId = parameters.GetValue<string>("shapeId") ?? throw new ArgumentException("Shape ID is required");
+        var direction = parameters.GetValue<string>("direction") ?? throw new ArgumentException("Flip direction is required");
         
         // Validate direction
         if (!string.Equals(direction, "horizontal", StringComparison.OrdinalIgnoreCase) && 
@@ -920,50 +920,50 @@ public class FlipShapeTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<F
     }
 }
 
-public class SetDiagramBackgroundTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<SetDiagramBackgroundTool> logger)
+public class SetDiagramBackgroundTool(DrawIoService drawIoService, ILogger<SetDiagramBackgroundTool> logger)
     : Tool
 {
     public override string Name => "set_diagram_background";
 
     public override string Description => "Set the background color or image for a diagram";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "diagram",
             Type = "string",
             Description = "Diagram filename",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "backgroundColor",
             Type = "string",
             Description = "Background color in hex format (e.g., #f5f5f5)",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "backgroundImage",
             Type = "string",
             Description = "URL or path to background image",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "returnDiagram",
             Type = "boolean",
             Description = "Whether to include the diagram image in the response",
             Required = false
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string backgroundColor = parameters.GetValue<string>("backgroundColor") ?? "";
-        string backgroundImage = parameters.GetValue<string>("backgroundImage") ?? "";
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var backgroundColor = parameters.GetValue<string>("backgroundColor") ?? "";
+        var backgroundImage = parameters.GetValue<string>("backgroundImage") ?? "";
         
         if (string.IsNullOrEmpty(backgroundColor) && string.IsNullOrEmpty(backgroundImage))
         {
@@ -974,7 +974,7 @@ public class SetDiagramBackgroundTool(DrawIO.MCP.SSE.DrawIoService drawIoService
         {
             drawIoService.SetDiagramBackground(diagram, backgroundImage, backgroundColor);
             
-            string message = "";
+            var message = "";
             if (!string.IsNullOrEmpty(backgroundColor))
             {
                 message += $"Background color set to {backgroundColor}. ";
@@ -1001,90 +1001,89 @@ public class SetDiagramBackgroundTool(DrawIO.MCP.SSE.DrawIoService drawIoService
     }
 }
 
-public class ConnectShapesAtPointsTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<ConnectShapesAtPointsTool> logger)
+public class ConnectShapesAtPointsTool(DrawIoService drawIoService, ILogger<ConnectShapesAtPointsTool> logger)
     : Tool
 {
     public override string Name => "connect_shapes_at_points";
 
     public override string Description => "Connect two shapes with an arrow at specific points";
 
-    public override ToolParameter[] Parameters => new[]
-    {
-        new ToolParameter
+    public override ToolParameter[] Parameters =>
+    [
+        new()
         {
             Name = "diagram",
             Type = "string",
             Description = "Diagram filename",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "sourceId",
             Type = "string",
             Description = "ID of the source shape",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "targetId",
             Type = "string",
             Description = "ID of the target shape",
             Required = true
         },
-        new ToolParameter
+        new()
         {
             Name = "sourceX",
             Type = "number",
             Description = "X coordinate on the source shape",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "sourceY",
             Type = "number",
             Description = "Y coordinate on the source shape",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "targetX",
             Type = "number",
             Description = "X coordinate on the target shape",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "targetY",
             Type = "number",
             Description = "Y coordinate on the target shape",
             Required = false
         },
-        new ToolParameter
+        new()
         {
             Name = "returnDiagram",
             Type = "boolean",
             Description = "Whether to include the diagram image in the response",
             Required = false
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
-        string diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
-        string sourceId = parameters.GetValue<string>("sourceId") ?? throw new ArgumentException("Source ID is required");
-        string targetId = parameters.GetValue<string>("targetId") ?? throw new ArgumentException("Target ID is required");
+        var diagram = parameters.GetValue<string>("diagram") ?? throw new ArgumentException("Diagram name is required");
+        var sourceId = parameters.GetValue<string>("sourceId") ?? throw new ArgumentException("Source ID is required");
+        var targetId = parameters.GetValue<string>("targetId") ?? throw new ArgumentException("Target ID is required");
         
-        float? sourceX = parameters.GetValue<float?>("sourceX");
-        float? sourceY = parameters.GetValue<float?>("sourceY");
-        float? targetX = parameters.GetValue<float?>("targetX");
-        float? targetY = parameters.GetValue<float?>("targetY");
+        var sourceX = parameters.GetValue<float?>("sourceX");
+        var sourceY = parameters.GetValue<float?>("sourceY");
+        var targetX = parameters.GetValue<float?>("targetX");
+        var targetY = parameters.GetValue<float?>("targetY");
         
         try
         {
             var result = drawIoService.ConnectShapesAtPoints(
                 diagram, sourceId, targetId, sourceX, sourceY, targetX, targetY);
-            
-            var updatedDiagram = result.Item1;
+
             var connectorId = result.Item2;
             
             var response = new
@@ -1128,22 +1127,21 @@ public static class ToolExtensions
     public static async Task<object> AddDiagramImageToResponseAsync(
         object response, 
         ToolParameters parameters, 
-        DrawIO.MCP.SSE.DrawIoService drawIoService)
+        DrawIoService drawIoService)
     {
         // If return_diagram is true and diagram parameter exists, add image to response
-        bool returnDiagram = parameters.GetValue<bool>("return_diagram");
-        string? diagramName = parameters.GetValue<string>("diagram");
+        var returnDiagram = parameters.GetValue<bool>("return_diagram");
+        var diagramName = parameters.GetValue<string>("diagram");
         
         if (returnDiagram && !string.IsNullOrEmpty(diagramName))
         {
             // Get page index if specified
-            int pageIndex = parameters.GetValue<int>("page_index", 
-                          parameters.GetValue<int>("page", 0));
+            var pageIndex = parameters.GetValue("page_index", 
+                          parameters.GetValue("page", 0));
             
             // Get image data
-            var imageData = await Task.FromResult(drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex, "png"));
-            
-            if (imageData != null)
+            var imageData = await Task.FromResult(drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex));
+
             {
                 // Create a copy of the response object with the image added
                 // Convert to dictionaries for manipulation
@@ -1163,15 +1161,10 @@ public static class ToolExtensions
                             var newContent = new List<object>(contentArray) { imageData };
                             respDict["content"] = newContent;
                         }
-                        else if (existingContent != null)
+                        else
                         {
                             // Create new content with original and image
                             respDict["content"] = new List<object> { existingContent, imageData };
-                        }
-                        else
-                        {
-                            // Just set the image as content
-                            respDict["content"] = new List<object> { imageData };
                         }
                     }
                     else
@@ -1182,26 +1175,24 @@ public static class ToolExtensions
                     
                     return respDict;
                 }
-                else 
+
+                // Convert response to dictionary
+                var responseDict = new Dictionary<string, object>();
+                    
+                // Add all properties from original response
+                foreach (var prop in response.GetType().GetProperties())
                 {
-                    // Convert response to dictionary
-                    var responseDict = new Dictionary<string, object>();
-                    
-                    // Add all properties from original response
-                    foreach (var prop in response.GetType().GetProperties())
+                    var value = prop.GetValue(response);
+                    if (value != null)
                     {
-                        var value = prop.GetValue(response);
-                        if (value != null)
-                        {
-                            responseDict[prop.Name] = value;
-                        }
+                        responseDict[prop.Name] = value;
                     }
-                    
-                    // Add content with the image
-                    responseDict["content"] = new List<object> { imageData };
-                    
-                    return responseDict;
                 }
+                    
+                // Add content with the image
+                responseDict["content"] = new List<object> { imageData };
+                    
+                return responseDict;
             }
         }
         
@@ -1211,7 +1202,7 @@ public static class ToolExtensions
 
 // Add a ListShapeTypesTool class similar to other tool classes
 #pragma warning disable CS9113 // Parameter is unread
-public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService _, ILogger<ListShapeTypesTool> logger)
+public class ListShapeTypesTool(DrawIoService _, ILogger<ListShapeTypesTool> logger)
     : Tool
 #pragma warning restore CS9113
 {
@@ -1221,7 +1212,7 @@ public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService _, ILogger<ListShap
 
     public override string Description => "List available shape types that can be used with add_shape";
 
-    public override ToolParameter[] Parameters => Array.Empty<ToolParameter>();
+    public override ToolParameter[] Parameters => [];
 
     public override Task<object> ExecuteAsync(ToolParameters parameters)
     {
@@ -1229,11 +1220,11 @@ public class ListShapeTypesTool(DrawIO.MCP.SSE.DrawIoService _, ILogger<ListShap
         {
             var shapeTypes = new Dictionary<string, List<string>>
             {
-                ["Basic"] = new() { "rectangle", "ellipse", "circle", "triangle", "rhombus", "hexagon" },
-                ["Flowchart"] = new() { "decision", "data", "predefined", "stored-data", "process" },
-                ["UML"] = new() { "class", "interface", "package", "actor" },
-                ["Network"] = new() { "server", "database", "cloud", "cloud-service" },
-                ["Containers"] = new() { "document", "note", "cylinder", "diamond" }
+                ["Basic"] = ["rectangle", "ellipse", "circle", "triangle", "rhombus", "hexagon"],
+                ["Flowchart"] = ["decision", "data", "predefined", "stored-data", "process"],
+                ["UML"] = ["class", "interface", "package", "actor"],
+                ["Network"] = ["server", "database", "cloud", "cloud-service"],
+                ["Containers"] = ["document", "note", "cylinder", "diamond"]
             };
 
             return Task.FromResult<object>(new
@@ -1277,10 +1268,10 @@ public class ToolParameterStartupFilter : IStartupFilter
                     // Check if tool has diagram parameter
                     if (parameters.Any(p => p.Name == "diagram"))
                     {
-                        bool parametersUpdated = false;
+                        var parametersUpdated = false;
                         
                         // Check if tool already has return_diagram parameter
-                        for (int i = 0; i < parameters.Count; i++)
+                        for (var i = 0; i < parameters.Count; i++)
                         {
                             if (parameters[i].Name == "returnDiagram")
                             {
@@ -1311,8 +1302,8 @@ public class ToolParameterStartupFilter : IStartupFilter
                         
                         // Now we can directly access the _parameters field
                         var parametersField = typeof(Tool).GetField("_parameters", 
-                            System.Reflection.BindingFlags.NonPublic | 
-                            System.Reflection.BindingFlags.Instance);
+                            BindingFlags.NonPublic | 
+                            BindingFlags.Instance);
                             
                         if (parametersField != null)
                         {
@@ -1327,14 +1318,14 @@ public class ToolParameterStartupFilter : IStartupFilter
     }
 }
 
-public class GetDiagramImageTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILogger<GetDiagramImageTool> logger) : Tool
+public class GetDiagramImageTool(DrawIoService drawIoService, ILogger<GetDiagramImageTool> logger) : Tool
 {
     public override string Name => "get_diagram_image";
 
     public override string Description => "Get a diagram as a base64-encoded image";
 
-    public override ToolParameter[] Parameters => _parameters ??= new[]
-    {
+    public override ToolParameter[] Parameters => _parameters ??=
+    [
         new ToolParameter
         {
             Name = "diagram",
@@ -1356,36 +1347,20 @@ public class GetDiagramImageTool(DrawIO.MCP.SSE.DrawIoService drawIoService, ILo
             Description = "Page index (defaults to 0)",
             Required = false
         }
-    };
+    ];
 
     public override async Task<object> ExecuteAsync(ToolParameters parameters)
     {
         try
         {
-            string diagramName = parameters.GetValue<string>("diagram") ?? throw new ArgumentNullException("diagram", "Diagram name is required");
-            string format = parameters.GetValue<string>("format", "png");
-            int pageIndex = parameters.GetValue<int>("page", 0);
+            var diagramName = parameters.GetValue<string>("diagram") ?? throw new ArgumentNullException("diagram", "Diagram name is required");
+            var format = parameters.GetValue<string>("format", "png");
+            var pageIndex = parameters.GetValue("page", 0);
             
             logger.LogInformation($"Getting diagram image for {diagramName}, page {pageIndex}, format {format}");
             
             var imageData = await Task.FromResult(drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex, format));
-            
-            if (imageData == null)
-            {
-                return new Dictionary<string, object>
-                {
-                    ["isError"] = true,
-                    ["content"] = new[]
-                    {
-                        new Dictionary<string, string>
-                        {
-                            ["type"] = "text",
-                            ["text"] = $"Error: Failed to generate diagram image for {diagramName}"
-                        }
-                    }
-                };
-            }
-            
+
             return new Dictionary<string, object>
             {
                 ["status"] = "success",

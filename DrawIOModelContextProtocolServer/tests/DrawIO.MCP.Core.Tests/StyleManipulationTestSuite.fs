@@ -13,7 +13,7 @@ open Microsoft.FSharp.Core
 let ``UpdateShapeStyle should apply style properties`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape, shapeId) = addShape diagram 0 "Test Shape" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape, shapeId = addShape diagram 0 "Test Shape" 100.0 100.0 120.0 60.0 "rectangle"
     
     // Create a style map
     let styleProperties = Map.ofList [
@@ -28,7 +28,7 @@ let ``UpdateShapeStyle should apply style properties`` () =
     
     // Assert
     // Find the updated shape
-    let updatedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
+    let updatedShape = updatedDiagram.Pages[0].Cells |> List.find (fun c -> c.Id = shapeId)
     
     // Check each style property was applied
     Assert.Contains("fillColor=#ff0000", updatedShape.Style)
@@ -40,7 +40,7 @@ let ``UpdateShapeStyle should apply style properties`` () =
 let ``UpdateShape should merge new styles with existing styles`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape, shapeId) = addShape diagram 0 "Test Shape" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape, shapeId = addShape diagram 0 "Test Shape" 100.0 100.0 120.0 60.0 "rectangle"
     
     // First update with some styles
     let diagram1 = updateShape diagramWithShape 0 shapeId "Test Shape" None None None None (Some "fillColor=#ff0000;fontStyle=1;")
@@ -50,7 +50,7 @@ let ``UpdateShape should merge new styles with existing styles`` () =
     
     // Assert
     // Find the updated shape
-    let updatedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
+    let updatedShape = updatedDiagram.Pages[0].Cells |> List.find (fun c -> c.Id = shapeId)
     
     // Both sets of styles should be present
     Assert.Contains("fillColor=#ff0000", updatedShape.Style)
@@ -62,14 +62,14 @@ let ``UpdateShape should merge new styles with existing styles`` () =
 let ``UpdateShape should update geometry and style`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape, shapeId) = addShape diagram 0 "Original" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape, shapeId = addShape diagram 0 "Original" 100.0 100.0 120.0 60.0 "rectangle"
     
     // Act
     let updatedDiagram = updateShape diagramWithShape 0 shapeId "Updated" (Some 200.0) (Some 200.0) (Some 150.0) (Some 75.0) (Some "fillColor=#ff0000;")
     
     // Assert
     // Find the updated shape
-    let updatedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
+    let updatedShape = updatedDiagram.Pages[0].Cells |> List.find (fun c -> c.Id = shapeId)
     
     // Check all properties updated
     Assert.Equal("Updated", updatedShape.Value)
@@ -85,15 +85,15 @@ let ``UpdateShape should update geometry and style`` () =
 let ``ArrangeLayout with horizontal layout should align shapes horizontally`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, _) = addShape diagram 0 "Shape 1" 100.0 100.0 120.0 60.0 "rectangle"
-    let (diagramWithShape2, _) = addShape diagramWithShape1 0 "Shape 2" 300.0 200.0 120.0 60.0 "rectangle"
-    let (diagramWithShape3, _) = addShape diagramWithShape2 0 "Shape 3" 500.0 300.0 120.0 60.0 "rectangle"
+    let diagramWithShape1, _ = addShape diagram 0 "Shape 1" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape2, _ = addShape diagramWithShape1 0 "Shape 2" 300.0 200.0 120.0 60.0 "rectangle"
+    let diagramWithShape3, _ = addShape diagramWithShape2 0 "Shape 3" 500.0 300.0 120.0 60.0 "rectangle"
     
     // Act
     let arrangedDiagram = arrangeLayout diagramWithShape3 0 "horizontal"
     
     // Assert
-    let vertices = arrangedDiagram.Pages.[0].Cells 
+    let vertices = arrangedDiagram.Pages[0].Cells 
                   |> List.filter (fun c -> c.IsVertex && c.Value <> "" && c.Geometry.IsSome)
     
     // Check all shapes have the same Y value
@@ -105,7 +105,7 @@ let ``ArrangeLayout with horizontal layout should align shapes horizontally`` ()
     let spacings = List.pairwise xValues |> List.map (fun (a, b) -> b - a)
     
     // All spacings should be equal (within a small tolerance for floating point)
-    let firstSpacing: float = spacings.[0]
+    let firstSpacing: float = spacings[0]
     spacings
     |> List.iter (fun spacing ->
         let diff = Math.Abs(spacing - firstSpacing)
@@ -116,15 +116,15 @@ let ``ArrangeLayout with horizontal layout should align shapes horizontally`` ()
 let ``ArrangeLayout with vertical layout should align shapes vertically`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, _) = addShape diagram 0 "Shape 1" 100.0 100.0 120.0 60.0 "rectangle"
-    let (diagramWithShape2, _) = addShape diagramWithShape1 0 "Shape 2" 300.0 200.0 120.0 60.0 "rectangle"
-    let (diagramWithShape3, _) = addShape diagramWithShape2 0 "Shape 3" 500.0 300.0 120.0 60.0 "rectangle"
+    let diagramWithShape1, _ = addShape diagram 0 "Shape 1" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape2, _ = addShape diagramWithShape1 0 "Shape 2" 300.0 200.0 120.0 60.0 "rectangle"
+    let diagramWithShape3, _ = addShape diagramWithShape2 0 "Shape 3" 500.0 300.0 120.0 60.0 "rectangle"
     
     // Act
     let arrangedDiagram = arrangeLayout diagramWithShape3 0 "vertical"
     
     // Assert
-    let vertices = arrangedDiagram.Pages.[0].Cells 
+    let vertices = arrangedDiagram.Pages[0].Cells 
                   |> List.filter (fun c -> c.IsVertex && c.Value <> "" && c.Geometry.IsSome)
     
     // Check all shapes have the same X value
@@ -136,7 +136,7 @@ let ``ArrangeLayout with vertical layout should align shapes vertically`` () =
     let spacings = List.pairwise yValues |> List.map (fun (a, b) -> b - a)
     
     // All spacings should be equal (within a small tolerance for floating point)
-    let firstSpacing: float = spacings.[0]
+    let firstSpacing: float = spacings[0]
     spacings
     |> List.iter (fun spacing ->
         let diff = Math.Abs(spacing - firstSpacing)
@@ -147,13 +147,13 @@ let ``ArrangeLayout with vertical layout should align shapes vertically`` () =
 let ``MoveShape should update shape position`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape, shapeId) = addShape diagram 0 "Test Shape" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape, shapeId = addShape diagram 0 "Test Shape" 100.0 100.0 120.0 60.0 "rectangle"
 
     // Act
     let updatedDiagram = moveShape diagramWithShape shapeId 300.0 200.0
 
     // Assert
-    let movedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
+    let movedShape = updatedDiagram.Pages[0].Cells |> List.find (fun c -> c.Id = shapeId)
     Assert.Equal(300.0, movedShape.Geometry.Value.Position.X)
     Assert.Equal(200.0, movedShape.Geometry.Value.Position.Y)
 
@@ -167,14 +167,14 @@ let ``Different shape types should have correct styles`` () =
     let diagram = createEmptyDiagram()
 
     // Create shapes with different types
-    let (diagramWithRect, rectId) = addShape diagram 0 "Rectangle" 100.0 100.0 120.0 60.0 "rectangle"
-    let (diagramWithEllipse, ellipseId) = addShape diagramWithRect 0 "Ellipse" 300.0 100.0 120.0 60.0 "ellipse"
-    let (diagramWithDiamond, diamondId) = addShape diagramWithEllipse 0 "Diamond" 500.0 100.0 120.0 60.0 "diamond"
+    let diagramWithRect, rectId = addShape diagram 0 "Rectangle" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithEllipse, ellipseId = addShape diagramWithRect 0 "Ellipse" 300.0 100.0 120.0 60.0 "ellipse"
+    let diagramWithDiamond, diamondId = addShape diagramWithEllipse 0 "Diamond" 500.0 100.0 120.0 60.0 "diamond"
 
     // Assert
-    let rectShape = diagramWithDiamond.Pages.[0].Cells |> List.find (fun c -> c.Id = rectId)
-    let ellipseShape = diagramWithDiamond.Pages.[0].Cells |> List.find (fun c -> c.Id = ellipseId)
-    let diamondShape = diagramWithDiamond.Pages.[0].Cells |> List.find (fun c -> c.Id = diamondId)
+    let rectShape = diagramWithDiamond.Pages[0].Cells |> List.find (fun c -> c.Id = rectId)
+    let ellipseShape = diagramWithDiamond.Pages[0].Cells |> List.find (fun c -> c.Id = ellipseId)
+    let diamondShape = diagramWithDiamond.Pages[0].Cells |> List.find (fun c -> c.Id = diamondId)
 
     // Each shape type should have an appropriate style
     Assert.Contains("rounded=0", rectShape.Style)

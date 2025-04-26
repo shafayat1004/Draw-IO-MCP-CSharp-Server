@@ -10,7 +10,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public ProtocolVersionTests()
         {
             // Create a temporary directory for testing
-            string tempDir = Path.Combine(Path.GetTempPath(), "drawio-mcp-test-protocols");
+            var tempDir = Path.Combine(Path.GetTempPath(), "drawio-mcp-test-protocols");
             if (!Directory.Exists(tempDir))
             {
                 Directory.CreateDirectory(tempDir);
@@ -26,9 +26,9 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task Initialize_WithProtocolVersion_2024_11_05_ShouldAccept()
         {
             // Arrange
-            string paramsJson = @"{""protocolVersion"": ""2024-11-05""}";
+            var paramsJson = @"{""protocolVersion"": ""2024-11-05""}";
             JsonElement paramsElement;
-            using (JsonDocument doc = JsonDocument.Parse(paramsJson))
+            using (var doc = JsonDocument.Parse(paramsJson))
             {
                 paramsElement = doc.RootElement.Clone();
             }
@@ -60,9 +60,9 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task Initialize_WithProtocolVersion_2025_03_26_ShouldAccept()
         {
             // Arrange
-            string paramsJson = @"{""protocolVersion"": ""2025-03-26""}";
+            var paramsJson = @"{""protocolVersion"": ""2025-03-26""}";
             JsonElement paramsElement;
-            using (JsonDocument doc = JsonDocument.Parse(paramsJson))
+            using (var doc = JsonDocument.Parse(paramsJson))
             {
                 paramsElement = doc.RootElement.Clone();
             }
@@ -94,9 +94,9 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task Initialize_WithNoProtocolVersion_ShouldDefaultTo_2025_03_26()
         {
             // Arrange
-            string paramsJson = @"{}";
+            var paramsJson = @"{}";
             JsonElement paramsElement;
-            using (JsonDocument doc = JsonDocument.Parse(paramsJson))
+            using (var doc = JsonDocument.Parse(paramsJson))
             {
                 paramsElement = doc.RootElement.Clone();
             }
@@ -128,10 +128,10 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task Initialize_WithUnsupportedProtocolVersion_ShouldReturnError()
         {
             // Arrange
-            string requestedVersion = "2023-01-01";
-            string paramsJson = $"{{\"protocolVersion\": \"{requestedVersion}\"}}";
+            var requestedVersion = "2023-01-01";
+            var paramsJson = $"{{\"protocolVersion\": \"{requestedVersion}\"}}";
             JsonElement paramsElement;
-            using (JsonDocument doc = JsonDocument.Parse(paramsJson))
+            using (var doc = JsonDocument.Parse(paramsJson))
             {
                 paramsElement = doc.RootElement.Clone();
             }
@@ -168,7 +168,7 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.Contains("2025-03-26", supportedVersions);
             Assert.Contains("2024-11-05", supportedVersions);
 
-            string logs = _testLogWriter.ToString();
+            var logs = _testLogWriter.ToString();
             Assert.Contains($"Client requested unsupported version {requestedVersion}", logs);
         }
     }

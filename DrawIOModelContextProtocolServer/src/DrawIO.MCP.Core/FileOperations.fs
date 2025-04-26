@@ -67,7 +67,7 @@ let createDiagramPage (diagram: Diagram) (name: string) =
 /// Gets a diagram page by its index
 let getDiagramPage (diagram: Diagram) (page_index: int) =
     if page_index >= 0 && page_index < diagram.Pages.Length then
-        Some diagram.Pages.[page_index]
+        Some diagram.Pages[page_index]
     else
         None
 
@@ -102,7 +102,7 @@ let moveCellBetweenPages (diagram: Diagram) (cellId: string) (sourcePageId: stri
     let targetPage = diagram.Pages |> List.tryFind (fun page -> page.Id = targetPageId)
     
     match (sourcePage, targetPage) with
-    | (Some srcPage, Some tgtPage) ->
+    | Some srcPage, Some _tgtPage ->
         // Find the cell to move
         let cellToMove = srcPage.Cells |> List.tryFind (fun cell -> cell.Id = cellId)
         

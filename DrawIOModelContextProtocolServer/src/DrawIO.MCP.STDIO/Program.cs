@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Text;
-using System.Threading;
 using System.CommandLine;
+using System.IO;
+using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DrawIO.MCP.STDIO
 {
@@ -14,11 +14,11 @@ namespace DrawIO.MCP.STDIO
     {
         private static string _diagramsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "diagrams");
         private static TextWriter _logWriter = Console.Error;
-        private static ProtocolType _protocolType = ProtocolType.STDIO;
-        private static string _logFilePath = null;
+        private static ProtocolType _protocolType = ProtocolType.Stdio;
+        private static string _logFilePath;
         private static long _maxLogSizeBytes = 100 * 1024 * 1024; // 100 MB
         private static int _maxLogFiles = 3;
-        private static long _currentLogSize = 0;
+        private static long _currentLogSize;
 
         public static async Task<int> Main(string[] args)
         {
@@ -36,7 +36,7 @@ namespace DrawIO.MCP.STDIO
                 var writer = new StreamWriter(stdout) { AutoFlush = true };
                 Console.SetOut(writer);
 
-                AppDomain.CurrentDomain.ProcessExit += (sender, e) => 
+                AppDomain.CurrentDomain.ProcessExit += (_, _) => 
                 {
                     var writer = _logWriter ?? Console.Error;
                     writer.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] Process exit event triggered");
@@ -79,10 +79,10 @@ namespace DrawIO.MCP.STDIO
                 rootCommand.AddOption(maxLogFilesOption);
                 rootCommand.AddOption(protocolOption);
 
-                rootCommand.SetHandler(async (string diagramsDir, bool verbose, string logFile, long maxLogSizeMB, int maxLogFiles, string protocol) =>
+                rootCommand.SetHandler(async (diagramsDir, verbose, logFile, maxLogSizeMb, maxLogFiles, protocol) =>
                 {
                     _diagramsDirectory = diagramsDir;
-                    _maxLogSizeBytes = maxLogSizeMB * 1024 * 1024;
+                    _maxLogSizeBytes = maxLogSizeMb * 1024 * 1024;
                     _maxLogFiles = maxLogFiles;
                     
                     if (!Directory.Exists(_diagramsDirectory))
@@ -96,7 +96,7 @@ namespace DrawIO.MCP.STDIO
                         try 
                         {
                             // Create directory if it doesn't exist
-                            string logDir = Path.GetDirectoryName(logFile);
+                            var logDir = Path.GetDirectoryName(logFile);
                             if (!string.IsNullOrEmpty(logDir) && !Directory.Exists(logDir))
                             {
                                 Directory.CreateDirectory(logDir);
@@ -140,15 +140,15 @@ namespace DrawIO.MCP.STDIO
                     // Determine protocol type
                     _protocolType = protocol.ToLower() switch
                     {
-                        "stdio" => ProtocolType.STDIO,
-                        "sse" => ProtocolType.SSE,
-                        _ => ProtocolType.STDIO
+                        "stdio" => ProtocolType.Stdio,
+                        "sse" => ProtocolType.Sse,
+                        _ => ProtocolType.Stdio
                     };
                     
                     LogMessage($"Using protocol: {_protocolType}");
 
                     // Check standard streams for STDIO protocol
-                    if (_protocolType == ProtocolType.STDIO)
+                    if (_protocolType == ProtocolType.Stdio)
                     {
                         LogMessage("Checking stdin stream...");
                         if (Console.IsInputRedirected)
@@ -206,11 +206,11 @@ namespace DrawIO.MCP.STDIO
 
         private static string[] PreprocessArguments(string[] args)
         {
-            List<string> processedArgs = new List<string>();
+            var processedArgs = new List<string>();
             
-            for (int i = 0; i < args.Length; i++)
+            for (var i = 0; i < args.Length; i++)
             {
-                string arg = args[i];
+                var arg = args[i];
                 
                 // Check for arguments where option and value are concatenated
                 if (arg.StartsWith("--log-file") && !arg.Equals("--log-file"))
@@ -247,7 +247,7 @@ namespace DrawIO.MCP.STDIO
             
             // Log the processed arguments for debugging
             Console.Error.WriteLine("Processed arguments:");
-            for (int i = 0; i < processedArgs.Count; i++)
+            for (var i = 0; i < processedArgs.Count; i++)
             {
                 Console.Error.WriteLine($"  [{i}]: {processedArgs[i]}");
             }
@@ -292,10 +292,10 @@ namespace DrawIO.MCP.STDIO
                 _logWriter.Close();
                 
                 // Perform log rotation - shift files
-                for (int i = _maxLogFiles - 1; i > 0; i--)
+                for (var i = _maxLogFiles - 1; i > 0; i--)
                 {
-                    string oldFile = $"{_logFilePath}.{i}";
-                    string newFile = $"{_logFilePath}.{i + 1}";
+                    var oldFile = $"{_logFilePath}.{i}";
+                    var newFile = $"{_logFilePath}.{i + 1}";
                     
                     if (File.Exists(oldFile))
                     {
@@ -317,7 +317,7 @@ namespace DrawIO.MCP.STDIO
                 // Rename the current log file
                 if (File.Exists(_logFilePath))
                 {
-                    string newFile = $"{_logFilePath}.1";
+                    var newFile = $"{_logFilePath}.1";
                     if (File.Exists(newFile))
                         File.Delete(newFile);
                     File.Move(_logFilePath, newFile);
@@ -357,8 +357,8 @@ namespace DrawIO.MCP.STDIO
                         LogMessage($"SERVER HEARTBEAT #{counter} (Thread: {Thread.CurrentThread.ManagedThreadId})");
                         
                         // Check standard streams
-                        bool stdinOk = Console.In != null;
-                        bool stdoutOk = Console.Out != null;
+                        var stdinOk = Console.In != null;
+                        var stdoutOk = Console.Out != null;
                         LogMessage($"HEARTBEAT DETAIL: stdin={stdinOk}, stdout={stdoutOk}, GC.TotalMemory={GC.GetTotalMemory(false) / (1024*1024)}MB");
                         
                         try
@@ -383,13 +383,13 @@ namespace DrawIO.MCP.STDIO
             }, heartbeatCts.Token);
             
             // Set up console cancellation
-            Console.CancelKeyPress += (sender, e) => 
+            Console.CancelKeyPress += (_, e) => 
             {
                 LogMessage("Cancel key detected. Starting graceful shutdown.");
                 e.Cancel = true; // Prevent default behavior
             };
 
-            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
             {
                 var ex = args.ExceptionObject as Exception;
                 LogMessage($"CRITICAL: Unhandled exception: {ex?.Message}");
@@ -403,13 +403,13 @@ namespace DrawIO.MCP.STDIO
             try
             {
                 // Create the appropriate protocol handler
-                IMcpProtocolHandler protocolHandler = ProtocolHandlerFactory.CreateHandler(_protocolType, _logWriter);
+                var protocolHandler = ProtocolHandlerFactory.CreateHandler(_protocolType, _logWriter);
                 
                 // Initialize the protocol handler
                 await protocolHandler.InitializeAsync(_diagramsDirectory, verbose);
                 
                 // Run the appropriate protocol handler
-                if (_protocolType == ProtocolType.STDIO)
+                if (_protocolType == ProtocolType.Stdio)
                 {
                     await RunStdioServer(protocolHandler, cancellationTokenSource.Token);
                 }
@@ -446,9 +446,9 @@ namespace DrawIO.MCP.STDIO
         private static async Task RunStdioServer(IMcpProtocolHandler protocolHandler, CancellationToken cancellationToken)
         {
             // Keep track of whether stdin/stdout are still valid
-            bool stdioValid = true;
-            int consecutiveErrors = 0;
-            const int MAX_CONSECUTIVE_ERRORS = 3;
+            var stdioValid = true;
+            var consecutiveErrors = 0;
+            const int maxConsecutiveErrors = 3;
 
             try
             {
@@ -480,7 +480,7 @@ namespace DrawIO.MCP.STDIO
                             LogMessage($"Stack trace: {ex.StackTrace}");
                             consecutiveErrors++;
                             
-                            if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS)
+                            if (consecutiveErrors >= maxConsecutiveErrors)
                             {
                                 LogMessage($"Too many consecutive errors ({consecutiveErrors}), shutting down server");
                                 stdioValid = false;
@@ -545,7 +545,7 @@ namespace DrawIO.MCP.STDIO
                                 LogMessage($"Stack trace: {ex.StackTrace}");
                                 consecutiveErrors++;
                                 
-                                if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS)
+                                if (consecutiveErrors >= maxConsecutiveErrors)
                                 {
                                     LogMessage($"Too many consecutive errors ({consecutiveErrors}), shutting down server");
                                     stdioValid = false;
@@ -554,7 +554,6 @@ namespace DrawIO.MCP.STDIO
                                 
                                 // Wait a bit before retrying
                                 await Task.Delay(1000);
-                                continue;
                             }
                         }
                         else
@@ -570,7 +569,7 @@ namespace DrawIO.MCP.STDIO
                         LogMessage($"CRITICAL: Inner exception: {ex.InnerException?.Message ?? "none"}");
                         
                         consecutiveErrors++;
-                        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS)
+                        if (consecutiveErrors >= maxConsecutiveErrors)
                         {
                             LogMessage($"Too many consecutive errors ({consecutiveErrors}), shutting down server");
                             stdioValid = false;

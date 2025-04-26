@@ -16,7 +16,7 @@ namespace DrawIO.MCP.SSE.Tests
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder.ConfigureServices(services =>
+            builder.ConfigureServices(_ =>
             {
                 // Use temp diagrams directory
                 Environment.SetEnvironmentVariable("DIAGRAMS_DIR", _tempDiagramsDirectory);

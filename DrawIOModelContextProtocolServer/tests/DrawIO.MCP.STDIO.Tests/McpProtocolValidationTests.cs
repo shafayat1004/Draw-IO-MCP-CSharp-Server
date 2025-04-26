@@ -113,7 +113,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task ProtocolVersion_NegotiationConflict_ShouldReturnError()
         {
             // Arrange - Request an unsupported protocol version
-            string requestedVersion = "1.0.0";
+            var requestedVersion = "1.0.0";
             var request = new McpRequest
             {
                 Id = "protocol-1",
@@ -173,7 +173,7 @@ namespace DrawIO.MCP.STDIO.Tests
             var resultJson = JsonSerializer.Serialize(response.Result);
             var resultObj = JsonDocument.Parse(resultJson).RootElement;
             Assert.True(resultObj.TryGetProperty("protocolVersion", out var protocolVersion));
-            string? version = protocolVersion.GetString();
+            var version = protocolVersion.GetString();
             Assert.NotNull(version);
             
             _output.WriteLine($"Negotiated protocol version: {version}");
@@ -202,7 +202,7 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.Equal(-32601, response.Error.Code);  // Method not found error code
             Assert.Contains("not found", response.Error.Message, StringComparison.OrdinalIgnoreCase);
             
-            string errorJson = JsonSerializer.Serialize(response);
+            var errorJson = JsonSerializer.Serialize(response);
             _output.WriteLine($"Error response: {errorJson}");
             
             // Check the serialized JSON format
@@ -255,12 +255,12 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.Equal(JsonValueKind.Array, contentEl.ValueKind);
             
             // At least one content item should exist with error message
-            bool foundErrorMessage = false;
+            var foundErrorMessage = false;
             foreach (var item in contentEl.EnumerateArray())
             {
                 if (item.TryGetProperty("text", out var textEl))
                 {
-                    string? text = textEl.GetString();
+                    var text = textEl.GetString();
                     if (text != null && text.Contains("name", StringComparison.OrdinalIgnoreCase))
                     {
                         foundErrorMessage = true;

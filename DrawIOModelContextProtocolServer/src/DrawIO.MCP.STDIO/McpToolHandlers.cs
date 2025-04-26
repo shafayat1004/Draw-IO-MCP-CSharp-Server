@@ -20,7 +20,7 @@ namespace DrawIO.MCP.STDIO
             var tools = new List<McpToolDefinition>
             {
                 // Essential creation and editing tools
-                new McpToolDefinition
+                new()
                 {
                     Name = "create_new_diagram",
                     Description = "Create a new empty diagram file",
@@ -37,7 +37,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "generate_vpc",
                     Description = "Generate a sample AWS VPC layout diagram",
@@ -54,7 +54,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "add_shape",
                     Description = "Add a new shape to a diagram",
@@ -134,7 +134,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "connect_shapes",
                     Description = "Connect two shapes with an arrow",
@@ -178,7 +178,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "get_diagram_image",
                     Description = "Get a diagram as a base64-encoded image",
@@ -213,7 +213,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "delete_shape",
                     Description = "Delete a shape from a diagram",
@@ -239,7 +239,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "update_shape",
                     Description = "Update a shape's properties in a diagram",
@@ -274,7 +274,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "style_shape",
                     Description = "Apply style to a shape in a diagram",
@@ -318,7 +318,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "arrange_diagram",
                     Description = "Auto-arrange the layout of a diagram",
@@ -344,7 +344,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "move_shape",
                     Description = "Move a shape to a new position in the diagram",
@@ -388,7 +388,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "update_shape_style",
                     Description = "Update a shape's style properties",
@@ -423,7 +423,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "create_diagram_page",
                     Description = "Create a new page in a diagram",
@@ -449,7 +449,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "get_diagram_page",
                     Description = "Get the details of a diagram page",
@@ -475,7 +475,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "update_diagram_page",
                     Description = "Update a diagram page's properties",
@@ -510,7 +510,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "delete_diagram_page",
                     Description = "Delete a page from a diagram",
@@ -545,7 +545,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "move_cell_between_pages",
                     Description = "Move a cell (shape or connector) from one page to another",
@@ -608,7 +608,7 @@ namespace DrawIO.MCP.STDIO
                     }
                 },
                 // New query tools added here
-                new McpToolDefinition
+                new()
                 {
                     Name = "find_elements_by_text",
                     Description = "Find diagram elements containing the specified text",
@@ -643,7 +643,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "get_element_info",
                     Description = "Get detailed information about a specific diagram element",
@@ -678,7 +678,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "list_neighbors",
                     Description = "List all elements connected to the specified element",
@@ -713,7 +713,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "get_diagram_bounds",
                     Description = "Get the bounding box coordinates of all elements in the diagram",
@@ -739,7 +739,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "resize_shape",
                     Description = "Resize a shape to specified dimensions",
@@ -783,7 +783,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "set_text_style",
                     Description = "Set text styling properties for a shape",
@@ -836,7 +836,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "set_line_style",
                     Description = "Set line style properties for a connector",
@@ -907,7 +907,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "set_arrow_style",
                     Description = "Set arrow style properties for a connector",
@@ -951,7 +951,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "reset_connector",
                     Description = "Reset a connector to its default path",
@@ -977,7 +977,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "reverse_connector",
                     Description = "Reverse the direction of a connector",
@@ -1004,7 +1004,7 @@ namespace DrawIO.MCP.STDIO
                     }
                 },
                 // Waypoint manipulation tools
-                new McpToolDefinition
+                new()
                 {
                     Name = "add_waypoint",
                     Description = "Add a waypoint to a connector for precise path control",
@@ -1066,7 +1066,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "remove_waypoint",
                     Description = "Remove a waypoint from a connector",
@@ -1101,7 +1101,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "update_waypoint",
                     Description = "Update a waypoint's position on a connector",
@@ -1154,7 +1154,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "get_waypoints",
                     Description = "Get all waypoints on a connector",
@@ -1180,7 +1180,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "clear_waypoints",
                     Description = "Remove all waypoints from a connector, resetting to default path",
@@ -1206,7 +1206,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "group_shapes",
                     Description = "Group multiple shapes into a single group",
@@ -1246,7 +1246,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "ungroup_shapes",
                     Description = "Ungroup shapes from a group",
@@ -1282,7 +1282,7 @@ namespace DrawIO.MCP.STDIO
                     }
                 },
                 // Add new tool definitions after the existing tools
-                new McpToolDefinition
+                new()
                 {
                     Name = "rotate_shape",
                     Description = "Rotate a shape by a specified angle",
@@ -1326,7 +1326,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "flip_shape",
                     Description = "Flip a shape horizontally or vertically",
@@ -1370,7 +1370,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "set_diagram_background",
                     Description = "Set the background color or image for a diagram",
@@ -1414,7 +1414,7 @@ namespace DrawIO.MCP.STDIO
                         }
                     }
                 },
-                new McpToolDefinition
+                new()
                 {
                     Name = "connect_shapes_at_points",
                     Description = "Connect two shapes with an arrow at specific points",
@@ -1536,11 +1536,11 @@ namespace DrawIO.MCP.STDIO
                 // Define common shape categories and their types
                 var shapeTypes = new Dictionary<string, List<string>>
                 {
-                    ["Basic"] = new() { "rectangle", "ellipse", "circle", "triangle", "rhombus", "hexagon" },
-                    ["Flowchart"] = new() { "decision", "data", "predefined", "stored-data", "process" },
-                    ["UML"] = new() { "class", "interface", "package", "actor" },
-                    ["Network"] = new() { "server", "database", "cloud", "cloud-service" },
-                    ["Containers"] = new() { "document", "note", "cylinder", "diamond" }
+                    ["Basic"] = ["rectangle", "ellipse", "circle", "triangle", "rhombus", "hexagon"],
+                    ["Flowchart"] = ["decision", "data", "predefined", "stored-data", "process"],
+                    ["UML"] = ["class", "interface", "package", "actor"],
+                    ["Network"] = ["server", "database", "cloud", "cloud-service"],
+                    ["Containers"] = ["document", "note", "cylinder", "diamond"]
                 };
 
                 return Task.FromResult<object>(new

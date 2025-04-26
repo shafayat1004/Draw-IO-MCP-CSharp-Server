@@ -17,12 +17,12 @@ let ``Create Empty Diagram Creates Valid Structure`` () =
     // Assert
     Assert.NotNull(diagram)
     Assert.Single(diagram.Pages) |> ignore
-    Assert.Equal(2, diagram.Pages.[0].Cells.Length)
-    Assert.Equal("0", diagram.Pages.[0].Cells.[0].Id)
-    Assert.Equal("1", diagram.Pages.[0].Cells.[1].Id)
-    Assert.Equal("0", diagram.Pages.[0].Cells.[1].Parent)
+    Assert.Equal(2, diagram.Pages[0].Cells.Length)
+    Assert.Equal("0", diagram.Pages[0].Cells[0].Id)
+    Assert.Equal("1", diagram.Pages[0].Cells[1].Id)
+    Assert.Equal("0", diagram.Pages[0].Cells[1].Parent)
     // Use ignore to explicitly discard the result
-    diagram.Pages.[0] |> ignore
+    diagram.Pages[0] |> ignore
 
 [<Fact>]
 let ``Add Shape To Diagram Returns Updated Diagram And Shape Id`` () =
@@ -30,14 +30,14 @@ let ``Add Shape To Diagram Returns Updated Diagram And Shape Id`` () =
     let diagram = createEmptyDiagram()
     
     // Act
-    let (updatedDiagram, newId) = addShape diagram 0 "Test Shape" 100.0 200.0 300.0 400.0 "rectangle"
+    let updatedDiagram, newId = addShape diagram 0 "Test Shape" 100.0 200.0 300.0 400.0 "rectangle"
     
     // Assert
     Assert.NotNull(updatedDiagram)
-    Assert.Equal(3, updatedDiagram.Pages.[0].Cells.Length)
-    Assert.Equal(2, diagram.Pages.[0].Cells.Length) // Original diagram unchanged
+    Assert.Equal(3, updatedDiagram.Pages[0].Cells.Length)
+    Assert.Equal(2, diagram.Pages[0].Cells.Length) // Original diagram unchanged
     
-    let addedShape = updatedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = newId)
+    let addedShape = updatedDiagram.Pages[0].Cells |> List.find (fun c -> c.Id = newId)
     Assert.Equal("Test Shape", addedShape.Value)
     Assert.Equal(true, addedShape.IsVertex)
     Assert.Equal(false, addedShape.IsEdge)
@@ -53,17 +53,17 @@ let ``Add Shape To Diagram Returns Updated Diagram And Shape Id`` () =
 let ``Connect Shapes Creates Edge Between Shapes`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, shape1Id) = addShape diagram 0 "Shape 1" 100.0 100.0 100.0 100.0 "rectangle"
-    let (diagramWithShape2, shape2Id) = addShape diagramWithShape1 0 "Shape 2" 300.0 100.0 100.0 100.0 "rectangle"
+    let diagramWithShape1, shape1Id = addShape diagram 0 "Shape 1" 100.0 100.0 100.0 100.0 "rectangle"
+    let diagramWithShape2, shape2Id = addShape diagramWithShape1 0 "Shape 2" 300.0 100.0 100.0 100.0 "rectangle"
     
     // Act
-    let (diagramWithEdge, edgeId) = connectShapes diagramWithShape2 0 shape1Id shape2Id
+    let diagramWithEdge, edgeId = connectShapes diagramWithShape2 0 shape1Id shape2Id
     
     // Assert
     Assert.NotNull(diagramWithEdge)
-    Assert.Equal(5, diagramWithEdge.Pages.[0].Cells.Length)
+    Assert.Equal(5, diagramWithEdge.Pages[0].Cells.Length)
     
-    let addedEdge = diagramWithEdge.Pages.[0].Cells |> List.find (fun c -> c.Id = edgeId)
+    let addedEdge = diagramWithEdge.Pages[0].Cells |> List.find (fun c -> c.Id = edgeId)
     Assert.Equal(true, addedEdge.IsEdge)
     Assert.Equal(false, addedEdge.IsVertex)
     Assert.Equal("1", addedEdge.Parent)
@@ -77,7 +77,7 @@ let ``Connect Shapes Creates Edge Between Shapes`` () =
 let ``Serialize Diagram Creates Valid XML`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape, _) = addShape diagram 0 "Test Shape" 100.0 200.0 300.0 400.0 "rectangle"
+    let diagramWithShape, _ = addShape diagram 0 "Test Shape" 100.0 200.0 300.0 400.0 "rectangle"
     
     // Act
     let xml = XmlSerializer.serializeDiagram diagramWithShape
@@ -115,7 +115,7 @@ let ``Serialize Diagram Creates Valid XML`` () =
 let ``Serialize And Parse Round Trip Preserves Diagram`` () =
     // Arrange
     let originalDiagram = createEmptyDiagram()
-    let (diagramWithShape, shapeId) = addShape originalDiagram 0 "Test Shape" 100.0 200.0 300.0 400.0 "rectangle"
+    let diagramWithShape, shapeId = addShape originalDiagram 0 "Test Shape" 100.0 200.0 300.0 400.0 "rectangle"
     
     // Act
     let xml = XmlSerializer.serializeDiagram diagramWithShape
@@ -123,12 +123,12 @@ let ``Serialize And Parse Round Trip Preserves Diagram`` () =
     
     // Assert
     Assert.Equal(diagramWithShape.Pages.Length, parsedDiagram.Pages.Length)
-    Assert.Equal(diagramWithShape.Pages.[0].Name, parsedDiagram.Pages.[0].Name)
-    Assert.Equal(diagramWithShape.Pages.[0].Cells.Length, parsedDiagram.Pages.[0].Cells.Length)
+    Assert.Equal(diagramWithShape.Pages[0].Name, parsedDiagram.Pages[0].Name)
+    Assert.Equal(diagramWithShape.Pages[0].Cells.Length, parsedDiagram.Pages[0].Cells.Length)
     
     // Find the added shape in both diagrams and compare
-    let originalShape = diagramWithShape.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
-    let parsedShape = parsedDiagram.Pages.[0].Cells |> List.find (fun c -> c.Id = shapeId)
+    let originalShape = diagramWithShape.Pages[0].Cells |> List.find (fun c -> c.Id = shapeId)
+    let parsedShape = parsedDiagram.Pages[0].Cells |> List.find (fun c -> c.Id = shapeId)
     
     Assert.Equal(originalShape.Value, parsedShape.Value)
     Assert.Equal(originalShape.IsVertex, parsedShape.IsVertex)

@@ -10,9 +10,9 @@ open DrawIO.MCP.Core.DiagramManipulation
 let ``FindElementsByText should find matching elements`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, _) = addShape diagram 0 "Hello World" 100.0 100.0 120.0 60.0 "rectangle"
-    let (diagramWithShape2, _) = addShape diagramWithShape1 0 "Another Shape" 250.0 100.0 120.0 60.0 "rectangle"
-    let (diagramWithShape3, _) = addShape diagramWithShape2 0 "More Hello" 400.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape1, _ = addShape diagram 0 "Hello World" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape2, _ = addShape diagramWithShape1 0 "Another Shape" 250.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape3, _ = addShape diagramWithShape2 0 "More Hello" 400.0 100.0 120.0 60.0 "rectangle"
     
     // Act
     let results = findElementsByText diagramWithShape3 0 "hello"
@@ -30,7 +30,7 @@ let ``FindElementsByText should find matching elements`` () =
 let ``FindElementsByText with no matches should return empty list`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape, _) = addShape diagram 0 "No Match" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape, _ = addShape diagram 0 "No Match" 100.0 100.0 120.0 60.0 "rectangle"
     
     // Act
     let results = findElementsByText diagramWithShape 0 "xyz123"
@@ -42,9 +42,9 @@ let ``FindElementsByText with no matches should return empty list`` () =
 let ``GetElementInfo should return detailed information`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, shape1Id) = addShape diagram 0 "Source" 100.0 100.0 120.0 60.0 "rectangle"
-    let (diagramWithShape2, shape2Id) = addShape diagramWithShape1 0 "Target" 300.0 100.0 120.0 60.0 "rectangle"
-    let (finalDiagram, edgeId) = connectShapes diagramWithShape2 0 shape1Id shape2Id
+    let diagramWithShape1, shape1Id = addShape diagram 0 "Source" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape2, shape2Id = addShape diagramWithShape1 0 "Target" 300.0 100.0 120.0 60.0 "rectangle"
+    let finalDiagram, edgeId = connectShapes diagramWithShape2 0 shape1Id shape2Id
     
     // Act
     let info = getElementInfo finalDiagram 0 shape1Id
@@ -65,7 +65,7 @@ let ``GetElementInfo should return detailed information`` () =
     
     // Check connections
     Assert.Equal(1, elementInfo.Connections.Length)
-    let (connectionId, targetId) = elementInfo.Connections.[0]
+    let connectionId, targetId = elementInfo.Connections[0]
     Assert.Equal(edgeId, connectionId)
     Assert.Equal(shape2Id, targetId)
 
@@ -73,9 +73,9 @@ let ``GetElementInfo should return detailed information`` () =
 let ``GetElementInfo for edge should include source and target`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, shape1Id) = addShape diagram 0 "Source" 100.0 100.0 120.0 60.0 "rectangle"
-    let (diagramWithShape2, shape2Id) = addShape diagramWithShape1 0 "Target" 300.0 100.0 120.0 60.0 "rectangle"
-    let (finalDiagram, edgeId) = connectShapes diagramWithShape2 0 shape1Id shape2Id
+    let diagramWithShape1, shape1Id = addShape diagram 0 "Source" 100.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape2, shape2Id = addShape diagramWithShape1 0 "Target" 300.0 100.0 120.0 60.0 "rectangle"
+    let finalDiagram, edgeId = connectShapes diagramWithShape2 0 shape1Id shape2Id
     
     // Act
     let info = getElementInfo finalDiagram 0 edgeId
@@ -105,15 +105,15 @@ let ``GetElementInfo for non-existent element should return None`` () =
 let ``ListNeighbors should find connected elements`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, shape1Id) = addShape diagram 0 "Center" 200.0 200.0 120.0 60.0 "rectangle"
-    let (diagramWithShape2, shape2Id) = addShape diagramWithShape1 0 "Top" 200.0 100.0 120.0 60.0 "rectangle"
-    let (diagramWithShape3, shape3Id) = addShape diagramWithShape2 0 "Right" 350.0 200.0 120.0 60.0 "rectangle"
-    let (diagramWithShape4, shape4Id) = addShape diagramWithShape3 0 "Bottom" 200.0 300.0 120.0 60.0 "rectangle"
+    let diagramWithShape1, shape1Id = addShape diagram 0 "Center" 200.0 200.0 120.0 60.0 "rectangle"
+    let diagramWithShape2, shape2Id = addShape diagramWithShape1 0 "Top" 200.0 100.0 120.0 60.0 "rectangle"
+    let diagramWithShape3, shape3Id = addShape diagramWithShape2 0 "Right" 350.0 200.0 120.0 60.0 "rectangle"
+    let diagramWithShape4, shape4Id = addShape diagramWithShape3 0 "Bottom" 200.0 300.0 120.0 60.0 "rectangle"
     
     // Connect center to others
-    let (diagram1, _) = connectShapes diagramWithShape4 0 shape1Id shape2Id // Center -> Top
-    let (diagram2, _) = connectShapes diagram1 0 shape3Id shape1Id // Right -> Center
-    let (finalDiagram, _) = connectShapes diagram2 0 shape1Id shape4Id // Center -> Bottom
+    let diagram1, _ = connectShapes diagramWithShape4 0 shape1Id shape2Id // Center -> Top
+    let diagram2, _ = connectShapes diagram1 0 shape3Id shape1Id // Right -> Center
+    let finalDiagram, _ = connectShapes diagram2 0 shape1Id shape4Id // Center -> Bottom
     
     // Act
     let neighbors = listNeighbors finalDiagram 0 shape1Id
@@ -139,8 +139,8 @@ let ``ListNeighbors should find connected elements`` () =
 let ``GetDiagramBounds should calculate correct bounds`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, _) = addShape diagram 0 "Top Left" 100.0 100.0 50.0 50.0 "rectangle"
-    let (diagramWithShape2, _) = addShape diagramWithShape1 0 "Bottom Right" 400.0 300.0 100.0 75.0 "rectangle"
+    let diagramWithShape1, _ = addShape diagram 0 "Top Left" 100.0 100.0 50.0 50.0 "rectangle"
+    let diagramWithShape2, _ = addShape diagramWithShape1 0 "Bottom Right" 400.0 300.0 100.0 75.0 "rectangle"
     
     // Act
     let bounds = getDiagramBounds diagramWithShape2 0
@@ -171,8 +171,8 @@ let ``GetDiagramBounds for empty diagram should return None`` () =
 let ``GetDiagramBounds with negative coordinates should handle correctly`` () =
     // Arrange
     let diagram = createEmptyDiagram()
-    let (diagramWithShape1, _) = addShape diagram 0 "Negative" -100.0 -50.0 50.0 25.0 "rectangle"
-    let (diagramWithShape2, _) = addShape diagramWithShape1 0 "Positive" 100.0 200.0 75.0 100.0 "rectangle"
+    let diagramWithShape1, _ = addShape diagram 0 "Negative" -100.0 -50.0 50.0 25.0 "rectangle"
+    let diagramWithShape2, _ = addShape diagramWithShape1 0 "Positive" 100.0 200.0 75.0 100.0 "rectangle"
     
     // Act
     let bounds = getDiagramBounds diagramWithShape2 0

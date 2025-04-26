@@ -69,7 +69,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task ParseValidInitializeMessage_ShouldReturnValidResponse()
         {
             // Arrange - A valid initialize message
-            string message = @"{
+            var message = @"{
                 ""jsonrpc"": ""2.0"",
                 ""id"": ""init-1"",
                 ""method"": ""mcp/initialize"",
@@ -80,7 +80,7 @@ namespace DrawIO.MCP.STDIO.Tests
             }";
             
             // Act
-            string responseJson = await ProcessRawMessageAsync(message);
+            var responseJson = await ProcessRawMessageAsync(message);
             
             // Assert
             _output.WriteLine($"Response: {responseJson}");
@@ -104,10 +104,10 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task ParseInvalidJsonMessage_ShouldReturnParseError()
         {
             // Arrange - An invalid JSON message
-            string message = @"{ ""jsonrpc"": ""2.0"", ""id"": ""broken, invalid json";
+            var message = @"{ ""jsonrpc"": ""2.0"", ""id"": ""broken, invalid json";
             
             // Act
-            string responseJson = await ProcessRawMessageAsync(message);
+            var responseJson = await ProcessRawMessageAsync(message);
             
             // Assert
             _output.WriteLine($"Response: {responseJson}");
@@ -126,21 +126,21 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task ProcessBatchOfValidMessages_ShouldHandleEachIndividually()
         {
             // Arrange - Multiple valid messages to simulate batch processing
-            string[] messages = new string[]
-            {
+            string[] messages =
+            [
                 @"{""jsonrpc"": ""2.0"", ""id"": ""msg1"", ""method"": ""mcp/initialize"", ""params"": {}}",
                 @"{""jsonrpc"": ""2.0"", ""id"": ""msg2"", ""method"": ""tools/list"", ""params"": {}}"
-            };
+            ];
             
             // Act - Process each message individually
             var responses = new string[messages.Length];
-            for (int i = 0; i < messages.Length; i++)
+            for (var i = 0; i < messages.Length; i++)
             {
                 responses[i] = await ProcessRawMessageAsync(messages[i]);
             }
             
             // Assert
-            for (int i = 0; i < responses.Length; i++)
+            for (var i = 0; i < responses.Length; i++)
             {
                 _output.WriteLine($"Response {i+1}: {responses[i]}");
                 
@@ -159,7 +159,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task MalformedMethod_ShouldReturnMethodNotFoundError()
         {
             // Arrange - Message with invalid method name
-            string message = @"{
+            var message = @"{
                 ""jsonrpc"": ""2.0"",
                 ""id"": ""bad-method"",
                 ""method"": ""invalid/unknown/method"",
@@ -167,7 +167,7 @@ namespace DrawIO.MCP.STDIO.Tests
             }";
             
             // Act
-            string responseJson = await ProcessRawMessageAsync(message);
+            var responseJson = await ProcessRawMessageAsync(message);
             
             // Assert
             _output.WriteLine($"Response: {responseJson}");
@@ -186,7 +186,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task ValidateMcpMessageFormatCompliance()
         {
             // Arrange - Valid tool execution message
-            string message = @"{
+            var message = @"{
                 ""jsonrpc"": ""2.0"",
                 ""id"": ""tool-exec"",
                 ""method"": ""tools/execute"",
@@ -199,7 +199,7 @@ namespace DrawIO.MCP.STDIO.Tests
             }";
             
             // Act
-            string responseJson = await ProcessRawMessageAsync(message);
+            var responseJson = await ProcessRawMessageAsync(message);
             
             // Assert
             _output.WriteLine($"Response: {responseJson}");
@@ -212,13 +212,13 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.Matches(idPattern, responseJson);
             
             // Response should have either result or error but not both
-            bool hasResult = responseJson.Contains("\"result\"");
-            bool hasError = responseJson.Contains("\"error\"");
+            var hasResult = responseJson.Contains("\"result\"");
+            var hasError = responseJson.Contains("\"error\"");
             Assert.True(hasResult || hasError);
             Assert.False(hasResult && hasError);
             
             // Check if the file was actually created
-            string filePath = Path.Combine(_tempDiagramsDir, "test-diagram.drawio");
+            var filePath = Path.Combine(_tempDiagramsDir, "test-diagram.drawio");
             Assert.True(File.Exists(filePath), "The file should be created by the tool execution");
         }
 
@@ -231,7 +231,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task WaypointManipulationTools_WithValidParameters_ShouldSucceed(string toolName)
         {
             // Define a simple message format for tool execution
-            string message = @$"{{
+            var message = @$"{{
                 ""jsonrpc"": ""2.0"",
                 ""id"": ""test-waypoint"",
                 ""method"": ""tools/execute"",
@@ -252,7 +252,7 @@ namespace DrawIO.MCP.STDIO.Tests
             {
                 Directory.CreateDirectory(_tempDiagramsDir);
             }
-            string filePath = Path.Combine(_tempDiagramsDir, "test-diagram.drawio");
+            var filePath = Path.Combine(_tempDiagramsDir, "test-diagram.drawio");
             if (!File.Exists(filePath))
             {
                 File.WriteAllText(filePath, "<mxfile><diagram id=\"test\"><mxGraphModel><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"test-connector-id\" edge=\"1\" parent=\"1\"><mxGeometry relative=\"1\" as=\"geometry\"/></mxCell></root></mxGraphModel></diagram></mxfile>");
@@ -261,7 +261,7 @@ namespace DrawIO.MCP.STDIO.Tests
             try
             {
                 // Act
-                string responseJson = await ProcessRawMessageAsync(message);
+                var responseJson = await ProcessRawMessageAsync(message);
                 
                 // Assert
                 var responseObject = JsonNode.Parse(responseJson);
@@ -272,8 +272,8 @@ namespace DrawIO.MCP.STDIO.Tests
                 Assert.Equal("test-waypoint", responseObject?["id"]?.GetValue<string>() ?? string.Empty);
                 
                 // Either there should be a result or an error explaining why it wasn't processed
-                bool hasResult = responseObject?["result"] != null;
-                bool hasError = responseObject?["error"] != null;
+                var hasResult = responseObject?["result"] != null;
+                var hasError = responseObject?["error"] != null;
                 
                 // Assert that we got either a result or an error, but not both
                 Assert.True(hasResult || hasError);

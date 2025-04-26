@@ -38,7 +38,7 @@ namespace DrawIO.MCP.SSE
         public abstract string Description { get; }
         
         // Parameters property will initialize the field if null
-        public virtual ToolParameter[] Parameters => _parameters ??= Array.Empty<ToolParameter>();
+        public virtual ToolParameter[] Parameters => _parameters ??= [];
         
         public abstract Task<object> ExecuteAsync(ToolParameters parameters);
         
@@ -49,7 +49,7 @@ namespace DrawIO.MCP.SSE
             DrawIoService drawIoService)
         {
             // More robust handling of return_diagram parameter
-            bool returnDiagram = false;
+            var returnDiagram = false;
             
             try 
             {
@@ -61,7 +61,7 @@ namespace DrawIO.MCP.SSE
                 // If that fails, try to handle it as a string value
                 try 
                 {
-                    string? returnDiagramStr = parameters.GetValue<string>("return_diagram");
+                    var returnDiagramStr = parameters.GetValue<string>("return_diagram");
                     if (!string.IsNullOrEmpty(returnDiagramStr))
                     {
                         returnDiagramStr = returnDiagramStr.ToLowerInvariant();
@@ -75,68 +75,60 @@ namespace DrawIO.MCP.SSE
                 }
             }
             
-            string? diagramName = parameters.GetValue<string>("diagram");
-            
-            if (returnDiagram && !string.IsNullOrEmpty(diagramName))
+            var diagramName = parameters.GetValue<string>("diagram");
+
+            if (!returnDiagram || string.IsNullOrEmpty(diagramName)) return response;
+            // Get page index if specified
+            var pageIndex = parameters.GetValue("page_index", 
+                parameters.GetValue("page", 0));
+                
+            // Get image data
+            var imageData = await Task.FromResult(drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex));
+
+            // Create a copy of the response object with the image added
+            // Convert to dictionaries for manipulation
+            if (response is Dictionary<string, object> respDict)
             {
-                // Get page index if specified
-                int pageIndex = parameters.GetValue<int>("page_index", 
-                              parameters.GetValue<int>("page", 0));
-                
-                // Get image data
-                var imageData = await Task.FromResult(drawIoService.GetDiagramImageAsBase64(diagramName, pageIndex, "png"));
-                
-                if (imageData != null)
+                // Check if there's already a content property
+                if (respDict.TryGetValue("content", out var existingContent))
                 {
-                    // Create a copy of the response object with the image added
-                    // Convert to dictionaries for manipulation
-                    if (response is Dictionary<string, object> respDict)
+                    // If content is an array, add the image to the array
+                    if (existingContent is object[] contentArray)
                     {
-                        // Check if there's already a content property
-                        if (respDict.TryGetValue("content", out var existingContent))
-                        {
-                            // If content is an array, add the image to the array
-                            if (existingContent is object[] contentArray)
-                            {
-                                var newContentList = contentArray.ToList();
-                                newContentList.Add(imageData);
-                                respDict["content"] = newContentList.ToArray();
-                            }
-                            else if (existingContent is List<object> contentList)
-                            {
-                                contentList.Add(imageData);
-                            }
-                            else
-                            {
-                                // If content is not an array, create a new array with both old content and image
-                                respDict["content"] = new object[] { existingContent, imageData };
-                            }
-                        }
-                        else
-                        {
-                            // If no content property exists, create one with the image
-                            respDict["content"] = new object[] { imageData };
-                        }
-                        
-                        // Also add the image as a separate property for backward compatibility
-                        respDict["diagram"] = imageData;
-                        
-                        return respDict;
+                        var newContentList = contentArray.ToList();
+                        newContentList.Add(imageData);
+                        respDict["content"] = newContentList.ToArray();
+                    }
+                    else if (existingContent is List<object> contentList)
+                    {
+                        contentList.Add(imageData);
                     }
                     else
                     {
-                        // If response is not a dictionary, create a new one with both the original response and image
-                        return new Dictionary<string, object>
-                        {
-                            ["result"] = response,
-                            ["diagram"] = imageData,
-                            ["content"] = new object[] { imageData }
-                        };
+                        // If content is not an array, create a new array with both old content and image
+                        respDict["content"] = new[] { existingContent, imageData };
                     }
                 }
+                else
+                {
+                    // If no content property exists, create one with the image
+                    respDict["content"] = new object[] { imageData };
+                }
+                        
+                // Also add the image as a separate property for backward compatibility
+                respDict["diagram"] = imageData;
+                        
+                return respDict;
             }
-            
-            return response;
+
+            // If response is not a dictionary, create a new one with both the original response and image
+            return new Dictionary<string, object>
+            {
+                ["result"] = response,
+                ["diagram"] = imageData,
+                ["content"] = new object[] { imageData }
+            };
+
         }
     }
 
@@ -150,7 +142,7 @@ namespace DrawIO.MCP.SSE
 
     public class ToolParameters
     {
-        private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _values = new();
 
         public ToolParameters()
         {

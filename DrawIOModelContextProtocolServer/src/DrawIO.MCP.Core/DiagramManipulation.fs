@@ -91,7 +91,7 @@ let addShape (diagram: Diagram) (pageIndex: int) (value: string) (x: float) (y: 
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     let shapeId = Guid.NewGuid().ToString()
     
     let shapeStyle = 
@@ -150,7 +150,7 @@ let connectShapes (diagram: Diagram) (pageIndex: int) (sourceId: string) (target
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Check if source and target exist
     let sourceExists = page.Cells |> List.exists (fun cell -> cell.Id = sourceId)
@@ -204,7 +204,7 @@ let deleteShape (diagram: Diagram) (pageIndex: int) (shapeId: string) =
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Check if shape exists
     match page.Cells |> List.tryFind (fun cell -> cell.Id = shapeId) with
@@ -265,14 +265,14 @@ let updateShape (diagram: Diagram) (pageIndex: int) (shapeId: string) (value: st
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Find the shape to update
     match page.Cells |> List.tryFindIndex (fun cell -> cell.Id = shapeId) with
     | None -> 
         raise <| ArgumentException($"Shape with ID {shapeId} not found")
     | Some cellIndex ->
-        let cell = page.Cells.[cellIndex]
+        let cell = page.Cells[cellIndex]
         
         // Update the geometry if needed
         let updatedGeometry = 
@@ -347,7 +347,7 @@ let arrangeLayout (diagram: Diagram) (pageIndex: int) (layout: string) =
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Get all vertex cells with geometry
     let vertices = 
@@ -358,17 +358,12 @@ let arrangeLayout (diagram: Diagram) (pageIndex: int) (layout: string) =
         // No shapes to arrange
         diagram
     else
-        // Get all edges
-        let edges = page.Cells |> List.filter (fun c -> c.IsEdge)
-        
         // Perform layout based on the requested type
         let updatedVertices =
             match layout.ToLowerInvariant() with
             | "horizontal" ->
                 // Arrange horizontally with equal spacing
-                let count = vertices.Length
                 let spacing = 150.0
-                let totalWidth = spacing * float(count - 1)
                 let startX = 50.0
                 let y = 100.0
                 
@@ -385,9 +380,7 @@ let arrangeLayout (diagram: Diagram) (pageIndex: int) (layout: string) =
             
             | "vertical" ->
                 // Arrange vertically with equal spacing
-                let count = vertices.Length
                 let spacing = 100.0
-                let totalHeight = spacing * float(count - 1)
                 let x = 100.0
                 let startY = 50.0
                 
@@ -444,9 +437,7 @@ let arrangeLayout (diagram: Diagram) (pageIndex: int) (layout: string) =
             
             | _ -> 
                 // Default to horizontal layout
-                let count = vertices.Length
                 let spacing = 150.0
-                let totalWidth = spacing * float(count - 1)
                 let startX = 50.0
                 let y = 100.0
                 
@@ -609,13 +600,13 @@ let setDiagramBackground (diagram: Diagram) (backgroundImage: string option) (ba
                     // Add background color if provided
                     let bgInfoParts = 
                         match backgroundColor with
-                        | Some color -> (sprintf "background=\"%s\"" color) :: bgInfoParts
+                        | Some color -> $"background=\"%s{color}\"" :: bgInfoParts
                         | None -> bgInfoParts
                         
                     // Add background image if provided
                     let bgInfoParts = 
                         match backgroundImage with
-                        | Some image -> (sprintf "backgroundImage=\"%s\"" image) :: bgInfoParts
+                        | Some image -> $"backgroundImage=\"%s{image}\"" :: bgInfoParts
                         | None -> bgInfoParts
                         
                     // Create a special value that will be parsed during serialization
@@ -654,7 +645,7 @@ let setDiagramBackground (diagram: Diagram) (backgroundImage: string option) (ba
         // Parse the modified XML back into a diagram
         XmlParser.parseDiagram(doc.ToString())
     with ex ->
-        printfn "Error setting diagram background: %s" ex.Message
+        printfn $"Error setting diagram background: %s{ex.Message}"
         updatedDiagram // Return original diagram if any exception occurs
 
 /// Connects two shapes with an edge at specific points
@@ -671,7 +662,7 @@ let connectShapesAtPoints
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Check if source and target exist
     let sourceExists = page.Cells |> List.exists (fun cell -> cell.Id = sourceId)
@@ -794,12 +785,9 @@ let arrangeDiagram (diagram: Diagram) (pageId: string option) =
                         |> List.map (fun edge ->
                             // If this edge connects two vertices that we've moved, update its geometry
                             match (edge.Source, edge.Target) with
-                            | (Some sourceId, Some targetId) when 
+                            | Some sourceId, Some targetId when 
                                 Map.containsKey sourceId positionMap && 
                                 Map.containsKey targetId positionMap ->
-                                
-                                let sourcePos = Map.find sourceId positionMap
-                                let targetPos = Map.find targetId positionMap
                                 
                                 // Create a simple point-to-point edge geometry or keep existing
                                 if edge.Geometry.IsSome then
@@ -818,7 +806,7 @@ let arrangeDiagram (diagram: Diagram) (pageId: string option) =
                         |> List.filter (fun cell -> 
                             cell.Id <> "0" && cell.Id <> "1" && 
                             not (cell.IsVertex && cell.Geometry.IsSome) && 
-                            not (cell.IsEdge))
+                            not cell.IsEdge)
                     
                     { page with Cells = criticalCells @ otherCells @ arrangedVertices @ arrangedEdges }
                 else
@@ -829,7 +817,7 @@ let findElementsByText (diagram: Diagram) (pageIndex: int) (searchText: string) 
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     let searchTextLower = searchText.ToLowerInvariant()
     
     page.Cells
@@ -843,7 +831,7 @@ let getElementInfo (diagram: Diagram) (pageIndex: int) (elementId: string) : Ele
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     match page.Cells |> List.tryFind (fun cell -> cell.Id = elementId) with
     | None -> None
@@ -898,7 +886,7 @@ let listNeighbors (diagram: Diagram) (pageIndex: int) (elementId: string) : (str
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Verify the element exists
     match page.Cells |> List.tryFind (fun cell -> cell.Id = elementId) with
@@ -933,7 +921,7 @@ let getDiagramBounds (diagram: Diagram) (pageIndex: int) : BoundingBox option =
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Get all elements with geometry
     let elementsWithGeometry = 
@@ -968,7 +956,7 @@ let groupShapes (diagram: Diagram) (pageIndex: int) (shapeIds: string list) =
     if shapeIds.IsEmpty then
         raise <| ArgumentException("No shapes provided for grouping")
         
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Check if all shapes exist
     let shapesExist = shapeIds |> List.forall (fun id -> 
@@ -1055,7 +1043,7 @@ let ungroupShapes (diagram: Diagram) (pageIndex: int) (groupId: string) =
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
         
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Check if the group exists
     let groupExists = page.Cells |> List.exists (fun cell -> cell.Id = groupId)
@@ -1106,7 +1094,7 @@ let getWaypoints (diagram: Diagram) (pageIndex: int) (connectorId: string) =
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Find the connector
     match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
@@ -1126,7 +1114,7 @@ let addWaypoint (diagram: Diagram) (pageIndex: int) (connectorId: string) (x: fl
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Find the connector
     match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
@@ -1159,7 +1147,7 @@ let addWaypoint (diagram: Diagram) (pageIndex: int) (connectorId: string) (x: fl
                 let updatedWaypoints =
                     match position with
                     | Some pos when pos >= 0 && pos <= geo.Waypoints.Length ->
-                        let (before, after) = List.splitAt pos geo.Waypoints
+                        let before, after = List.splitAt pos geo.Waypoints
                         before @ [newWaypoint] @ after
                     | _ ->
                         // Default to adding at the end
@@ -1194,7 +1182,7 @@ let removeWaypoint (diagram: Diagram) (pageIndex: int) (connectorId: string) (wa
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Find the connector
     match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
@@ -1247,7 +1235,7 @@ let updateWaypoint (diagram: Diagram) (pageIndex: int) (connectorId: string) (wa
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Find the connector
     match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
@@ -1304,7 +1292,7 @@ let clearWaypoints (diagram: Diagram) (pageIndex: int) (connectorId: string) =
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Find the connector
     match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with
@@ -1347,7 +1335,7 @@ let reverseConnector (diagram: Diagram) (pageIndex: int) (connectorId: string) =
     if pageIndex < 0 || pageIndex >= diagram.Pages.Length then
         raise <| IndexOutOfRangeException("Page index out of range")
     
-    let page = diagram.Pages.[pageIndex]
+    let page = diagram.Pages[pageIndex]
     
     // Find the connector
     match page.Cells |> List.tryFind (fun cell -> cell.Id = connectorId) with

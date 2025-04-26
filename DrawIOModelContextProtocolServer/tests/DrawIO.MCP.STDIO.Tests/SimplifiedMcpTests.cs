@@ -159,7 +159,7 @@ namespace DrawIO.MCP.STDIO.Tests
             var resultObj = JsonDocument.Parse(resultJson).RootElement;
             
             // For an invalid tool, the response should contain isError=true
-            bool hasIsErrorProperty = resultObj.TryGetProperty("isError", out var isErrorEl);
+            var hasIsErrorProperty = resultObj.TryGetProperty("isError", out var isErrorEl);
             Assert.True(hasIsErrorProperty, "Response should contain an 'isError' property");
             Assert.True(isErrorEl.GetBoolean(), "isError should be true");
             
@@ -169,12 +169,12 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.True(contentEl.GetArrayLength() > 0, "Content array shouldn't be empty");
             
             // At least one content item should contain text with the error message
-            bool foundErrorMessage = false;
+            var foundErrorMessage = false;
             foreach (var item in contentEl.EnumerateArray())
             {
                 if (item.TryGetProperty("text", out var textEl))
                 {
-                    string? text = textEl.GetString();
+                    var text = textEl.GetString();
                     if (text != null && text.Contains("Unknown tool", StringComparison.OrdinalIgnoreCase))
                     {
                         foundErrorMessage = true;
@@ -190,7 +190,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task CreateDiagram_ShouldCreateFileAndReturnValidResponse()
         {
             // Arrange
-            string diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
+            var diagramName = $"test-diagram-{Guid.NewGuid()}.drawio";
             var request = new McpRequest
             {
                 Id = "test-5",
@@ -212,7 +212,7 @@ namespace DrawIO.MCP.STDIO.Tests
             _output.WriteLine($"Response: {resultJson}");
 
             // Verify file was created
-            string filePath = Path.Combine(_tempDiagramsDir, diagramName);
+            var filePath = Path.Combine(_tempDiagramsDir, diagramName);
             Assert.True(File.Exists(filePath), $"Diagram file was not created at: {filePath}");
         }
 
@@ -287,7 +287,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task GroupShapes_ShouldCreateGroupAndReturnGroupId()
         {
             // Arrange - Create a diagram and two shapes to group
-            string diagramName = $"group-test-{Guid.NewGuid()}.drawio";
+            var diagramName = $"group-test-{Guid.NewGuid()}.drawio";
             
             // Create diagram
             var createRequest = new McpRequest
@@ -356,7 +356,7 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.Equal("success", statusProp.GetString());
             
             // Save the group ID for the next test
-            string groupId = groupIdProp.GetString()!;
+            var groupId = groupIdProp.GetString()!;
             Assert.False(string.IsNullOrEmpty(groupId));
         }
         
@@ -364,7 +364,7 @@ namespace DrawIO.MCP.STDIO.Tests
         public async Task UngroupShapes_ShouldSuccessfullyUngroupElements()
         {
             // Arrange - Create a diagram, add shapes, and group them
-            string diagramName = $"ungroup-test-{Guid.NewGuid()}.drawio";
+            var diagramName = $"ungroup-test-{Guid.NewGuid()}.drawio";
             
             // Create diagram
             var createRequest = new McpRequest

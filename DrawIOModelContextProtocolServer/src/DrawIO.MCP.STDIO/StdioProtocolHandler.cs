@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace DrawIO.MCP.STDIO
 {
@@ -121,7 +121,7 @@ namespace DrawIO.MCP.STDIO
                 }
                 
                 // Default error code
-                int errorCode = -32603; // Internal error
+                var errorCode = -32603; // Internal error
                 
                 // Create properly formatted error response
                 return McpResponse.CreateError(

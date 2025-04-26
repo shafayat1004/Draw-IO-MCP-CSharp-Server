@@ -33,10 +33,10 @@ let ``Parse simple diagram XML should succeed`` () =
     
     // Assert
     Assert.Equal(1, diagram.Pages.Length)
-    Assert.Equal("Page 1", diagram.Pages.[0].Name)
-    Assert.Equal(3, diagram.Pages.[0].Cells.Length) // 2 system cells + 1 rectangle
+    Assert.Equal("Page 1", diagram.Pages[0].Name)
+    Assert.Equal(3, diagram.Pages[0].Cells.Length) // 2 system cells + 1 rectangle
     
-    let rectangle = diagram.Pages.[0].Cells |> List.find (fun c -> c.Id = "2")
+    let rectangle = diagram.Pages[0].Cells |> List.find (fun c -> c.Id = "2")
     Assert.Equal("Rectangle", rectangle.Value)
     Assert.True(rectangle.IsVertex)
     Assert.Equal("1", rectangle.Parent)
@@ -82,8 +82,8 @@ let ``Parse and serialize diagram should preserve content`` () =
     Assert.Equal(parsedDiagram.Pages.Length, reparsedDiagram.Pages.Length)
     
     // Verify page content is preserved
-    let originalPage = parsedDiagram.Pages.[0]
-    let reparsedPage = reparsedDiagram.Pages.[0]
+    let originalPage = parsedDiagram.Pages[0]
+    let reparsedPage = reparsedDiagram.Pages[0]
     
     Assert.Equal(originalPage.Name, reparsedPage.Name)
     Assert.Equal(originalPage.Cells.Length, reparsedPage.Cells.Length)
@@ -161,11 +161,11 @@ let ``Parse diagram with multiple pages should preserve all pages`` () =
     
     // Assert
     Assert.Equal(2, diagram.Pages.Length)
-    Assert.Equal("First Page", diagram.Pages.[0].Name)
-    Assert.Equal("Second Page", diagram.Pages.[1].Name)
+    Assert.Equal("First Page", diagram.Pages[0].Name)
+    Assert.Equal("Second Page", diagram.Pages[1].Name)
     
-    let page1Shape = diagram.Pages.[0].Cells |> List.find (fun c -> c.Value = "Page 1 Shape")
-    let page2Shape = diagram.Pages.[1].Cells |> List.find (fun c -> c.Value = "Page 2 Shape")
+    let page1Shape = diagram.Pages[0].Cells |> List.find (fun c -> c.Value = "Page 1 Shape")
+    let page2Shape = diagram.Pages[1].Cells |> List.find (fun c -> c.Value = "Page 2 Shape")
     
     Assert.Equal("rounded=0;whiteSpace=wrap;html=1;", page1Shape.Style)
     Assert.Equal("ellipse;whiteSpace=wrap;html=1;", page2Shape.Style) 

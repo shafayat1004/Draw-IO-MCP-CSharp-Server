@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.FSharp.Core;
+using DrawIO.MCP.Core;
 using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Core;
 using FSharpTypes = DrawIO.MCP.Core.Types;
 
 namespace DrawIO.MCP.STDIO
@@ -41,7 +42,7 @@ namespace DrawIO.MCP.STDIO
         }
         
         public static FSharpTypes.Diagram CreateEmptyDiagram() => 
-            DrawIO.MCP.Core.DiagramManipulation.createEmptyDiagram();
+            DiagramManipulation.createEmptyDiagram();
         
         public static bool HasGeometry(FSharpOption<FSharpTypes.Geometry> geometryOption) =>
             geometryOption.IsSome();
@@ -53,13 +54,13 @@ namespace DrawIO.MCP.STDIO
     public static class FileOperations
     {
         public static FSharpTypes.Diagram LoadDiagram(string filePath) => 
-            DrawIO.MCP.Core.FileOperations.loadDiagram(filePath);
+            Core.FileOperations.loadDiagram(filePath);
         
         public static void SaveDiagram(FSharpTypes.Diagram diagram, string filePath) => 
-            DrawIO.MCP.Core.FileOperations.saveDiagram(diagram, filePath);
+            Core.FileOperations.saveDiagram(diagram, filePath);
         
         public static FSharpTypes.Diagram CreateNewDiagram(string filePath) => 
-            DrawIO.MCP.Core.FileOperations.createNewDiagram(filePath);
+            Core.FileOperations.createNewDiagram(filePath);
     }
 
     /// <summary>

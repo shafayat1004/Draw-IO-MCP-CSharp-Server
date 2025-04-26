@@ -11,12 +11,12 @@ namespace DrawIO.MCP.STDIO
         /// <summary>
         /// Standard input/output protocol
         /// </summary>
-        STDIO,
+        Stdio,
         
         /// <summary>
         /// Server-sent events protocol
         /// </summary>
-        SSE
+        Sse
     }
     
     /// <summary>
@@ -31,9 +31,9 @@ namespace DrawIO.MCP.STDIO
         {
             switch (protocolType)
             {
-                case ProtocolType.STDIO:
+                case ProtocolType.Stdio:
                     return new StdioProtocolHandler(logWriter);
-                case ProtocolType.SSE:
+                case ProtocolType.Sse:
                     throw new NotImplementedException("SSE protocol handler not implemented yet");
                 default:
                     throw new ArgumentException($"Unknown protocol type: {protocolType}");

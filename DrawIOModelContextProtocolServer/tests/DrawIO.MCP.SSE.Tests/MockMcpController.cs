@@ -34,17 +34,19 @@ namespace DrawIO.MCP.SSE.Tests
                 
                 if (request.TryGetProperty("method", out var methodElement))
                 {
-                    string method = methodElement.GetString() ?? "";
+                    var method = methodElement.GetString() ?? "";
                     
                     if (method == "mcp/executeTool")
                     {
                         return HandleExecuteTool(request);
                     }
-                    else if (method == "mcp/getResource")
+
+                    if (method == "mcp/getResource")
                     {
                         return HandleGetResource(request);
                     }
-                    else if (method == "mcp/listResources")
+
+                    if (method == "mcp/listResources")
                     {
                         return HandleListResources(request);
                     }
@@ -93,13 +95,13 @@ namespace DrawIO.MCP.SSE.Tests
                 });
             }
             
-            string tool = toolElement.GetString() ?? "";
+            var tool = toolElement.GetString() ?? "";
             var parameters = paramsElement.TryGetProperty("parameters", out var parametersElement) 
                 ? parametersElement 
                 : new JsonElement();
             
             // Return success responses based on the tool
-            object result = tool switch
+            var result = tool switch
             {
                 "create_new_diagram" => HandleCreateNewDiagram(parameters),
                 "add_shape" => HandleAddShape(parameters),
@@ -118,7 +120,7 @@ namespace DrawIO.MCP.SSE.Tests
             {
                 jsonrpc = "2.0",
                 id = request.GetProperty("id"),
-                result = result
+                result
             });
         }
         
@@ -139,12 +141,10 @@ namespace DrawIO.MCP.SSE.Tests
                 });
             }
             
-            string resourceId = resourceIdElement.GetString() ?? "";
+            var resourceId = resourceIdElement.GetString() ?? "";
             
             if (resourceId.StartsWith("diagram://"))
             {
-                string diagramName = resourceId.Substring("diagram://".Length);
-                
                 // Create a mock diagram response
                 var result = new
                 {
@@ -189,7 +189,7 @@ namespace DrawIO.MCP.SSE.Tests
                 {
                     jsonrpc = "2.0",
                     id = request.GetProperty("id"),
-                    result = result
+                    result
                 });
             }
             
@@ -223,7 +223,7 @@ namespace DrawIO.MCP.SSE.Tests
                 id = request.GetProperty("id"),
                 result = new
                 {
-                    resources = resources
+                    resources
                 }
             });
         }
@@ -231,7 +231,7 @@ namespace DrawIO.MCP.SSE.Tests
         // Tool handler methods
         private object HandleCreateNewDiagram(JsonElement parameters)
         {
-            string name = parameters.TryGetProperty("name", out var nameElement) 
+            var name = parameters.TryGetProperty("name", out var nameElement) 
                 ? nameElement.GetString() ?? "diagram.drawio"
                 : "diagram.drawio";
                 
@@ -312,7 +312,7 @@ namespace DrawIO.MCP.SSE.Tests
         
         private object HandleGenerateVpc(JsonElement parameters)
         {
-            string name = parameters.TryGetProperty("name", out var nameElement) 
+            var name = parameters.TryGetProperty("name", out var nameElement) 
                 ? nameElement.GetString() ?? "vpc.drawio"
                 : "vpc.drawio";
                 

@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Linq;
+using DrawIO.MCP.Core;
+using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using static DrawIO.MCP.STDIO.FileOperations;
 
@@ -25,7 +29,7 @@ namespace DrawIO.MCP.STDIO
             try
             {
                 // Parse bool value explicitly to handle proper JSON boolean values
-                bool returnDiagram = false;
+                var returnDiagram = false;
                 if (arguments.TryGetProperty("return_diagram", out var returnDiagramElement))
                 {
                     switch (returnDiagramElement.ValueKind)
@@ -40,7 +44,7 @@ namespace DrawIO.MCP.STDIO
                         case JsonValueKind.String:
                         {
                             // Handle string values like "true" or "false"
-                            string strValue = returnDiagramElement.GetString()?.ToLowerInvariant();
+                            var strValue = returnDiagramElement.GetString()?.ToLowerInvariant();
                             returnDiagram = (strValue == "true");
                             break;
                         }
@@ -56,7 +60,7 @@ namespace DrawIO.MCP.STDIO
                 }
                 
                 // Execute the appropriate tool based on the name
-                object result = toolName switch
+                var result = toolName switch
                 {
                     "create_new_diagram" => await CreateNewDiagramAsync(arguments, diagramsDirectory),
                     "add_shape" => await AddShapeAsync(arguments, diagramsDirectory),
@@ -101,8 +105,8 @@ namespace DrawIO.MCP.STDIO
                 // If not the get_diagram_image tool and return_diagram is true, append the diagram image
                 if (returnDiagram && toolName != "get_diagram_image" && arguments.TryGetProperty("diagram", out var diagramElement))
                 {
-                    string diagramName = diagramElement.GetString();
-                    int page = arguments.TryGetProperty("page_index", out var pageElement) ? 
+                    var diagramName = diagramElement.GetString();
+                    var page = arguments.TryGetProperty("page_index", out var pageElement) ? 
                               pageElement.GetInt32() : 
                               (arguments.TryGetProperty("page", out var altPageElement) ? altPageElement.GetInt32() : 0);
                     
@@ -132,13 +136,13 @@ namespace DrawIO.MCP.STDIO
                                 else
                                 {
                                     // If content is not an array, create a new array with both old content and image
-                                    resultDict["content"] = new object[] { existingContent, diagramImage };
+                                    resultDict["content"] = new[] { existingContent, diagramImage };
                                 }
                             }
                             else
                             {
                                 // If no content property exists, create one with the image
-                                resultDict["content"] = new object[] { diagramImage };
+                                resultDict["content"] = new[] { diagramImage };
                             }
                             
                             // Also add the image as a separate property for backward compatibility
@@ -179,7 +183,7 @@ namespace DrawIO.MCP.STDIO
         {
             try
             {
-                string filePath = Path.Combine(diagramsDirectory, diagramName);
+                var filePath = Path.Combine(diagramsDirectory, diagramName);
                 if (!File.Exists(filePath))
                 {
                     LogMessage(logWriter, verbose, $"Diagram file not found for image generation: {diagramName}");
@@ -194,14 +198,14 @@ namespace DrawIO.MCP.STDIO
                 }
                 
                 // Create a temporary file to store the output image
-                string tempFileName = $"{Path.GetFileNameWithoutExtension(diagramName)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
-                string outputImagePath = Path.Combine(diagramsDirectory, tempFileName);
+                var tempFileName = $"{Path.GetFileNameWithoutExtension(diagramName)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
+                var outputImagePath = Path.Combine(diagramsDirectory, tempFileName);
                 
                 // Build the drawio CLI command with proper escaping
-                string drawioCommand = $"drawio --export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
+                var drawioCommand = $"drawio --export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
                 
                 // Try bash first
-                var bashStartInfo = new System.Diagnostics.ProcessStartInfo
+                var bashStartInfo = new ProcessStartInfo
                 {
                     FileName = "bash",
                     Arguments = $"-c \"{drawioCommand}\"",
@@ -213,11 +217,11 @@ namespace DrawIO.MCP.STDIO
 
                 LogMessage(logWriter, verbose, $"Attempting to export with bash for response: {bashStartInfo.FileName} {bashStartInfo.Arguments}");
                 
-                bool exportSuccess = false;
+                var exportSuccess = false;
                 
                 try
                 {
-                    using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
+                    using var bashProcess = Process.Start(bashStartInfo);
                     if (bashProcess != null)
                     {
                         await bashProcess.WaitForExitAsync();
@@ -236,7 +240,7 @@ namespace DrawIO.MCP.STDIO
                 if (!exportSuccess)
                 {
                     LogMessage(logWriter, verbose, "Falling back to direct drawio CLI call...");
-                    var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                    var processStartInfo = new ProcessStartInfo
                     {
                         FileName = "drawio",
                         Arguments = $"--export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"",
@@ -248,7 +252,7 @@ namespace DrawIO.MCP.STDIO
 
                     LogMessage(logWriter, verbose, $"Executing command for response: {processStartInfo.FileName} {processStartInfo.Arguments}");
                     
-                    using var process = System.Diagnostics.Process.Start(processStartInfo);
+                    using var process = Process.Start(processStartInfo);
                     if (process != null)
                     {
                         await process.WaitForExitAsync();
@@ -261,13 +265,13 @@ namespace DrawIO.MCP.STDIO
 
                 if (!exportSuccess || !File.Exists(outputImagePath))
                 {
-                    LogMessage(logWriter, verbose, $"Failed to generate diagram image for response");
+                    LogMessage(logWriter, verbose, "Failed to generate diagram image for response");
                     return null;
                 }
                 
                 // Read the generated image and convert it to base64
-                byte[] imageBytes = await File.ReadAllBytesAsync(outputImagePath);
-                string base64Image = Convert.ToBase64String(imageBytes);
+                var imageBytes = await File.ReadAllBytesAsync(outputImagePath);
+                var base64Image = Convert.ToBase64String(imageBytes);
                 
                 // Clean up the temporary file
                 try
@@ -305,7 +309,7 @@ namespace DrawIO.MCP.STDIO
             // Handle arrays and lists
             if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
             {
-                var list = ((IEnumerable<object>)obj).Cast<object>().Select(item => ConvertToDictionary(item)).ToList();
+                var list = ((IEnumerable<object>)obj).Select(item => ConvertToDictionary(item)).ToList();
                 return list;
             }
 
@@ -339,14 +343,14 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> CreateNewDiagramAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string name = GetParameterString(parameters, "name");
+            var name = GetParameterString(parameters, "name");
             
             if (string.IsNullOrEmpty(Path.GetExtension(name)))
             {
                 name += ".drawio";
             }
             
-            string filePath = Path.Combine(diagramsDirectory, name);
+            var filePath = Path.Combine(diagramsDirectory, name);
             
             // Create the diagrams directory if it doesn't exist
             if (!Directory.Exists(diagramsDirectory))
@@ -355,7 +359,7 @@ namespace DrawIO.MCP.STDIO
             }
             
             // Create a new diagram using the Core library
-            var diagram = CreateNewDiagram(filePath);
+            CreateNewDiagram(filePath);
             
             return Task.FromResult<object>(new 
             {
@@ -388,13 +392,13 @@ namespace DrawIO.MCP.STDIO
                 
                 // Load diagram
                 var diagramPath = Path.Combine(diagramsDirectory, diagramName);
-                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+                var diagramObj = Core.FileOperations.loadDiagram(diagramPath);
                 
                 // Add shape using the new ShapeLibrary.addShapeByType function for more flexibility with shape types
-                var (updatedDiagram, shapeId) = DrawIO.MCP.Core.ShapeLibrary.addShapeByType(diagramObj, 0, value, shape, x, y, width, height);
+                var (updatedDiagram, shapeId) = ShapeLibrary.addShapeByType(diagramObj, 0, value, shape, x, y, width, height);
                 
                 // Save updated diagram
-                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+                Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
                 
                 return Task.FromResult<object>(new 
                 { 
@@ -439,13 +443,13 @@ namespace DrawIO.MCP.STDIO
 
                 // Load diagram
                 var diagramPath = Path.Combine(diagramsDirectory, diagramName);
-                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+                var diagramObj = Core.FileOperations.loadDiagram(diagramPath);
 
                 // Connect shapes
-                var (updatedDiagram, connectorId) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramObj, 0, sourceId, targetId);
+                var (updatedDiagram, connectorId) = DiagramManipulation.connectShapes(diagramObj, 0, sourceId, targetId);
 
                 // Save updated diagram
-                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+                Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
 
                 return Task.FromResult<object>(new 
                 { 
@@ -487,21 +491,21 @@ namespace DrawIO.MCP.STDIO
                 var diagramPath = Path.Combine(diagramsDirectory, diagramName);
 
                 // Create empty diagram
-                var emptyDiagram = DrawIO.MCP.Core.DiagramManipulation.createEmptyDiagram();
+                var emptyDiagram = DiagramManipulation.createEmptyDiagram();
 
                 // Add VPC
-                var (vpcDiagram, vpcId) = DrawIO.MCP.Core.DiagramManipulation.addShape(emptyDiagram, 0, "VPC", 50, 50, 600, 400, "swimlane");
+                var (vpcDiagram, vpcId) = DiagramManipulation.addShape(emptyDiagram, 0, "VPC", 50, 50, 600, 400, "swimlane");
 
                 // Add IGW
-                var (igwDiagram, igwId) = DrawIO.MCP.Core.DiagramManipulation.addShape(vpcDiagram, 0, "IGW", 350, 10, 80, 40, "rectangle");
+                var (igwDiagram, igwId) = DiagramManipulation.addShape(vpcDiagram, 0, "IGW", 350, 10, 80, 40, "rectangle");
 
                 // Connect components
-                var (diagramWithConnector1, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(igwDiagram, 0, igwId, vpcId);
-                var (diagramWithConnector2, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramWithConnector1, 0, vpcId, vpcId);
-                var (finalDiagram, _) = DrawIO.MCP.Core.DiagramManipulation.connectShapes(diagramWithConnector2, 0, vpcId, vpcId);
+                var (diagramWithConnector1, _) = DiagramManipulation.connectShapes(igwDiagram, 0, igwId, vpcId);
+                var (diagramWithConnector2, _) = DiagramManipulation.connectShapes(diagramWithConnector1, 0, vpcId, vpcId);
+                var (finalDiagram, _) = DiagramManipulation.connectShapes(diagramWithConnector2, 0, vpcId, vpcId);
 
                 // Save the diagram
-                DrawIO.MCP.Core.FileOperations.saveDiagram(finalDiagram, diagramPath);
+                Core.FileOperations.saveDiagram(finalDiagram, diagramPath);
 
                 return Task.FromResult<object>(new { status = "success" });
             }
@@ -513,7 +517,7 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> DeleteShapeAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
+            var diagram = GetParameterString(parameters, "diagram");
             
             // Try both naming conventions for parameters
             string shapeId;
@@ -526,7 +530,7 @@ namespace DrawIO.MCP.STDIO
                 shapeId = GetParameterString(parameters, "shape_id");
             }
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -534,7 +538,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, delete the shape, and save it
             var diagramObj = LoadDiagram(filePath);
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.deleteShape(diagramObj, 0, shapeId);
+            var updatedDiagram = DiagramManipulation.deleteShape(diagramObj, 0, shapeId);
             SaveDiagram(updatedDiagram, filePath);
             
             return Task.FromResult<object>(new
@@ -556,7 +560,7 @@ namespace DrawIO.MCP.STDIO
         {
             try
             {
-                string diagram = GetParameterString(parameters, "diagram");
+                var diagram = GetParameterString(parameters, "diagram");
                 
                 // Try both naming conventions for parameters
                 string shapeId;
@@ -570,45 +574,45 @@ namespace DrawIO.MCP.STDIO
                 }
                 
                 // Handle null value properly - set to empty string if not provided
-                string value = "";
+                var value = "";
                 if (parameters.TryGetProperty("value", out var valueElement))
                 {
                     value = valueElement.GetString() ?? "";
                 }
                 
                 // Convert nullable parameters to F# options
-                Microsoft.FSharp.Core.FSharpOption<double> x = null;
-                Microsoft.FSharp.Core.FSharpOption<double> y = null;
-                Microsoft.FSharp.Core.FSharpOption<double> width = null;
-                Microsoft.FSharp.Core.FSharpOption<double> height = null;
-                Microsoft.FSharp.Core.FSharpOption<string> style = null;
+                FSharpOption<double> x = null;
+                FSharpOption<double> y = null;
+                FSharpOption<double> width = null;
+                FSharpOption<double> height = null;
+                FSharpOption<string> style = null;
                 
                 if (parameters.TryGetProperty("x", out var xElement))
                 {
-                    x = Microsoft.FSharp.Core.FSharpOption<double>.Some(xElement.GetDouble());
+                    x = FSharpOption<double>.Some(xElement.GetDouble());
                 }
                 
                 if (parameters.TryGetProperty("y", out var yElement))
                 {
-                    y = Microsoft.FSharp.Core.FSharpOption<double>.Some(yElement.GetDouble());
+                    y = FSharpOption<double>.Some(yElement.GetDouble());
                 }
                 
                 if (parameters.TryGetProperty("width", out var widthElement))
                 {
-                    width = Microsoft.FSharp.Core.FSharpOption<double>.Some(widthElement.GetDouble());
+                    width = FSharpOption<double>.Some(widthElement.GetDouble());
                 }
                 
                 if (parameters.TryGetProperty("height", out var heightElement))
                 {
-                    height = Microsoft.FSharp.Core.FSharpOption<double>.Some(heightElement.GetDouble());
+                    height = FSharpOption<double>.Some(heightElement.GetDouble());
                 }
                 
                 if (parameters.TryGetProperty("style", out var styleElement))
                 {
-                    style = Microsoft.FSharp.Core.FSharpOption<string>.Some(styleElement.GetString());
+                    style = FSharpOption<string>.Some(styleElement.GetString());
                 }
                 
-                string filePath = Path.Combine(diagramsDirectory, diagram);
+                var filePath = Path.Combine(diagramsDirectory, diagram);
                 if (!File.Exists(filePath))
                 {
                     throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -616,7 +620,7 @@ namespace DrawIO.MCP.STDIO
                 
                 // Load the diagram, update the shape, and save it
                 var diagramObj = LoadDiagram(filePath);
-                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                var updatedDiagram = DiagramManipulation.updateShape(
                     diagramObj, 
                     0, // page index
                     shapeId,
@@ -664,7 +668,7 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> StyleShapeAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
+            var diagram = GetParameterString(parameters, "diagram");
             
             // Try both naming conventions for parameters
             string shapeId;
@@ -698,14 +702,14 @@ namespace DrawIO.MCP.STDIO
                 strokeColor = strokeColorElement.GetString();
             }
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
             }
             
             // Build style string
-            var styleBuilder = new System.Text.StringBuilder();
+            var styleBuilder = new StringBuilder();
             
             if (!string.IsNullOrEmpty(fillColor))
             {
@@ -717,7 +721,7 @@ namespace DrawIO.MCP.STDIO
                 styleBuilder.Append($"strokeColor={strokeColor};");
             }
             
-            string styleString = styleBuilder.ToString();
+            var styleString = styleBuilder.ToString();
             
             if (string.IsNullOrEmpty(styleString))
             {
@@ -726,7 +730,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, update style, and save it
             var diagramObj = LoadDiagram(filePath);
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(diagramObj, 0, shapeId, null, null, null, null, null, styleString);
+            var updatedDiagram = DiagramManipulation.updateShape(diagramObj, 0, shapeId, null, null, null, null, null, styleString);
             SaveDiagram(updatedDiagram, filePath);
             
             return Task.FromResult<object>(new 
@@ -747,10 +751,10 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> ArrangeDiagramAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string layout = GetParameterString(parameters, "layout", "grid");
+            var diagram = GetParameterString(parameters, "diagram");
+            var layout = GetParameterString(parameters, "layout", "grid");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -772,7 +776,7 @@ namespace DrawIO.MCP.STDIO
                 : FSharpOption<string>.Some(pageId);
             
             // Arrange the diagram
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.arrangeDiagram(loadedDiagram, pageIdOption);
+            var updatedDiagram = DiagramManipulation.arrangeDiagram(loadedDiagram, pageIdOption);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
@@ -794,12 +798,12 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> MoveShapeAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string shape_id = GetParameterString(parameters, "shape_id");
-            float x = GetParameterFloat(parameters, "x");
-            float y = GetParameterFloat(parameters, "y");
+            var diagram = GetParameterString(parameters, "diagram");
+            var shapeId = GetParameterString(parameters, "shape_id");
+            var x = GetParameterFloat(parameters, "x");
+            var y = GetParameterFloat(parameters, "y");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -809,7 +813,7 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Move the shape
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.moveShape(loadedDiagram, shape_id, x, y);
+            var updatedDiagram = DiagramManipulation.moveShape(loadedDiagram, shapeId, x, y);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
@@ -817,13 +821,13 @@ namespace DrawIO.MCP.STDIO
             return Task.FromResult<object>(new 
             {
                 status = "success",
-                message = $"Shape {shape_id} moved to position ({x}, {y})",
+                message = $"Shape {shapeId} moved to position ({x}, {y})",
                 content = new[] 
                 { 
                     new 
                     { 
                         type = "text", 
-                        text = $"Shape {shape_id} moved to position ({x}, {y})" 
+                        text = $"Shape {shapeId} moved to position ({x}, {y})" 
                     } 
                 }
             });
@@ -831,10 +835,10 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> CreateDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string name = GetParameterString(parameters, "name");
+            var diagram = GetParameterString(parameters, "diagram");
+            var name = GetParameterString(parameters, "name");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -844,13 +848,13 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Create a new page
-            var updatedDiagram = DrawIO.MCP.Core.FileOperations.createDiagramPage(loadedDiagram, name);
+            var updatedDiagram = Core.FileOperations.createDiagramPage(loadedDiagram, name);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
             
             // Get the new page ID (last page in the list)
-            string pageId = updatedDiagram.Pages[updatedDiagram.Pages.Length - 1].Id;
+            var pageId = updatedDiagram.Pages[updatedDiagram.Pages.Length - 1].Id;
             
             return Task.FromResult<object>(new
             {
@@ -870,10 +874,10 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> GetDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            int page_index = GetParameterInt(parameters, "page_index");
+            var diagram = GetParameterString(parameters, "diagram");
+            var pageIndex = GetParameterInt(parameters, "page_index");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -883,16 +887,16 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Get the page
-            var pageOption = FSharpOption<FSharpTypes.Page>.None;
+            var pageOption = FSharpOption<Types.Page>.None;
             
-            if (page_index >= 0 && page_index < loadedDiagram.Pages.Length)
+            if (pageIndex >= 0 && pageIndex < loadedDiagram.Pages.Length)
             {
-                pageOption = FSharpOption<FSharpTypes.Page>.Some(loadedDiagram.Pages[page_index]);
+                pageOption = FSharpOption<Types.Page>.Some(loadedDiagram.Pages[pageIndex]);
             }
             
             if (pageOption.IsNone())
             {
-                throw new ArgumentException($"Page at index {page_index} not found");
+                throw new ArgumentException($"Page at index {pageIndex} not found");
             }
             
             var page = pageOption.Value;
@@ -944,7 +948,7 @@ namespace DrawIO.MCP.STDIO
                 {
                     id = page.Id,
                     name = page.Name,
-                    cells = cells
+                    cells
                 },
                 content = new[] 
                 { 
@@ -959,10 +963,10 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> UpdateDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            int pageIndex = GetParameterInt(parameters, "page_index");
+            var diagram = GetParameterString(parameters, "diagram");
+            var pageIndex = GetParameterInt(parameters, "page_index");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -978,7 +982,7 @@ namespace DrawIO.MCP.STDIO
             }
             
             // Get the page ID from the index
-            string pageId = loadedDiagram.Pages[pageIndex].Id;
+            var pageId = loadedDiagram.Pages[pageIndex].Id;
             
             // Get the optional name parameter
             string name = null;
@@ -988,7 +992,7 @@ namespace DrawIO.MCP.STDIO
             }
             
             // Update the page
-            var updatedDiagram = DrawIO.MCP.Core.FileOperations.updateDiagramPage(loadedDiagram, pageId, 
+            var updatedDiagram = Core.FileOperations.updateDiagramPage(loadedDiagram, pageId, 
                 string.IsNullOrEmpty(name) ? FSharpOption<string>.None : FSharpOption<string>.Some(name));
             
             // Save the updated diagram
@@ -1011,9 +1015,9 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> DeleteDiagramPageAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string pageId = null;
-            DrawIO.MCP.Core.Types.Diagram diagramObj = null;
+            var diagram = GetParameterString(parameters, "diagram");
+            string pageId;
+            Types.Diagram diagramObj = null;
             
             // Try to get page ID directly
             if (parameters.TryGetProperty("page_id", out var pageIdElement))
@@ -1023,10 +1027,10 @@ namespace DrawIO.MCP.STDIO
             // If page ID isn't provided, try to get it from page index
             else if (parameters.TryGetProperty("page_index", out var pageIndexElement))
             {
-                int pageIndex = pageIndexElement.GetInt32();
+                var pageIndex = pageIndexElement.GetInt32();
                 
                 // Load the diagram to get the page ID from index
-                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                var diagramPath = Path.Combine(diagramsDirectory, diagram);
                 if (!File.Exists(diagramPath))
                 {
                     throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1051,7 +1055,7 @@ namespace DrawIO.MCP.STDIO
             
             if (diagramObj == null)
             {
-                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                var diagramPath = Path.Combine(diagramsDirectory, diagram);
                 if (!File.Exists(diagramPath))
                 {
                     throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1062,24 +1066,24 @@ namespace DrawIO.MCP.STDIO
             }
             
             // Delete the page
-            var updatedDiagram = DrawIO.MCP.Core.FileOperations.deleteDiagramPage(diagramObj, pageId);
+            var updatedDiagram = Core.FileOperations.deleteDiagramPage(diagramObj, pageId);
             
             // Check if the diagram was modified (the page was deleted)
-            bool deleted = updatedDiagram.Pages.Length < diagramObj.Pages.Length;
+            var deleted = updatedDiagram.Pages.Length < diagramObj.Pages.Length;
             
             if (deleted)
             {
                 // Save the updated diagram
-                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                var diagramPath = Path.Combine(diagramsDirectory, diagram);
                 SaveDiagram(updatedDiagram, diagramPath);
             }
             
-            string message = deleted ? $"Page {pageId} deleted" : "Page could not be deleted (may be the only page)";
+            var message = deleted ? $"Page {pageId} deleted" : "Page could not be deleted (may be the only page)";
             
             return Task.FromResult<object>(new
             {
                 status = deleted ? "success" : "error",
-                message = message,
+                message,
                 content = new[] 
                 { 
                     new 
@@ -1093,13 +1097,13 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> MoveCellBetweenPagesAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string cellId = GetParameterString(parameters, "cell_id");
+            var diagram = GetParameterString(parameters, "diagram");
+            var cellId = GetParameterString(parameters, "cell_id");
             
             // Support both page_index and page_id parameters for backward compatibility
             string sourcePageId = null;
             string targetPageId = null;
-            DrawIO.MCP.Core.Types.Diagram diagramObj = null;
+            Types.Diagram diagramObj = null;
             
             // Try to get page IDs directly
             if (parameters.TryGetProperty("source_page_id", out var sourcePageIdElement))
@@ -1115,10 +1119,10 @@ namespace DrawIO.MCP.STDIO
             // If page IDs aren't provided, try to get them from page indices
             if (sourcePageId == null && parameters.TryGetProperty("source_page_index", out var sourcePageIndexElement))
             {
-                int sourcePageIndex = sourcePageIndexElement.GetInt32();
+                var sourcePageIndex = sourcePageIndexElement.GetInt32();
                 
                 // Load the diagram to get the page ID from index
-                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                var diagramPath = Path.Combine(diagramsDirectory, diagram);
                 if (!File.Exists(diagramPath))
                 {
                     throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1139,12 +1143,12 @@ namespace DrawIO.MCP.STDIO
             
             if (targetPageId == null && parameters.TryGetProperty("target_page_index", out var targetPageIndexElement))
             {
-                int targetPageIndex = targetPageIndexElement.GetInt32();
+                var targetPageIndex = targetPageIndexElement.GetInt32();
                 
                 // Load the diagram if not already loaded
                 if (diagramObj == null)
                 {
-                    string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                    var diagramPath = Path.Combine(diagramsDirectory, diagram);
                     if (!File.Exists(diagramPath))
                     {
                         throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1178,7 +1182,7 @@ namespace DrawIO.MCP.STDIO
             // Load the diagram if not already loaded
             if (diagramObj == null)
             {
-                string diagramPath = Path.Combine(diagramsDirectory, diagram);
+                var diagramPath = Path.Combine(diagramsDirectory, diagram);
                 if (!File.Exists(diagramPath))
                 {
                     throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1188,18 +1192,18 @@ namespace DrawIO.MCP.STDIO
             }
             
             // Move the cell between pages
-            var updatedDiagram = DrawIO.MCP.Core.FileOperations.moveCellBetweenPages(diagramObj, cellId, sourcePageId, targetPageId);
+            var updatedDiagram = Core.FileOperations.moveCellBetweenPages(diagramObj, cellId, sourcePageId, targetPageId);
             
             // Save the updated diagram
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             SaveDiagram(updatedDiagram, filePath);
             
-            string message = $"Cell {cellId} moved from page {sourcePageId} to page {targetPageId}";
+            var message = $"Cell {cellId} moved from page {sourcePageId} to page {targetPageId}";
             
             return Task.FromResult<object>(new
             {
                 status = "success",
-                message = message,
+                message,
                 content = new[] 
                 { 
                     new 
@@ -1213,11 +1217,11 @@ namespace DrawIO.MCP.STDIO
 
         private static async Task<object> GetDiagramImageAsync(JsonElement parameters, string diagramsDirectory, TextWriter logWriter, bool verbose)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            int page = parameters.TryGetProperty("page", out var pageElement) ? pageElement.GetInt32() : 0;
-            string format = parameters.TryGetProperty("format", out var formatElement) ? formatElement.GetString() : "png";
+            var diagram = GetParameterString(parameters, "diagram");
+            var page = parameters.TryGetProperty("page", out var pageElement) ? pageElement.GetInt32() : 0;
+            var format = parameters.TryGetProperty("format", out var formatElement) ? formatElement.GetString() : "png";
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1228,7 +1232,7 @@ namespace DrawIO.MCP.STDIO
             try
             {
                 // Check if drawio CLI is available
-                bool drawIoAvailable = CheckDrawIoCliAvailable(logWriter, verbose);
+                var drawIoAvailable = CheckDrawIoCliAvailable(logWriter, verbose);
                 if (!drawIoAvailable)
                 {
                     return new
@@ -1246,14 +1250,14 @@ namespace DrawIO.MCP.STDIO
                 }
                 
                 // Create a temporary file to store the output image
-                string tempFileName = $"{Path.GetFileNameWithoutExtension(diagram)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
-                string outputImagePath = Path.Combine(diagramsDirectory, tempFileName);
+                var tempFileName = $"{Path.GetFileNameWithoutExtension(diagram)}_{page}_{DateTime.Now:yyyyMMddHHmmss}.{format}";
+                var outputImagePath = Path.Combine(diagramsDirectory, tempFileName);
                 
                 // Build the drawio CLI command with proper escaping
-                string drawioCommand = $"drawio --export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
+                var drawioCommand = $"drawio --export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"";
                 
                 // Try bash first
-                var bashStartInfo = new System.Diagnostics.ProcessStartInfo
+                var bashStartInfo = new ProcessStartInfo
                 {
                     FileName = "bash",
                     Arguments = $"-c \"{drawioCommand}\"",
@@ -1265,15 +1269,15 @@ namespace DrawIO.MCP.STDIO
 
                 LogMessage(logWriter, verbose, $"Attempting to export with bash: {bashStartInfo.FileName} {bashStartInfo.Arguments}");
                 
-                bool exportSuccess = false;
-                string stderr = "";
+                var exportSuccess = false;
+                var stderr = "";
                 
                 try
                 {
-                    using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
+                    using var bashProcess = Process.Start(bashStartInfo);
                     if (bashProcess != null)
                     {
-                        string stdout = await bashProcess.StandardOutput.ReadToEndAsync();
+                        await bashProcess.StandardOutput.ReadToEndAsync();
                         stderr = await bashProcess.StandardError.ReadToEndAsync();
                         await bashProcess.WaitForExitAsync();
 
@@ -1296,7 +1300,7 @@ namespace DrawIO.MCP.STDIO
                 if (!exportSuccess)
                 {
                     LogMessage(logWriter, verbose, "Falling back to direct drawio CLI call...");
-                    var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                    var processStartInfo = new ProcessStartInfo
                     {
                         FileName = "drawio",
                         Arguments = $"--export --format {format} --page-index {page} --transparent --scale 1.0 --border 0 --output \"{outputImagePath}\" \"{filePath}\"",
@@ -1308,7 +1312,7 @@ namespace DrawIO.MCP.STDIO
 
                     LogMessage(logWriter, verbose, $"Executing command: {processStartInfo.FileName} {processStartInfo.Arguments}");
                     
-                    using var process = System.Diagnostics.Process.Start(processStartInfo);
+                    using var process = Process.Start(processStartInfo);
                     if (process == null)
                     {
                         return new
@@ -1325,7 +1329,7 @@ namespace DrawIO.MCP.STDIO
                         };
                     }
                     
-                    string stdout = await process.StandardOutput.ReadToEndAsync();
+                    await process.StandardOutput.ReadToEndAsync();
                     stderr = await process.StandardError.ReadToEndAsync();
                     await process.WaitForExitAsync();
                     
@@ -1373,8 +1377,8 @@ namespace DrawIO.MCP.STDIO
                 }
                 
                 // Read the generated image and convert it to base64
-                byte[] imageBytes = await File.ReadAllBytesAsync(outputImagePath);
-                string base64Image = Convert.ToBase64String(imageBytes);
+                var imageBytes = await File.ReadAllBytesAsync(outputImagePath);
+                var base64Image = Convert.ToBase64String(imageBytes);
                 
                 // Clean up the temporary file
                 try
@@ -1423,7 +1427,7 @@ namespace DrawIO.MCP.STDIO
             try
             {
                 // Try bash first
-                var bashStartInfo = new System.Diagnostics.ProcessStartInfo
+                var bashStartInfo = new ProcessStartInfo
                 {
                     FileName = "bash",
                     Arguments = "-c \"drawio --version\"",
@@ -1437,11 +1441,11 @@ namespace DrawIO.MCP.STDIO
                 
                 try
                 {
-                    using var bashProcess = System.Diagnostics.Process.Start(bashStartInfo);
+                    using var bashProcess = Process.Start(bashStartInfo);
                     if (bashProcess != null)
                     {
-                        string stdout = bashProcess.StandardOutput.ReadToEnd();
-                        string stderr = bashProcess.StandardError.ReadToEnd();
+                        var stdout = bashProcess.StandardOutput.ReadToEnd();
+                        var stderr = bashProcess.StandardError.ReadToEnd();
                         bashProcess.WaitForExit(5000); // Wait up to 5 seconds
 
                         if (bashProcess.ExitCode == 0)
@@ -1459,7 +1463,7 @@ namespace DrawIO.MCP.STDIO
 
                 // Fallback to direct drawio call (for PowerShell)
                 LogMessage(logWriter, verbose, "Falling back to direct drawio CLI check...");
-                var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                var processStartInfo = new ProcessStartInfo
                 {
                     FileName = "drawio",
                     Arguments = "--version",
@@ -1469,15 +1473,15 @@ namespace DrawIO.MCP.STDIO
                     CreateNoWindow = true
                 };
                 
-                using var process = System.Diagnostics.Process.Start(processStartInfo);
+                using var process = Process.Start(processStartInfo);
                 if (process == null)
                 {
                     LogMessage(logWriter, verbose, "Failed to start drawio CLI process");
                     return false;
                 }
                 
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
+                var output = process.StandardOutput.ReadToEnd();
+                var error = process.StandardError.ReadToEnd();
                 process.WaitForExit(5000); // Wait up to 5 seconds
                 
                 if (process.ExitCode == 0)
@@ -1565,17 +1569,17 @@ namespace DrawIO.MCP.STDIO
         // Helper method to update a shape with style properties
         private static Task<object> UpdateShapeWithStyleAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
+            var diagram = GetParameterString(parameters, "diagram");
             
             // Try both naming conventions for parameters
-            string shape_id;
+            string shapeId;
             if (parameters.TryGetProperty("shapeId", out var shapeIdElement))
             {
-                shape_id = shapeIdElement.GetString();
+                shapeId = shapeIdElement.GetString();
             }
             else
             {
-                shape_id = GetParameterString(parameters, "shape_id");
+                shapeId = GetParameterString(parameters, "shape_id");
             }
             
             // Try both naming conventions for style properties
@@ -1594,7 +1598,7 @@ namespace DrawIO.MCP.STDIO
                 .Select(p => new KeyValuePair<string, string>(p.Name, p.Value.GetString() ?? ""))
                 .ToDictionary(p => p.Key, p => p.Value);
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1608,10 +1612,10 @@ namespace DrawIO.MCP.STDIO
             if (!styleString.EndsWith(";")) styleString += ";";
             
             // Update the shape style by using UpdateShape instead
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+            var updatedDiagram = DiagramManipulation.updateShape(
                 loadedDiagram, 
                 0, // page index, assuming 0 for now
-                shape_id,
+                shapeId,
                 null, // value
                 null, // x
                 null, // y
@@ -1625,14 +1629,14 @@ namespace DrawIO.MCP.STDIO
             return Task.FromResult<object>(new
             {
                 status = "success",
-                message = $"Style of shape {shape_id} updated",
-                styleProperties = styleProperties,
+                message = $"Style of shape {shapeId} updated",
+                styleProperties,
                 content = new[] 
                 { 
                     new 
                     { 
                         type = "text", 
-                        text = $"Style of shape {shape_id} updated" 
+                        text = $"Style of shape {shapeId} updated" 
                     } 
                 }
             });
@@ -1642,11 +1646,11 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> FindElementsByTextAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string searchText = GetParameterString(parameters, "search_text");
-            int pageIndex = GetParameterInt(parameters, "page_index", 0);
+            var diagram = GetParameterString(parameters, "diagram");
+            var searchText = GetParameterString(parameters, "search_text");
+            var pageIndex = GetParameterInt(parameters, "page_index", 0);
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1654,11 +1658,11 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram and find elements by text
             var diagramObj = LoadDiagram(filePath);
-            var results = DrawIO.MCP.Core.DiagramManipulation.findElementsByText(diagramObj, pageIndex, searchText);
+            var results = DiagramManipulation.findElementsByText(diagramObj, pageIndex, searchText);
             
             // Convert to a list of dictionaries for JSON response
             var elementList = results
-                .Select<Tuple<string, string>, Dictionary<string, string>>(pair => new Dictionary<string, string>
+                .Select(pair => new Dictionary<string, string>
                 {
                     ["id"] = pair.Item1,
                     ["text"] = pair.Item2
@@ -1684,11 +1688,11 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> GetElementInfoAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string elementId = GetParameterString(parameters, "element_id");
-            int pageIndex = GetParameterInt(parameters, "page_index", 0);
+            var diagram = GetParameterString(parameters, "diagram");
+            var elementId = GetParameterString(parameters, "element_id");
+            var pageIndex = GetParameterInt(parameters, "page_index", 0);
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1696,7 +1700,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram and get element info
             var diagramObj = LoadDiagram(filePath);
-            var elementInfo = DrawIO.MCP.Core.DiagramManipulation.getElementInfo(diagramObj, pageIndex, elementId);
+            var elementInfo = DiagramManipulation.getElementInfo(diagramObj, pageIndex, elementId);
             
             if (elementInfo.IsNone())
             {
@@ -1722,7 +1726,7 @@ namespace DrawIO.MCP.STDIO
             
             // Convert connections to list of dictionaries
             var connections = info.Connections
-                .Select<Tuple<string, string>, Dictionary<string, string>>(conn => new Dictionary<string, string>
+                .Select(conn => new Dictionary<string, string>
                 {
                     ["edgeId"] = conn.Item1,
                     ["connectedTo"] = conn.Item2
@@ -1774,11 +1778,11 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> ListNeighborsAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string elementId = GetParameterString(parameters, "element_id");
-            int pageIndex = GetParameterInt(parameters, "page_index", 0);
+            var diagram = GetParameterString(parameters, "diagram");
+            var elementId = GetParameterString(parameters, "element_id");
+            var pageIndex = GetParameterInt(parameters, "page_index", 0);
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1786,11 +1790,11 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram and list neighbors
             var diagramObj = LoadDiagram(filePath);
-            var neighbors = DrawIO.MCP.Core.DiagramManipulation.listNeighbors(diagramObj, pageIndex, elementId);
+            var neighbors = DiagramManipulation.listNeighbors(diagramObj, pageIndex, elementId);
             
             // Convert to a list of dictionaries for JSON response
             var neighborsList = neighbors
-                .Select<Tuple<string, string, string>, Dictionary<string, string>>(tuple => new Dictionary<string, string>
+                .Select(tuple => new Dictionary<string, string>
                 {
                     ["id"] = tuple.Item1,
                     ["label"] = tuple.Item2,
@@ -1817,10 +1821,10 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> GetDiagramBoundsAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            int pageIndex = GetParameterInt(parameters, "page_index", 0);
+            var diagram = GetParameterString(parameters, "diagram");
+            var pageIndex = GetParameterInt(parameters, "page_index", 0);
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1828,7 +1832,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram and get bounds
             var diagramObj = LoadDiagram(filePath);
-            var bounds = DrawIO.MCP.Core.DiagramManipulation.getDiagramBounds(diagramObj, pageIndex);
+            var bounds = DiagramManipulation.getDiagramBounds(diagramObj, pageIndex);
             
             if (bounds.IsNone())
             {
@@ -1857,7 +1861,7 @@ namespace DrawIO.MCP.STDIO
                 new Dictionary<string, string>
                 { 
                     ["type"] = "text", 
-                    ["text"] = $"Diagram bounds retrieved successfully" 
+                    ["text"] = "Diagram bounds retrieved successfully" 
                 } 
             };
             
@@ -1875,7 +1879,7 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> ResizeShapeAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
+            var diagram = GetParameterString(parameters, "diagram");
             
             // Try both naming conventions for parameters
             string shapeId;
@@ -1888,10 +1892,10 @@ namespace DrawIO.MCP.STDIO
                 shapeId = GetParameterString(parameters, "shape_id");
             }
             
-            float width = parameters.GetProperty("width").GetSingle();
-            float height = parameters.GetProperty("height").GetSingle();
+            var width = parameters.GetProperty("width").GetSingle();
+            var height = parameters.GetProperty("height").GetSingle();
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1899,7 +1903,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, update the shape dimensions, and save it
             var diagramObj = LoadDiagram(filePath);
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+            var updatedDiagram = DiagramManipulation.updateShape(
                 diagramObj, 
                 0, // page index
                 shapeId,
@@ -1929,7 +1933,7 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> SetTextStyleAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
+            var diagram = GetParameterString(parameters, "diagram");
             
             // Try both naming conventions for parameters
             string shapeId;
@@ -1942,26 +1946,26 @@ namespace DrawIO.MCP.STDIO
                 shapeId = GetParameterString(parameters, "shape_id");
             }
             
-            var styleBuilder = new System.Text.StringBuilder();
+            var styleBuilder = new StringBuilder();
             
             // Handle font color
             if (parameters.TryGetProperty("font_color", out var fontColorElement))
             {
-                string fontColor = fontColorElement.GetString();
+                var fontColor = fontColorElement.GetString();
                 styleBuilder.Append($"fontColor={fontColor};");
             }
             
             // Handle font size
             if (parameters.TryGetProperty("font_size", out var fontSizeElement))
             {
-                float fontSize = fontSizeElement.GetSingle();
+                var fontSize = fontSizeElement.GetSingle();
                 styleBuilder.Append($"fontSize={fontSize};");
             }
             
             // Handle font style
             if (parameters.TryGetProperty("font_style", out var fontStyleElement))
             {
-                string fontStyle = fontStyleElement.GetString().ToLower();
+                var fontStyle = fontStyleElement.GetString()?.ToLower();
                 switch (fontStyle)
                 {
                     case "bold":
@@ -1981,14 +1985,14 @@ namespace DrawIO.MCP.STDIO
                 }
             }
             
-            string styleString = styleBuilder.ToString();
+            var styleString = styleBuilder.ToString();
             
             if (string.IsNullOrEmpty(styleString))
             {
                 throw new ArgumentException("At least one style property (font_color, font_size, font_style) must be provided");
             }
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -1996,7 +2000,7 @@ namespace DrawIO.MCP.STDIO
             
             // Load the diagram, update style, and save it
             var diagramObj = LoadDiagram(filePath);
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+            var updatedDiagram = DiagramManipulation.updateShape(
                 diagramObj, 
                 0, // page index
                 shapeId,
@@ -2029,16 +2033,16 @@ namespace DrawIO.MCP.STDIO
         {
             try
             {
-                string diagram = GetParameterString(parameters, "diagram");
-                string connectorId = GetParameterString(parameters, "connector_id");
+                var diagram = GetParameterString(parameters, "diagram");
+                var connectorId = GetParameterString(parameters, "connector_id");
                 
-                var styleBuilder = new System.Text.StringBuilder();
-                bool hasStyleChanges = false;
+                var styleBuilder = new StringBuilder();
+                var hasStyleChanges = false;
                 
                 // Handle line style
                 if (parameters.TryGetProperty("line_style", out var lineStyleElement))
                 {
-                    string lineStyle = lineStyleElement.GetString().ToLower();
+                    var lineStyle = lineStyleElement.GetString()?.ToLower();
                     switch (lineStyle)
                     {
                         case "dashed":
@@ -2061,7 +2065,7 @@ namespace DrawIO.MCP.STDIO
                 // Handle line width
                 if (parameters.TryGetProperty("line_width", out var lineWidthElement))
                 {
-                    float lineWidth = lineWidthElement.GetSingle();
+                    var lineWidth = lineWidthElement.GetSingle();
                     if (lineWidth <= 0)
                     {
                         throw new ArgumentException("Line width must be greater than 0");
@@ -2073,7 +2077,7 @@ namespace DrawIO.MCP.STDIO
                 // Handle edge style
                 if (parameters.TryGetProperty("edge_style", out var edgeStyleElement))
                 {
-                    string edgeStyle = edgeStyleElement.GetString().ToLower();
+                    var edgeStyle = edgeStyleElement.GetString()?.ToLower();
                     switch (edgeStyle)
                     {
                         case "sharp":
@@ -2096,7 +2100,7 @@ namespace DrawIO.MCP.STDIO
                 // Handle routing style
                 if (parameters.TryGetProperty("routing_style", out var routingStyleElement))
                 {
-                    string routingStyle = routingStyleElement.GetString().ToLower();
+                    var routingStyle = routingStyleElement.GetString()?.ToLower();
                     switch (routingStyle)
                     {
                         case "straight":
@@ -2119,7 +2123,7 @@ namespace DrawIO.MCP.STDIO
                 // Handle jump style
                 if (parameters.TryGetProperty("jump_style", out var jumpStyleElement))
                 {
-                    string jumpStyle = jumpStyleElement.GetString().ToLower();
+                    var jumpStyle = jumpStyleElement.GetString()?.ToLower();
                     switch (jumpStyle)
                     {
                         case "overlapped":
@@ -2139,7 +2143,7 @@ namespace DrawIO.MCP.STDIO
                     }
                 }
                 
-                string styleString = styleBuilder.ToString();
+                var styleString = styleBuilder.ToString();
                 
                 if (!hasStyleChanges)
                 {
@@ -2157,7 +2161,7 @@ namespace DrawIO.MCP.STDIO
                     });
                 }
                 
-                string filePath = Path.Combine(diagramsDirectory, diagram);
+                var filePath = Path.Combine(diagramsDirectory, diagram);
                 if (!File.Exists(filePath))
                 {
                     return Task.FromResult<object>(new
@@ -2192,7 +2196,7 @@ namespace DrawIO.MCP.STDIO
                     });
                 }
                 
-                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                var updatedDiagram = DiagramManipulation.updateShape(
                     diagramObj, 
                     0, // page index
                     connectorId,
@@ -2258,17 +2262,17 @@ namespace DrawIO.MCP.STDIO
         {
             try
             {
-                string diagram = GetParameterString(parameters, "diagram");
-                string connectorId = GetParameterString(parameters, "connector_id");
+                var diagram = GetParameterString(parameters, "diagram");
+                var connectorId = GetParameterString(parameters, "connector_id");
                 
-                var styleBuilder = new System.Text.StringBuilder();
-                bool hasStyleChanges = false;
+                var styleBuilder = new StringBuilder();
+                var hasStyleChanges = false;
                 
                 // Handle start arrow
                 if (parameters.TryGetProperty("start_arrow", out var startArrowElement))
                 {
-                    string startArrow = startArrowElement.GetString().ToLower();
-                    string arrowStyle = GetArrowStyle(startArrow);
+                    var startArrow = startArrowElement.GetString()?.ToLower();
+                    var arrowStyle = GetArrowStyle(startArrow);
                     styleBuilder.Append($"startArrow={arrowStyle};");
                     hasStyleChanges = true;
                 }
@@ -2276,13 +2280,13 @@ namespace DrawIO.MCP.STDIO
                 // Handle end arrow
                 if (parameters.TryGetProperty("end_arrow", out var endArrowElement))
                 {
-                    string endArrow = endArrowElement.GetString().ToLower();
-                    string arrowStyle = GetArrowStyle(endArrow);
+                    var endArrow = endArrowElement.GetString()?.ToLower();
+                    var arrowStyle = GetArrowStyle(endArrow);
                     styleBuilder.Append($"endArrow={arrowStyle};");
                     hasStyleChanges = true;
                 }
                 
-                string styleString = styleBuilder.ToString();
+                var styleString = styleBuilder.ToString();
                 
                 if (!hasStyleChanges)
                 {
@@ -2300,7 +2304,7 @@ namespace DrawIO.MCP.STDIO
                     });
                 }
                 
-                string filePath = Path.Combine(diagramsDirectory, diagram);
+                var filePath = Path.Combine(diagramsDirectory, diagram);
                 if (!File.Exists(filePath))
                 {
                     return Task.FromResult<object>(new
@@ -2335,7 +2339,7 @@ namespace DrawIO.MCP.STDIO
                     });
                 }
                 
-                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+                var updatedDiagram = DiagramManipulation.updateShape(
                     diagramObj, 
                     0, // page index
                     connectorId,
@@ -2413,10 +2417,10 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> ResetConnectorAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string connectorId = GetParameterString(parameters, "connector_id");
+            var diagram = GetParameterString(parameters, "diagram");
+            var connectorId = GetParameterString(parameters, "connector_id");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -2426,7 +2430,7 @@ namespace DrawIO.MCP.STDIO
             var diagramObj = LoadDiagram(filePath);
             
             // Reset the connector by removing waypoints
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateShape(
+            var updatedDiagram = DiagramManipulation.updateShape(
                 diagramObj, 
                 0, // page index
                 connectorId,
@@ -2456,12 +2460,12 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> ReverseConnectorAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string connectorId = GetParameterString(parameters, "connector_id");
-            bool returnDiagram = parameters.TryGetProperty("return_diagram", out var returnDiagramElement) && returnDiagramElement.GetBoolean();
+            var diagram = GetParameterString(parameters, "diagram");
+            var connectorId = GetParameterString(parameters, "connector_id");
+            var returnDiagram = parameters.TryGetProperty("return_diagram", out var returnDiagramElement) && returnDiagramElement.GetBoolean();
 
             // Check if file exists before attempting to process
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 return Task.FromResult<object>(new Dictionary<string, object>
@@ -2485,7 +2489,7 @@ namespace DrawIO.MCP.STDIO
                 var diagramObj = LoadDiagram(filePath);
                 
                 // Reverse the connector
-                var (updatedDiagram, _) = DrawIO.MCP.Core.DiagramManipulation.reverseConnector(diagramObj, 0, connectorId);
+                var (updatedDiagram, _) = DiagramManipulation.reverseConnector(diagramObj, 0, connectorId);
                 
                 // Save the updated diagram
                 SaveDiagram(updatedDiagram, filePath);
@@ -2499,7 +2503,7 @@ namespace DrawIO.MCP.STDIO
                         new Dictionary<string, string>
                         {
                             ["type"] = "text",
-                            ["text"] = $"Reversed connector direction"
+                            ["text"] = "Reversed connector direction"
                         }
                     }
                 };
@@ -2534,16 +2538,16 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> AddWaypointAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string connectorId = GetParameterString(parameters, "connector_id");
-            float x = GetParameterFloat(parameters, "x");
-            float y = GetParameterFloat(parameters, "y");
+            var diagram = GetParameterString(parameters, "diagram");
+            var connectorId = GetParameterString(parameters, "connector_id");
+            var x = GetParameterFloat(parameters, "x");
+            var y = GetParameterFloat(parameters, "y");
             
             // Optional parameters
-            bool isRelative = parameters.TryGetProperty("is_relative", out var relativeParam) && relativeParam.GetBoolean();
-            int? position = parameters.TryGetProperty("position", out var positionParam) ? (int?)positionParam.GetInt32() : null;
+            var isRelative = parameters.TryGetProperty("is_relative", out var relativeParam) && relativeParam.GetBoolean();
+            var position = parameters.TryGetProperty("position", out var positionParam) ? (int?)positionParam.GetInt32() : null;
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -2553,11 +2557,11 @@ namespace DrawIO.MCP.STDIO
             var diagramObj = LoadDiagram(filePath);
             
             // Create some value to pass to F# Option
-            Microsoft.FSharp.Core.FSharpOption<int> positionOption = 
-                position.HasValue ? Microsoft.FSharp.Core.FSharpOption<int>.Some(position.Value) : null;
+            var positionOption = 
+                position.HasValue ? FSharpOption<int>.Some(position.Value) : null;
             
             // Add waypoint to the connector
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.addWaypoint(
+            var updatedDiagram = DiagramManipulation.addWaypoint(
                 diagramObj, 
                 0, // page index
                 connectorId,
@@ -2585,11 +2589,11 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> RemoveWaypointAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string connectorId = GetParameterString(parameters, "connector_id");
-            int waypointIndex = GetParameterInt(parameters, "waypoint_index");
+            var diagram = GetParameterString(parameters, "diagram");
+            var connectorId = GetParameterString(parameters, "connector_id");
+            var waypointIndex = GetParameterInt(parameters, "waypoint_index");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -2599,7 +2603,7 @@ namespace DrawIO.MCP.STDIO
             var diagramObj = LoadDiagram(filePath);
             
             // Remove waypoint from connector
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.removeWaypoint(
+            var updatedDiagram = DiagramManipulation.removeWaypoint(
                 diagramObj, 
                 0, // page index
                 connectorId,
@@ -2624,20 +2628,20 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> UpdateWaypointAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string connectorId = GetParameterString(parameters, "connector_id");
-            int waypointIndex = GetParameterInt(parameters, "waypoint_index");
+            var diagram = GetParameterString(parameters, "diagram");
+            var connectorId = GetParameterString(parameters, "connector_id");
+            var waypointIndex = GetParameterInt(parameters, "waypoint_index");
             
             // Optional parameters - allow updating just x, just y, or both
-            float? x = parameters.TryGetProperty("x", out var xParam) ? (float?)xParam.GetSingle() : null;
-            float? y = parameters.TryGetProperty("y", out var yParam) ? (float?)yParam.GetSingle() : null;
+            var x = parameters.TryGetProperty("x", out var xParam) ? (float?)xParam.GetSingle() : null;
+            var y = parameters.TryGetProperty("y", out var yParam) ? (float?)yParam.GetSingle() : null;
             
             if (x == null && y == null)
             {
                 throw new ArgumentException("At least one of 'x' or 'y' must be provided");
             }
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 return Task.FromResult<object>(new Dictionary<string, object>
@@ -2661,8 +2665,8 @@ namespace DrawIO.MCP.STDIO
                 var diagramObj = LoadDiagram(filePath);
                 
                 // First check if the connector has the waypoint at the specified index
-                var waypoints = DrawIO.MCP.Core.DiagramManipulation.getWaypoints(diagramObj, 0, connectorId);
-                int waypointsCount = waypoints?.Count() ?? 0;
+                var waypoints = DiagramManipulation.getWaypoints(diagramObj, 0, connectorId);
+                var waypointsCount = waypoints?.Count() ?? 0;
                 
                 if (waypointIndex < 0 || waypointIndex >= waypointsCount)
                 {
@@ -2682,13 +2686,13 @@ namespace DrawIO.MCP.STDIO
                 }
                 
                 // Create F# options for x and y values
-                Microsoft.FSharp.Core.FSharpOption<double> xOption = 
-                    x.HasValue ? Microsoft.FSharp.Core.FSharpOption<double>.Some((double)x.Value) : Microsoft.FSharp.Core.FSharpOption<double>.None;
-                Microsoft.FSharp.Core.FSharpOption<double> yOption = 
-                    y.HasValue ? Microsoft.FSharp.Core.FSharpOption<double>.Some((double)y.Value) : Microsoft.FSharp.Core.FSharpOption<double>.None;
+                var xOption = 
+                    x.HasValue ? FSharpOption<double>.Some(x.Value) : FSharpOption<double>.None;
+                var yOption = 
+                    y.HasValue ? FSharpOption<double>.Some(y.Value) : FSharpOption<double>.None;
                 
                 // Update waypoint position
-                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.updateWaypoint(
+                var updatedDiagram = DiagramManipulation.updateWaypoint(
                     diagramObj, 
                     0, // page index
                     connectorId,
@@ -2744,10 +2748,10 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> GetWaypointsAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string connectorId = GetParameterString(parameters, "connector_id");
+            var diagram = GetParameterString(parameters, "diagram");
+            var connectorId = GetParameterString(parameters, "connector_id");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -2757,7 +2761,7 @@ namespace DrawIO.MCP.STDIO
             var diagramObj = LoadDiagram(filePath);
             
             // Get waypoints
-            var waypoints = DrawIO.MCP.Core.DiagramManipulation.getWaypoints(
+            var waypoints = DiagramManipulation.getWaypoints(
                 diagramObj, 
                 0, // page index
                 connectorId
@@ -2791,10 +2795,10 @@ namespace DrawIO.MCP.STDIO
         
         private static Task<object> ClearWaypointsAsync(JsonElement parameters, string diagramsDirectory)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string connectorId = GetParameterString(parameters, "connector_id");
+            var diagram = GetParameterString(parameters, "diagram");
+            var connectorId = GetParameterString(parameters, "connector_id");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -2804,7 +2808,7 @@ namespace DrawIO.MCP.STDIO
             var diagramObj = LoadDiagram(filePath);
             
             // Clear waypoints
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.clearWaypoints(
+            var updatedDiagram = DiagramManipulation.clearWaypoints(
                 diagramObj, 
                 0, // page index
                 connectorId
@@ -2855,21 +2859,21 @@ namespace DrawIO.MCP.STDIO
 
                 // Load diagram
                 var diagramPath = Path.Combine(diagramsDirectory, diagramName);
-                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+                var diagramObj = Core.FileOperations.loadDiagram(diagramPath);
 
                 // Create F# list from C# list
-                var fsharpList = Microsoft.FSharp.Collections.ListModule.OfSeq(shapeIds);
+                var fsharpList = ListModule.OfSeq(shapeIds);
                 
                 // Group shapes
-                var (updatedDiagram, groupId) = DrawIO.MCP.Core.DiagramManipulation.groupShapes(diagramObj, pageIndex, fsharpList);
+                var (updatedDiagram, groupId) = DiagramManipulation.groupShapes(diagramObj, pageIndex, fsharpList);
 
                 // Save updated diagram
-                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+                Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
 
                 return Task.FromResult<object>(new 
                 { 
                     status = "success",
-                    groupId = groupId,
+                    groupId,
                     content = new[] 
                     { 
                         new 
@@ -2909,13 +2913,13 @@ namespace DrawIO.MCP.STDIO
 
                 // Load diagram
                 var diagramPath = Path.Combine(diagramsDirectory, diagramName);
-                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+                var diagramObj = Core.FileOperations.loadDiagram(diagramPath);
 
                 // Ungroup shapes
-                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.ungroupShapes(diagramObj, pageIndex, groupId);
+                var updatedDiagram = DiagramManipulation.ungroupShapes(diagramObj, pageIndex, groupId);
 
                 // Save updated diagram
-                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+                Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
 
                 return Task.FromResult<object>(new 
                 { 
@@ -2951,11 +2955,11 @@ namespace DrawIO.MCP.STDIO
         // Add right before the last closing brace of the class
         private static Task<object> RotateShapeAsync(JsonElement parameters, string diagramsDirectory, bool verbose = false, TextWriter logWriter = null)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string shapeId = GetParameterString(parameters, "shape_id");
-            float angle = GetParameterFloat(parameters, "angle");
+            var diagram = GetParameterString(parameters, "diagram");
+            var shapeId = GetParameterString(parameters, "shape_id");
+            var angle = GetParameterFloat(parameters, "angle");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -2965,12 +2969,12 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Rotate the shape
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.rotateShape(loadedDiagram, shapeId, angle);
+            var updatedDiagram = DiagramManipulation.rotateShape(loadedDiagram, shapeId, angle);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
             
-            bool returnDiagram = false;
+            var returnDiagram = false;
             if (parameters.TryGetProperty("return_diagram", out var returnDiagramProp))
             {
                 returnDiagram = returnDiagramProp.GetBoolean();
@@ -2998,11 +3002,11 @@ namespace DrawIO.MCP.STDIO
 
         private static Task<object> FlipShapeAsync(JsonElement parameters, string diagramsDirectory, bool verbose = false, TextWriter logWriter = null)
         {
-            string diagram = GetParameterString(parameters, "diagram");
-            string shapeId = GetParameterString(parameters, "shape_id");
-            string directionStr = GetParameterString(parameters, "direction");
+            var diagram = GetParameterString(parameters, "diagram");
+            var shapeId = GetParameterString(parameters, "shape_id");
+            var directionStr = GetParameterString(parameters, "direction");
             
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException($"Diagram file not found: {diagram}");
@@ -3012,14 +3016,14 @@ namespace DrawIO.MCP.STDIO
             var loadedDiagram = LoadDiagram(filePath);
             
             // Convert direction from string to enum
-            DrawIO.MCP.Core.DiagramManipulation.FlipDirection flipDirection;
+            DiagramManipulation.FlipDirection flipDirection;
             if (string.Equals(directionStr, "horizontal", StringComparison.OrdinalIgnoreCase))
             {
-                flipDirection = DrawIO.MCP.Core.DiagramManipulation.FlipDirection.Horizontal;
+                flipDirection = DiagramManipulation.FlipDirection.Horizontal;
             }
             else if (string.Equals(directionStr, "vertical", StringComparison.OrdinalIgnoreCase))
             {
-                flipDirection = DrawIO.MCP.Core.DiagramManipulation.FlipDirection.Vertical;
+                flipDirection = DiagramManipulation.FlipDirection.Vertical;
             }
             else
             {
@@ -3027,12 +3031,12 @@ namespace DrawIO.MCP.STDIO
             }
             
             // Flip the shape
-            var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.flipShape(loadedDiagram, shapeId, flipDirection);
+            var updatedDiagram = DiagramManipulation.flipShape(loadedDiagram, shapeId, flipDirection);
             
             // Save the updated diagram
             SaveDiagram(updatedDiagram, filePath);
             
-            bool returnDiagram = false;
+            var returnDiagram = false;
             if (parameters.TryGetProperty("return_diagram", out var returnDiagramProp))
             {
                 returnDiagram = returnDiagramProp.GetBoolean();
@@ -3087,28 +3091,28 @@ namespace DrawIO.MCP.STDIO
                 
                 // Load diagram
                 var diagramPath = Path.Combine(diagramsDirectory, diagramName);
-                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+                var diagramObj = Core.FileOperations.loadDiagram(diagramPath);
                 
                 // Create FSharpOption types for the parameters
-                FSharpOption<string> backgroundImageOption = 
+                var backgroundImageOption = 
                     string.IsNullOrEmpty(backgroundImage) 
                         ? FSharpOption<string>.None 
                         : FSharpOption<string>.Some(backgroundImage);
                         
-                FSharpOption<string> backgroundColorOption = 
+                var backgroundColorOption = 
                     string.IsNullOrEmpty(backgroundColor) 
                         ? FSharpOption<string>.None 
                         : FSharpOption<string>.Some(backgroundColor);
                 
                 // Set the diagram background
-                var updatedDiagram = DrawIO.MCP.Core.DiagramManipulation.setDiagramBackground(
+                var updatedDiagram = DiagramManipulation.setDiagramBackground(
                     diagramObj, backgroundImageOption, backgroundColorOption);
                 
                 // Save updated diagram
-                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+                Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
                 
                 // Generate response message
-                string message = "Diagram background updated";
+                var message = "Diagram background updated";
                 if (!string.IsNullOrEmpty(backgroundColor))
                 {
                     message += $" with color {backgroundColor}";
@@ -3187,35 +3191,35 @@ namespace DrawIO.MCP.STDIO
                 
                 // Load diagram
                 var diagramPath = Path.Combine(diagramsDirectory, diagramName);
-                var diagramObj = DrawIO.MCP.Core.FileOperations.loadDiagram(diagramPath);
+                var diagramObj = Core.FileOperations.loadDiagram(diagramPath);
                 
                 // Create FSharpOption types for the parameters
-                FSharpOption<double> sourceXOption = 
+                var sourceXOption = 
                     sourceX.HasValue 
                         ? FSharpOption<double>.Some(sourceX.Value) 
                         : FSharpOption<double>.None;
                         
-                FSharpOption<double> sourceYOption = 
+                var sourceYOption = 
                     sourceY.HasValue 
                         ? FSharpOption<double>.Some(sourceY.Value) 
                         : FSharpOption<double>.None;
                         
-                FSharpOption<double> targetXOption = 
+                var targetXOption = 
                     targetX.HasValue 
                         ? FSharpOption<double>.Some(targetX.Value) 
                         : FSharpOption<double>.None;
                         
-                FSharpOption<double> targetYOption = 
+                var targetYOption = 
                     targetY.HasValue 
                         ? FSharpOption<double>.Some(targetY.Value) 
                         : FSharpOption<double>.None;
                 
                 // Connect shapes at specified points
-                var (updatedDiagram, edgeId) = DrawIO.MCP.Core.DiagramManipulation.connectShapesAtPoints(
+                var (updatedDiagram, edgeId) = DiagramManipulation.connectShapesAtPoints(
                     diagramObj, pageIndex, sourceId, targetId, sourceXOption, sourceYOption, targetXOption, targetYOption);
                 
                 // Save updated diagram
-                DrawIO.MCP.Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
+                Core.FileOperations.saveDiagram(updatedDiagram, diagramPath);
                 
                 return Task.FromResult<object>(new 
                 { 
@@ -3250,21 +3254,21 @@ namespace DrawIO.MCP.STDIO
         }
 
         // Helper method to load a diagram from a file path
-        private static DrawIO.MCP.Core.Types.Diagram LoadDiagram(string filePath)
+        private static FSharpTypes.Diagram LoadDiagram(string filePath)
         {
-            return DrawIO.MCP.Core.FileOperations.loadDiagram(filePath);
+            return Core.FileOperations.loadDiagram(filePath);
         }
 
         // Helper method to save a diagram to a file path
-        private static void SaveDiagram(DrawIO.MCP.Core.Types.Diagram diagram, string filePath)
+        private static void SaveDiagram(FSharpTypes.Diagram diagram, string filePath)
         {
-            DrawIO.MCP.Core.FileOperations.saveDiagram(diagram, filePath);
+            Core.FileOperations.saveDiagram(diagram, filePath);
         }
 
         // Helper for diagram image extraction
         private static object GetDiagramImage(string diagram, string diagramsDirectory)
         {
-            string filePath = Path.Combine(diagramsDirectory, diagram);
+            var filePath = Path.Combine(diagramsDirectory, diagram);
             if (!File.Exists(filePath))
             {
                 return null;

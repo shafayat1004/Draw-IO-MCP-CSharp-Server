@@ -9,7 +9,7 @@ namespace DrawIO.MCP.STDIO
         public static async Task<object> ExecuteTool(Task<string> task)
         {
             var result = await task;
-            return result as object;
+            return result;
         }
         
         // Used to fix issues with updateShapeStyle

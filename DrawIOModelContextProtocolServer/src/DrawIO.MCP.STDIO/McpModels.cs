@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Linq;
 
 namespace DrawIO.MCP.STDIO
 {
@@ -154,11 +154,12 @@ namespace DrawIO.MCP.STDIO
             {
                 return reader.GetInt64().ToString();
             }
-            else if (reader.TokenType == JsonTokenType.String)
+
+            if (reader.TokenType == JsonTokenType.String)
             {
                 return reader.GetString();
             }
-            
+
             throw new JsonException($"Unexpected token type when converting request ID: {reader.TokenType}");
         }
 
