@@ -1772,20 +1772,22 @@ namespace DrawIO.MCP.STDIO
                 } 
             };
 
-            var elementDict = new Dictionary<string, object>
+            var result = new Dictionary<string, object>
             {
+                ["status"] = "success",
                 ["id"] = info.Id,
                 ["type"] = info.Type,
                 ["value"] = info.Value,
                 ["style"] = info.Style,
                 ["parent"] = info.Parent,
-                ["connections"] = connections
+                ["connections"] = connections,
+                ["content"] = infoMessage
             };
 
             if (info.Position.IsSome())
             {
                 var pos = info.Position.Value;
-                elementDict["position"] = new Dictionary<string, double>
+                result["position"] = new Dictionary<string, double>
                 {
                     ["x"] = pos.X,
                     ["y"] = pos.Y
@@ -1795,19 +1797,14 @@ namespace DrawIO.MCP.STDIO
             if (info.Size.IsSome())
             {
                 var size = info.Size.Value;
-                elementDict["size"] = new Dictionary<string, double>
+                result["size"] = new Dictionary<string, double>
                 {
                     ["width"] = size.Width,
                     ["height"] = size.Height
                 };
             }
 
-            return Task.FromResult<object>(new Dictionary<string, object>
-            {
-                ["status"] = "success",
-                ["element"] = elementDict,
-                ["content"] = infoMessage
-            });
+            return Task.FromResult<object>(result);
         }
         
         private static Task<object> ListNeighborsAsync(JsonElement parameters, string diagramsDirectory)
@@ -1904,15 +1901,12 @@ namespace DrawIO.MCP.STDIO
             return Task.FromResult<object>(new Dictionary<string, object>
             {
                 ["status"] = "success",
-                ["bounds"] = new Dictionary<string, double>
-                {
-                    ["minX"] = boundingBox.MinX,
-                    ["minY"] = boundingBox.MinY,
-                    ["maxX"] = boundingBox.MaxX,
-                    ["maxY"] = boundingBox.MaxY,
-                    ["width"] = boundingBox.Width,
-                    ["height"] = boundingBox.Height
-                },
+                ["minX"] = boundingBox.MinX,
+                ["minY"] = boundingBox.MinY,
+                ["maxX"] = boundingBox.MaxX,
+                ["maxY"] = boundingBox.MaxY,
+                ["width"] = boundingBox.Width,
+                ["height"] = boundingBox.Height,
                 ["content"] = boundsMessage
             });
         }
