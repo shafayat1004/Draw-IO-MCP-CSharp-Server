@@ -459,6 +459,20 @@ namespace DrawIO.MCP.STDIO.Tests
             Assert.True(resultObj.TryGetProperty("elementId", out var elementIdProp) && elementIdProp.ValueKind == JsonValueKind.String, "Result should contain a string 'elementId' (for the connector)");
             Assert.False(string.IsNullOrWhiteSpace(elementIdProp.GetString()), "elementId should not be empty");
             Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+
+            // Extract connector ID from the response
+            var connectResponseJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Connect Shapes Response: {connectResponseJson}");
+            
+            // Extract connector ID from elementId property
+            var connectResultObj = JsonDocument.Parse(connectResponseJson).RootElement;
+            string connectorId = "";
+            if (connectResultObj.TryGetProperty("elementId", out var connectElementIdProp) && connectElementIdProp.ValueKind == JsonValueKind.String)
+            {
+                connectorId = connectElementIdProp.GetString() ?? "";
+            }
+            Assert.False(string.IsNullOrEmpty(connectorId), "Failed to extract connector ID from connect_shapes response");
+            _output.WriteLine($"Extracted connector ID: {connectorId}");
         }
 
         [Fact]
@@ -1401,6 +1415,624 @@ namespace DrawIO.MCP.STDIO.Tests
                      textEl.ValueKind == JsonValueKind.String &&
                      textEl.GetString() != null && 
                      textEl.GetString()!.Contains($"Error:", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundErrorMessageInContent, "Content should contain an error message");
+        }
+
+        [Fact]
+        public async Task SetLineStyle_ShouldReturnSuccessMessageAndContent()
+        {
+            // Arrange: Create diagram and add a connector
+            string diagramName = $"line-style-test-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-line-style-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            
+            // Add two shapes and connect them to get a connector
+            string sourceId = await AddShapeAsync(diagramName, "Source", 50, 50);
+            string targetId = await AddShapeAsync(diagramName, "Target", 250, 50);
+            
+            // Connect shapes to create a connector
+            var connectRequest = new McpRequest
+            {
+                Id = "test-line-style-connect",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""connect_shapes"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""source_id"": ""{sourceId}"", ""target_id"": ""{targetId}"" }} }}").RootElement
+            };
+            var connectResponse = await _dispatcher.DispatchRequestAsync(connectRequest);
+            
+            // Extract connector ID from the response
+            var connectResponseJson = JsonSerializer.Serialize(connectResponse.Result);
+            _output.WriteLine($"Connect Shapes Response: {connectResponseJson}");
+            
+            // Extract connector ID from elementId property
+            var connectResultObj = JsonDocument.Parse(connectResponseJson).RootElement;
+            string connectorId = "";
+            if (connectResultObj.TryGetProperty("elementId", out var connectElementIdProp) && connectElementIdProp.ValueKind == JsonValueKind.String)
+            {
+                connectorId = connectElementIdProp.GetString() ?? "";
+            }
+            Assert.False(string.IsNullOrEmpty(connectorId), "Failed to extract connector ID from connect_shapes response");
+            _output.WriteLine($"Extracted connector ID: {connectorId}");
+
+            // Arrange: Prepare set_line_style request
+            var lineStyleRequest = new McpRequest
+            {
+                Id = "test-set-line-style",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""set_line_style"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{connectorId}"", ""line_style"": ""dashed"", ""line_width"": 2, ""routing_style"": ""orthogonal"", ""edge_style"": ""rounded"" }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(lineStyleRequest);
+
+            // Assert
+            Assert.Equal("test-set-line-style", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Set Line Style Response: {resultJson}");
+
+            // Assert specific response structure for success
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("status", out var statusProp) && statusProp.GetString() == "success", "Result should contain 'status: success'");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check that content has the right information
+            bool foundMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"Applied line style", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundMessageInContent, "Content should contain a message about applying line style");
+        }
+
+        [Fact]
+        public async Task SetLineStyle_InvalidConnectorId_ShouldReturnErrorResponse()
+        {
+            // Arrange: Create diagram
+            string diagramName = $"line-style-err-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-line-style-err-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            string invalidConnectorId = "non-existent-connector-id";
+
+            // Arrange: Prepare set_line_style request with invalid connector ID
+            var lineStyleRequest = new McpRequest
+            {
+                Id = "test-line-style-error",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""set_line_style"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{invalidConnectorId}"", ""line_style"": ""dashed"", ""line_width"": 2 }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(lineStyleRequest);
+
+            // Assert
+            Assert.Equal("test-line-style-error", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Set Line Style Error Response: {resultJson}");
+
+            // For set_line_style, we expect it to properly return an error for invalid IDs
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("isError", out var isErrorProp) && isErrorProp.GetBoolean() == true, "Result should contain 'isError' set to true");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check for specific error message in content
+            bool foundErrorMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundErrorMessageInContent, "Content should contain an error message");
+        }
+
+        [Fact]
+        public async Task SetArrowStyle_ShouldReturnSuccessMessageAndContent()
+        {
+            // Arrange: Create diagram and add a connector
+            string diagramName = $"arrow-style-test-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-arrow-style-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            
+            // Add two shapes and connect them to get a connector
+            string sourceId = await AddShapeAsync(diagramName, "Source", 50, 50);
+            string targetId = await AddShapeAsync(diagramName, "Target", 250, 50);
+            
+            // Connect shapes to create a connector
+            var connectRequest = new McpRequest
+            {
+                Id = "test-arrow-style-connect",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""connect_shapes"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""source_id"": ""{sourceId}"", ""target_id"": ""{targetId}"" }} }}").RootElement
+            };
+            var connectResponse = await _dispatcher.DispatchRequestAsync(connectRequest);
+            
+            // Extract connector ID from the response
+            var connectResponseJson = JsonSerializer.Serialize(connectResponse.Result);
+            _output.WriteLine($"Connect Shapes Response: {connectResponseJson}");
+            
+            // Extract connector ID from elementId property
+            var connectResultObj = JsonDocument.Parse(connectResponseJson).RootElement;
+            string connectorId = "";
+            if (connectResultObj.TryGetProperty("elementId", out var connectElementIdProp) && connectElementIdProp.ValueKind == JsonValueKind.String)
+            {
+                connectorId = connectElementIdProp.GetString() ?? "";
+            }
+            Assert.False(string.IsNullOrEmpty(connectorId), "Failed to extract connector ID from connect_shapes response");
+            _output.WriteLine($"Extracted connector ID: {connectorId}");
+
+            // Arrange: Prepare set_arrow_style request
+            var arrowStyleRequest = new McpRequest
+            {
+                Id = "test-set-arrow-style",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""set_arrow_style"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{connectorId}"", ""start_arrow"": ""diamond"", ""end_arrow"": ""classic"" }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(arrowStyleRequest);
+
+            // Assert
+            Assert.Equal("test-set-arrow-style", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Set Arrow Style Response: {resultJson}");
+
+            // Assert specific response structure for success
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("status", out var statusProp) && statusProp.GetString() == "success", "Result should contain 'status: success'");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check that content has the right information
+            bool foundMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"Applied arrow style", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundMessageInContent, "Content should contain a message about applying arrow style");
+        }
+
+        [Fact]
+        public async Task SetArrowStyle_InvalidConnectorId_ShouldReturnErrorResponse()
+        {
+            // Arrange: Create diagram
+            string diagramName = $"arrow-style-err-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-arrow-style-err-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            string invalidConnectorId = "non-existent-connector-id";
+
+            // Arrange: Prepare set_arrow_style request with invalid connector ID
+            var arrowStyleRequest = new McpRequest
+            {
+                Id = "test-arrow-style-error",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""set_arrow_style"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{invalidConnectorId}"", ""start_arrow"": ""diamond"", ""end_arrow"": ""classic"" }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(arrowStyleRequest);
+
+            // Assert
+            Assert.Equal("test-arrow-style-error", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Set Arrow Style Error Response: {resultJson}");
+
+            // For set_arrow_style, we expect it to properly return an error for invalid IDs
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("isError", out var isErrorProp) && isErrorProp.GetBoolean() == true, "Result should contain 'isError' set to true");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check for specific error message in content
+            bool foundErrorMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundErrorMessageInContent, "Content should contain an error message");
+        }
+
+        [Fact]
+        public async Task AddWaypoint_ShouldReturnSuccessMessageAndContent()
+        {
+            // Arrange: Create diagram and add a connector
+            string diagramName = $"waypoint-test-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-waypoint-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            
+            // Add two shapes and connect them to get a connector
+            string sourceId = await AddShapeAsync(diagramName, "Source", 50, 50);
+            string targetId = await AddShapeAsync(diagramName, "Target", 250, 50);
+            
+            // Connect shapes to create a connector
+            var connectRequest = new McpRequest
+            {
+                Id = "test-waypoint-connect",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""connect_shapes"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""source_id"": ""{sourceId}"", ""target_id"": ""{targetId}"" }} }}").RootElement
+            };
+            var connectResponse = await _dispatcher.DispatchRequestAsync(connectRequest);
+            
+            // Extract connector ID from the response
+            var connectResponseJson = JsonSerializer.Serialize(connectResponse.Result);
+            _output.WriteLine($"Connect Shapes Response: {connectResponseJson}");
+            
+            // Extract connector ID from elementId property
+            var connectResultObj = JsonDocument.Parse(connectResponseJson).RootElement;
+            string connectorId = "";
+            if (connectResultObj.TryGetProperty("elementId", out var connectElementIdProp) && connectElementIdProp.ValueKind == JsonValueKind.String)
+            {
+                connectorId = connectElementIdProp.GetString() ?? "";
+            }
+            Assert.False(string.IsNullOrEmpty(connectorId), "Failed to extract connector ID from connect_shapes response");
+            _output.WriteLine($"Extracted connector ID: {connectorId}");
+
+            // Arrange: Prepare add_waypoint request
+            var addWaypointRequest = new McpRequest
+            {
+                Id = "test-add-waypoint",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""add_waypoint"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{connectorId}"", ""x"": 150, ""y"": 100 }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(addWaypointRequest);
+
+            // Assert
+            Assert.Equal("test-add-waypoint", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Add Waypoint Response: {resultJson}");
+
+            // Assert specific response structure for success
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("status", out var statusProp) && statusProp.GetString() == "success", "Result should contain 'status: success'");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check that content has the right information
+            bool foundMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"Added waypoint", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundMessageInContent, "Content should contain a message about adding a waypoint");
+        }
+
+        [Fact]
+        public async Task AddWaypoint_InvalidConnectorId_ShouldReturnErrorResponse()
+        {
+            // Arrange: Create diagram
+            string diagramName = $"waypoint-err-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-waypoint-err-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            string invalidConnectorId = "non-existent-connector-id";
+
+            // Arrange: Prepare add_waypoint request with invalid connector ID
+            var waypointRequest = new McpRequest
+            {
+                Id = "test-waypoint-error",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""add_waypoint"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{invalidConnectorId}"", ""x"": 150, ""y"": 100 }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(waypointRequest);
+
+            // Assert
+            Assert.Equal("test-waypoint-error", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Add Waypoint Error Response: {resultJson}");
+
+            // For add_waypoint, we expect it to properly return an error for invalid IDs
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("isError", out var isErrorProp) && isErrorProp.GetBoolean() == true, "Result should contain 'isError' set to true");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check for specific error message in content
+            bool foundErrorMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundErrorMessageInContent, "Content should contain an error message");
+        }
+
+        [Fact]
+        public async Task GetWaypoints_ShouldReturnSuccessMessageAndContent()
+        {
+            // Arrange: Create diagram and add a connector with a waypoint
+            string diagramName = $"get-waypoints-test-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-get-waypoints-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            
+            // Add two shapes and connect them to get a connector
+            string sourceId = await AddShapeAsync(diagramName, "Source", 50, 50);
+            string targetId = await AddShapeAsync(diagramName, "Target", 250, 50);
+            
+            // Connect shapes to create a connector
+            var connectRequest = new McpRequest
+            {
+                Id = "test-get-waypoints-connect",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""connect_shapes"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""source_id"": ""{sourceId}"", ""target_id"": ""{targetId}"" }} }}").RootElement
+            };
+            var connectResponse = await _dispatcher.DispatchRequestAsync(connectRequest);
+            
+            // Extract connector ID from the response
+            var connectResponseJson = JsonSerializer.Serialize(connectResponse.Result);
+            _output.WriteLine($"Connect Shapes Response: {connectResponseJson}");
+            
+            // Extract connector ID from elementId property
+            var connectResultObj = JsonDocument.Parse(connectResponseJson).RootElement;
+            string connectorId = "";
+            if (connectResultObj.TryGetProperty("elementId", out var connectElementIdProp) && connectElementIdProp.ValueKind == JsonValueKind.String)
+            {
+                connectorId = connectElementIdProp.GetString() ?? "";
+            }
+            Assert.False(string.IsNullOrEmpty(connectorId), "Failed to extract connector ID from connect_shapes response");
+            _output.WriteLine($"Extracted connector ID: {connectorId}");
+
+            // Add a waypoint to the connector
+            var addWaypointRequest = new McpRequest
+            {
+                Id = "test-get-waypoints-add",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""add_waypoint"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{connectorId}"", ""x"": 150, ""y"": 100 }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(addWaypointRequest);
+
+            // Arrange: Prepare get_waypoints request
+            var getWaypointsRequest = new McpRequest
+            {
+                Id = "test-get-waypoints",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""get_waypoints"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{connectorId}"" }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(getWaypointsRequest);
+
+            // Assert
+            Assert.Equal("test-get-waypoints", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Get Waypoints Response: {resultJson}");
+
+            // Assert specific response structure for success
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("status", out var statusProp) && statusProp.GetString() == "success", "Result should contain 'status: success'");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check that content has the right information
+            bool foundMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"waypoint", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundMessageInContent, "Content should contain information about waypoints");
+        }
+
+        [Fact]
+        public async Task GetWaypoints_InvalidConnectorId_ShouldReturnErrorResponse()
+        {
+            // Arrange: Create diagram
+            string diagramName = $"get-waypoints-err-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-get-waypoints-err-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            string invalidConnectorId = "non-existent-connector-id";
+
+            // Arrange: Prepare get_waypoints request with invalid connector ID
+            var waypointsRequest = new McpRequest
+            {
+                Id = "test-get-waypoints-error",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""get_waypoints"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""connector_id"": ""{invalidConnectorId}"" }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(waypointsRequest);
+
+            // Assert
+            Assert.Equal("test-get-waypoints-error", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Get Waypoints Error Response: {resultJson}");
+
+            // For get_waypoints, we expect it to properly return an error for invalid IDs
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("isError", out var isErrorProp) && isErrorProp.GetBoolean() == true, "Result should contain 'isError' set to true");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check for specific error message in content
+            bool foundErrorMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundErrorMessageInContent, "Content should contain an error message");
+        }
+
+        [Fact]
+        public async Task ResizeShape_ShouldReturnSuccessMessageAndContent()
+        {
+            // Arrange: Create diagram and shape
+            string diagramName = $"resize-shape-test-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-resize-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            string shapeId = await AddShapeAsync(diagramName, "ResizeMe", 50, 50);
+
+            // Arrange: Prepare resize_shape request
+            var resizeRequest = new McpRequest
+            {
+                Id = "test-resize-shape",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""resize_shape"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""shape_id"": ""{shapeId}"", ""width"": 180, ""height"": 90 }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(resizeRequest);
+
+            // Assert
+            Assert.Equal("test-resize-shape", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Resize Shape Response: {resultJson}");
+
+            // Assert specific response structure for success
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("status", out var statusProp) && statusProp.GetString() == "success", "Result should contain 'status: success'");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check that content has the right information
+            bool foundMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"resized", StringComparison.OrdinalIgnoreCase));
+            Assert.True(foundMessageInContent, "Content should contain a message about resizing the shape");
+        }
+
+        [Fact]
+        public async Task ResizeShape_InvalidShapeId_ShouldReturnErrorResponse()
+        {
+            // Arrange: Create diagram
+            string diagramName = $"resize-shape-err-{Guid.NewGuid()}.drawio";
+            var createRequest = new McpRequest
+            {
+                Id = "test-resize-err-create",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""create_new_diagram"", ""parameters"": {{ ""name"": ""{diagramName}"" }} }}").RootElement
+            };
+            await _dispatcher.DispatchRequestAsync(createRequest);
+            string invalidShapeId = "non-existent-shape-id";
+
+            // Arrange: Prepare resize_shape request with invalid shape ID
+            var resizeRequest = new McpRequest
+            {
+                Id = "test-resize-shape-error",
+                JsonRpc = "2.0",
+                Method = "tools/execute",
+                Params = JsonDocument.Parse($@"{{ ""tool"": ""resize_shape"", ""parameters"": {{ ""diagram"": ""{diagramName}"", ""shape_id"": ""{invalidShapeId}"", ""width"": 180, ""height"": 90 }} }}").RootElement
+            };
+
+            // Act
+            var response = await _dispatcher.DispatchRequestAsync(resizeRequest);
+
+            // Assert
+            Assert.Equal("test-resize-shape-error", response.Id);
+            Assert.Equal("2.0", response.JsonRpc);
+            Assert.NotNull(response.Result);
+            Assert.Null(response.Error);
+
+            var resultJson = JsonSerializer.Serialize(response.Result);
+            _output.WriteLine($"Resize Shape Error Response: {resultJson}");
+
+            // For resize_shape, we expect it to properly return an error for invalid IDs
+            var resultObj = JsonDocument.Parse(resultJson).RootElement;
+            Assert.True(resultObj.TryGetProperty("isError", out var isErrorProp) && isErrorProp.GetBoolean() == true, "Result should contain 'isError' set to true");
+            Assert.True(resultObj.TryGetProperty("content", out var contentProp) && contentProp.ValueKind == JsonValueKind.Array, "Result should contain a 'content' array");
+            
+            // Check for specific error message in content
+            bool foundErrorMessageInContent = contentProp.EnumerateArray()
+                .Any(item => item.TryGetProperty("text", out var textEl) &&
+                     textEl.ValueKind == JsonValueKind.String &&
+                     textEl.GetString() != null && 
+                     textEl.GetString()!.Contains($"Error", StringComparison.OrdinalIgnoreCase));
             Assert.True(foundErrorMessageInContent, "Content should contain an error message");
         }
     }
