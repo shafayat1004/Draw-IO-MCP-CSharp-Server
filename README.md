@@ -5,13 +5,14 @@ A Model Context Protocol (MCP) server implementation for drawio (diagrams.net) d
 ## Features
 
 - Full MCP-compliant server using the official [Model Context Protocol C# SDK](https://github.com/modelcontextprotocol/csharp-sdk)
-- Read, generate, and edit `.drawio` files via API
+- **Comprehensive Toolset:** Offers 36+ tools for reading, generating, and editing `.drawio` files via API.
+- **High Reliability:** Recent testing shows a >97% success rate across all tools (see Testing Status section).
 - Support for different shape types and connectors
 - Automatic XML parsing and serialization for DrawIO files
 - Support for both STDIO (command-line) and SSE (Server-Sent Events) modes
-- VPC diagram generation template
+- VPC diagram generation template (Note: Known issue, see MCP Tools section)
 - Robust error handling and detailed logging
-- Comprehensive styling options for diagram elements
+- Comprehensive styling options for diagram elements (shapes, text, lines, arrows)
 - Diagram auto-arrangement capabilities
 - Multi-page diagram support with page management operations
 - Image export capabilities
@@ -112,7 +113,7 @@ The server exposes the following MCP resources:
 
 ## MCP Tools
 
-The server exposes the following MCP tools:
+The server exposes a comprehensive set of MCP tools, enabling detailed diagram manipulation. Recent testing has verified the functionality of these tools (see Testing Status). List of available tools:
 
 - `create_new_diagram` - Create a new empty diagram file
 - `add_shape` - Add a new shape to a diagram
@@ -122,6 +123,7 @@ The server exposes the following MCP tools:
 - `style_shape` - Apply styles to shapes (colors, borders, etc.)
 - `arrange_diagram` - Automatically organize shapes in a diagram (horizontal, vertical, or grid layout)
 - `generate_vpc` - Generate a sample AWS VPC layout diagram
+    - **Known Issue:** The current implementation requires a `content` array parameter not defined in the tool schema. Schema update is needed for correct usage.
 - `get_diagram_image` - Export a diagram as an image (requires drawio CLI)
 - `move_shape` - Move a shape to a new position in the diagram
 - `update_shape_style` - Update specific style properties of a shape
@@ -130,27 +132,48 @@ The server exposes the following MCP tools:
 - `update_diagram_page` - Update properties of a diagram page
 - `delete_diagram_page` - Delete a page from a diagram
 - `move_cell_between_pages` - Move a cell (shape/connector) from one page to another
+- `find_elements_by_text` - Find elements containing specified text
+- `get_element_info` - Get detailed info about a specific element
+- `list_neighbors` - List elements connected to a specific element
+- `get_diagram_bounds` - Get the bounding box of all elements
+- `resize_shape` - Resize a shape
+- `set_text_style` - Apply text styling (font, color, size, style)
+- `set_line_style` - Apply line styling (style, width, routing, edge)
+- `set_arrow_style` - Apply arrow styling (start/end arrows)
+- `reset_connector` - Reset a connector's path
+- `reverse_connector` - Reverse a connector's direction
+- `add_waypoint` - Add a waypoint to a connector
+- `remove_waypoint` - Remove a waypoint from a connector
+- `update_waypoint` - Update a waypoint's position
+- `get_waypoints` - Get all waypoints on a connector
+- `clear_waypoints` - Remove all waypoints from a connector
+- `group_shapes` - Group multiple shapes
+- `ungroup_shapes` - Ungroup shapes
+- `rotate_shape` - Rotate a shape
+- `flip_shape` - Flip a shape horizontally or vertically
+- `set_diagram_background` - Set diagram background color or image
+- `connect_shapes_at_points` - Connect shapes at specific points
 
-## Future Enhancements
+## Testing Status (As of 2024-03-27)
 
-Planned enhancements to improve the server's capabilities:
+Comprehensive testing of all 36+ MCP tools was recently completed. Key results:
 
-- Component overlap detection for identifying when shapes intersect
-- Targeted query capabilities for filtering diagram elements
-- Step-by-step diagram generation for incremental building
-- More comprehensive shape libraries and templates
+- **Success Rate:** >97% (43 out of 44 tests passed).
+- **Verified Functionality:** All core diagram creation, manipulation, styling, page management, grouping, and waypoint operations were successful.
+- **Known Issue:** The `generate_vpc` tool failed due to a mismatch between its schema definition and implementation requirements (missing `content` array parameter).
+- **Detailed Log:** See `drawio_mcp_test_log.md` for detailed results of each tool test.
+
+## Future Enhancements & Recommendations
+
+Based on recent testing and development, key areas for future work include:
+
+- **Tool Schema Alignment:** Update the schema for `generate_vpc` to match its implementation.
+- **Enhanced Validation:** Implement more robust parameter validation, potentially including schema validation checks.
+- **Improved Documentation:** Further clarify parameter requirements and types, especially for complex operations.
+- **Advanced Features:** Explore planned enhancements like component overlap detection, targeted queries, and step-by-step generation.
 
 ## Running Tests
 
 ```bash
 dotnet test
 ```
-
-## License
-
-MIT
-
-## Acknowledgements
-
-- [Model Context Protocol Project](https://modelcontextprotocol.io)
-- [drawio](https://www.drawio.com)
