@@ -1,7 +1,7 @@
 ---
 description: 
-globs: 
-alwaysApply: true
+globs: *.fs,*.cs,*.fsproj,*.csproj,*.md,*.drawio,*.json
+alwaysApply: false
 ---
 # DrawIO MCP Server Project Rules
 
