@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Library.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="XmlParser.fs" />
+    <Compile Include="XmlSerializer.fs" />
+    <Compile Include="DiagramManipulation.fs" />
+    <Compile Include="FileOperations.fs" />
     <Compile Include="ShapeLibrary.fs" />
   </ItemGroup>
 

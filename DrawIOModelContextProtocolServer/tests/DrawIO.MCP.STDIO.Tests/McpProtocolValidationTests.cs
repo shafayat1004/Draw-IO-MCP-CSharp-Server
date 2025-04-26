@@ -265,7 +265,7 @@ namespace DrawIO.MCP.STDIO.Tests
             {
                 if (item.TryGetProperty("text", out var textEl))
                 {
-                    string text = textEl.GetString();
+                    string? text = textEl.GetString();
                     if (text != null && text.Contains("name", StringComparison.OrdinalIgnoreCase))
                     {
                         foundErrorMessage = true;
