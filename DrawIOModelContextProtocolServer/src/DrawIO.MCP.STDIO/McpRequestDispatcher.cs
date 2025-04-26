@@ -379,7 +379,7 @@ namespace DrawIO.MCP.STDIO
             {
                 // Return a list of all diagrams
                 var files = Directory.GetFiles(_diagramsDirectory, "*.drawio")
-                    .Select(f => Path.GetFileName(f))
+                    .Select(Path.GetFileName)
                     .ToList();
                 
                 return Task.FromResult<object>(new
